@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Detalnaya stranitsa zayavki">
+  <title>Заявка #A-2356 - Tutash Hududlar Reestri</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Основная навигация">
+      <a class="brand" href="index.html"><span class="brand-mark">T</span><span><strong>Tutash hududlar reestri</strong><small>Кабинет предпринимателя</small></span></a>
+      <nav class="nav-list">
+        <a class="nav-link" href="index.html"><span class="nav-icon">H</span><span>Главная страница</span></a>
+        <a class="nav-link" href="create-request.html"><span class="nav-icon">R</span><span>Запросить договор</span></a>
+        <a class="nav-link active" href="request-detail.html"><span class="nav-icon">A</span><span>Заявка на договор</span></a>
+      </nav>
+    </aside>
+
+    <div class="content">
+      <header class="topbar">
+        <a class="back-link" href="index.html">&larr; Назад</a>
+        <div class="breadcrumb">Заявка #A-2356</div>
+        <div class="user-card"><span class="user-avatar">С</span><span>Сардорбек</span></div>
+      </header>
+
+      <main>
+        <section class="detail-hero">
+          <div>
+            <p class="eyebrow">Show page</p>
+            <h1>Заявка #A-2356</h1>
+            <p>Терраса в Фергане, зона 12. Создана 12.06.2026.</p>
+          </div>
+          <span class="status pending">На рассмотрении</span>
+        </section>
+
+        <div class="detail-actions">
+          <a class="secondary-button" href="#request-history-drawer">Открыть историю заявки</a>
+        </div>
+
+        <div class="detail-grid">
+          <section class="panel">
+            <div class="panel-heading"><h2>Основные данные</h2><a class="row-link" href="create-request.html">Редактировать</a></div>
+            <div class="detail-list">
+              <div><span>Заявитель</span><strong>Сардорбек Абдуллаев</strong></div>
+              <div><span>Регион</span><strong>Ферганская область</strong></div>
+              <div><span>Зона</span><strong>Зона 12</strong></div>
+              <div><span>Площадь</span><strong>24 м²</strong></div>
+              <div><span>Тип деятельности</span><strong>Кафе / общепит</strong></div>
+              <div><span>Ориентир</span><strong>ул. Мустакиллик, возле парка</strong></div>
+            </div>
+          </section>
+
+          <aside class="panel">
+            <div class="panel-heading"><h2>Статус</h2></div>
+            <ol class="timeline">
+              <li class="done"><strong>Заявка создана</strong><span>12.06.2026, 09:30</span></li>
+              <li class="done"><strong>Документы приняты</strong><span>12.06.2026, 10:15</span></li>
+              <li class="current"><strong>Проверка зоны</strong><span>В процессе</span></li>
+              <li><strong>Подготовка договора</strong><span>Следующий шаг</span></li>
+            </ol>
+          </aside>
+        </div>
+
+        <section class="panel table-panel">
+          <div class="panel-heading">
+            <h2>Карта и расположение</h2>
+            <a class="secondary-button" href="#map-detail-modal">Открыть крупно</a>
+          </div>
+          <div class="map-layout">
+            <div class="map-preview inline-map">
+              <span class="map-pin pin-one">12</span>
+              <span class="map-pin pin-two">04</span>
+              <span class="map-pin pin-three">09</span>
+            </div>
+            <div class="detail-list compact map-details">
+              <div><span>Выбранная зона</span><strong>Зона 12</strong></div>
+              <div><span>Статус зоны</span><strong>Свободна, ожидает проверки</strong></div>
+              <div><span>Адрес</span><strong>Фергана, ул. Мустакиллик, возле парка</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="panel-heading">
+            <h2>Прикрепленные документы</h2>
+            <a class="secondary-button" href="#upload-modal">Добавить документ</a>
+          </div>
+          <div class="document-grid">
+            <article><strong>passport.pdf</strong><span>Паспорт или ID-карта</span></article>
+            <article><strong>certificate.pdf</strong><span>Свидетельство ИП</span></article>
+            <article><strong>terrace-plan.png</strong><span>Схема террасы</span></article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <section class="modal" id="upload-modal" aria-labelledby="upload-title">
+    <a class="modal-backdrop" href="#" aria-label="Закрыть"></a>
+    <div class="modal-dialog" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="upload-title">Добавить документ</h2>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </div>
+      <form class="form-grid">
+        <label><span>Тип документа</span><select><option>Дополнительная схема</option><option>Доверенность</option><option>Прочее</option></select></label>
+        <label class="upload-box"><input type="file"><span>Выберите файл</span><small>PDF, JPG, PNG до 10 МБ</small></label>
+        <div class="form-actions">
+          <a class="ghost-button" href="#">Отмена</a>
+          <button class="primary-button" type="submit">Загрузить</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  <section class="modal" id="map-detail-modal" aria-labelledby="map-detail-title">
+    <a class="modal-backdrop" href="#" aria-label="Закрыть"></a>
+    <div class="modal-dialog modal-wide" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="map-detail-title">Карта зоны 12</h2>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </div>
+      <div class="map-preview">
+        <span class="map-pin pin-one">12</span>
+        <span class="map-pin pin-two">04</span>
+        <span class="map-pin pin-three">09</span>
+      </div>
+    </div>
+  </section>
+  <section class="side-drawer" id="request-history-drawer" aria-labelledby="drawer-title">
+    <a class="drawer-backdrop" href="#" aria-label="Закрыть"></a>
+    <aside class="drawer-panel" role="dialog" aria-modal="true">
+      <header class="drawer-header">
+        <div>
+          <p class="eyebrow">Кадастровые участки</p>
+          <h2 id="drawer-title">Заявка #A-2356</h2>
+        </div>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </header>
+      <div class="drawer-tabs" role="tablist" aria-label="Разделы заявки">
+        <button type="button" role="tab" data-drawer-tab="summary">Общий</button>
+        <button class="active" type="button" role="tab" data-drawer-tab="history">История</button>
+        <button type="button" role="tab" data-drawer-tab="actions">Действия</button>
+      </div>
+      <div class="drawer-body drawer-tab-panel active" data-drawer-panel="history">
+        <ol class="drawer-timeline">
+          <li class="done"><time>19.05.2025<br>15:42</time><div class="timeline-card"><h3>Заявка подана</h3><p>Предприниматель: “Polatov Boysun Gazovich” MCHJ</p><p>+99897 777 77 77</p><div class="object-info"><strong>Информация об объекте</strong><span>Область: г. Ташкент</span><span>Район: Шайхантахурский район</span><span>Адрес: ул. Пайтахт, 1А</span><span>Тип объекта: Прилегающая территория</span><span>Кадастр: 2553772772:2672/01</span></div></div></li>
+          <li class="done"><time>19.05.2025<br>16:10</time><div class="timeline-card"><h3>Заявка принята на проверку</h3><p>Регулятор: Иванов А.А. +99890 888 88 88</p></div></li>
+          <li class="done"><time>20.05.2025<br>10:05</time><div class="timeline-card"><h3>Назначен районный сотрудник</h3><p>Районный инспектор: Абдуллаев Б.Р.</p><div class="drawer-media-grid"><span></span><span></span><span></span></div><div class="drawer-map-preview"><span class="drawer-polygon"></span></div></div></li>
+          <li class="done"><time>21.05.2025<br>11:10</time><div class="timeline-card"><h3>Проверено обследование объекта</h3><p>A сторона: 8 м, B сторона: 10 м, площадь: 80 м²</p><div class="drawer-location-map"></div></div></li>
+          <li class="done"><time>22.05.2025<br>14:10</time><div class="timeline-card"><h3>Договор подписан</h3><p>Предприниматель: “Polatov Boysun Gazovich” MCHJ</p></div></li>
+          <li class="done"><time>23.05.2025<br>09:18</time><div class="timeline-card"><h3>Инвойс выставлен и оплачен</h3><div class="pdf-card"><span>PDF</span><strong>Счет_02356_308569478_19...</strong><small>3.0 mb</small></div></div></li>
+          <li class="done"><time>23.05.2025<br>10:00</time><div class="timeline-card"><h3>Процесс завершён</h3><span class="status paid">Закреплена</span></div></li>
+        </ol>
+      </div>
+      <div class="drawer-body drawer-tab-panel" data-drawer-panel="summary">
+        <div class="drawer-summary">
+          <div><span>№ заявки</span><strong>#A-2356</strong></div>
+          <div><span>Адрес участка</span><strong>ул. Пайтахт, 1А</strong></div>
+          <div><span>Площадь</span><strong>80 м²</strong></div>
+          <div><span>Статус участка</span><strong>Закреплена</strong></div>
+          <div><span>Проверка границ</span><strong>Проверено</strong></div>
+          <div><span>Кадастр</span><strong>2553772772:2672/01</strong></div>
+        </div>
+      </div>
+      <div class="drawer-body drawer-tab-panel" data-drawer-panel="actions">
+        <div class="drawer-action-list">
+          <a href="request-detail.html">Открыть страницу заявки</a>
+          <a href="#upload-modal">Добавить документ</a>
+          <a href="#upload-modal">Добавить документ</a>
+          <a href="#map-detail-modal">Открыть карту</a>
+        </div>
+      </div>
+    </aside>
+  </section>
+  <script src="app.js"></script>
+</body>
+</html>

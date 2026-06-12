@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kabinet predprinimatelya dlya Tutash Hududlar reestri">
+  <title>Tutash Hududlar Reestri</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Основная навигация">
+      <a class="brand" href="index.html" aria-label="Tutash Hududlar Reestri">
+        <span class="brand-mark" aria-hidden="true">T</span>
+        <span>
+          <strong>Tutash hududlar reestri</strong>
+          <small>Кабинет предпринимателя</small>
+        </span>
+      </a>
+
+      <nav class="nav-list">
+        <a class="nav-link active" href="index.html">
+          <span class="nav-icon" aria-hidden="true">H</span>
+          <span>Главная страница</span>
+        </a>
+        <a class="nav-link" href="create-request.html">
+          <span class="nav-icon" aria-hidden="true">R</span>
+          <span>Запросить договор</span>
+        </a>
+        <a class="nav-link" href="request-detail.html">
+          <span class="nav-icon" aria-hidden="true">A</span>
+          <span>Заявка на договор</span>
+        </a>
+  
+    
+      </nav>
+    </aside>
+
+    <div class="content">
+      <header class="topbar">
+        <button class="menu-button" type="button" aria-label="Открыть меню">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="breadcrumb">Главная страница</div>
+        <div class="user-card" aria-label="Профиль пользователя">
+          <span class="user-avatar" aria-hidden="true">С</span>
+          <span>Сардорбек</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="welcome" aria-labelledby="welcome-title">
+          <div>
+            <p class="eyebrow">Кабинет предпринимателя</p>
+            <h1 id="welcome-title">Добро пожаловать, Сардорбек!</h1>
+            <p>Ваше текущее состояние по террасам и договорам</p>
+          </div>
+        </section>
+
+        <section class="metrics" aria-label="Финансовые показатели">
+          <article class="metric-card danger">
+            <span>Невыполненные инвойсы - 3</span>
+            <strong>12.5 млн сум</strong>
+            <a href="#pay-invoice">Оплатить <span aria-hidden="true">&rarr;</span></a>
+          </article>
+          <article class="metric-card warning">
+            <span>Просроченные инвойсы - 1</span>
+            <strong>4.1 млн сум</strong>
+            <a href="#invoice-warning">Внимание <span aria-hidden="true">&rarr;</span></a>
+          </article>
+          <article class="metric-card success">
+            <span>Активные договоры</span>
+            <strong>8</strong>
+            <a href="#invoice-warning">Посмотреть <span aria-hidden="true">&rarr;</span></a>
+          </article>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="panel actions-panel" aria-labelledby="actions-title">
+            <div class="panel-heading">
+              <h2 id="actions-title">Быстрое действие</h2>
+              <a class="icon-button" href="#action-menu" aria-label="Дополнительные действия">&hellip;</a>
+            </div>
+
+            <div class="action-list">
+              <a class="action-card" href="create-request.html">
+                <span class="action-illustration document" aria-hidden="true"></span>
+                <span class="action-text">
+                  <strong>Подать заявку</strong>
+                  <small>Создание новой заявки на террасу</small>
+                </span>
+                <span class="action-arrow" aria-hidden="true">&rsaquo;</span>
+              </a>
+
+              <a class="action-card" href="#map-modal">
+                <span class="action-illustration map" aria-hidden="true"></span>
+                <span class="action-text">
+                  <strong>Открыть карту</strong>
+                  <small>Просмотр доступных зон</small>
+                </span>
+                <span class="action-arrow" aria-hidden="true">&rsaquo;</span>
+              </a>
+
+              <a class="action-card" href="#pay-invoice">
+                <span class="action-illustration invoice" aria-hidden="true"></span>
+                <span class="action-text">
+                  <strong>Оплатить инвойс</strong>
+                  <small>Быстрая оплата задолженности</small>
+                </span>
+                <span class="action-arrow" aria-hidden="true">&rsaquo;</span>
+              </a>
+            </div>
+          </section>
+
+          <section class="panel requests-panel" aria-labelledby="requests-title">
+            <div class="panel-heading">
+              <h2 id="requests-title">Заявки</h2>
+              <a class="text-link" href="request-detail.html">Все</a>
+            </div>
+
+            <div class="request-list">
+              <a class="request-item" href="#request-history-drawer">
+                <span>№ заявки</span>
+                <strong>#A-2356</strong>
+              </a>
+              <a class="request-item" href="#request-history-drawer">
+                <span>№ заявки</span>
+                <strong>#A-2290</strong>
+              </a>
+              <a class="request-item" href="#request-history-drawer">
+                <span>№ заявки</span>
+                <strong>#A-6478</strong>
+              </a>
+              <a class="request-item" href="#request-history-drawer">
+                <span>№ заявки</span>
+                <strong>#A-6479</strong>
+              </a>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel table-panel" aria-labelledby="contracts-title">
+          <div class="panel-heading">
+            <h2 id="contracts-title">Последние договоры</h2>
+            <a class="secondary-button" href="#report-modal">Скачать отчет</a>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr class="clickable-row" data-href="#invoice-warning" tabindex="0">
+                  <th>Номер</th>
+                  <th>Терраса</th>
+                  <th>Статус</th>
+                  <th>Инвойс</th>
+                  <th>Сумма</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="clickable-row" data-href="#invoice-warning" tabindex="0">
+                  <td>#TR-1048</td>
+                  <td>Фергана, зона 12</td>
+                  <td><span class="status paid">Активен</span></td>
+                  <td>Оплачен</td>
+                  <td>2.5 млн сум</td>
+                  <td><a class="row-link" href="#invoice-warning">Детали</a></td>
+                </tr>
+                <tr class="clickable-row" data-href="#invoice-warning" tabindex="0">
+                  <td>#TR-1036</td>
+                  <td>Маргилан, зона 04</td>
+                  <td><span class="status pending">Ожидает</span></td>
+                  <td>В обработке</td>
+                  <td>1.8 млн сум</td>
+                  <td><a class="row-link" href="#invoice-warning">Детали</a></td>
+                </tr>
+                <tr>
+                  <td>#TR-1021</td>
+                  <td>Коканд, зона 09</td>
+                  <td><span class="status late">Просрочен</span></td>
+                  <td>Не оплачен</td>
+                  <td>4.1 млн сум</td>
+                  <td><a class="row-link" href="#invoice-warning">Детали</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <section class="modal" id="pay-invoice" aria-labelledby="pay-invoice-title">
+    <a class="modal-backdrop" href="#" aria-label="Закрыть"></a>
+    <div class="modal-dialog" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="pay-invoice-title">Оплата инвойса</h2>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </div>
+      <form class="form-grid">
+        <label>
+          <span>Номер инвойса</span>
+          <select>
+            <option>INV-2026-0148 - 4.1 млн сум</option>
+            <option>INV-2026-0132 - 2.5 млн сум</option>
+            <option>INV-2026-0119 - 5.9 млн сум</option>
+          </select>
+        </label>
+        <label>
+          <span>Способ оплаты</span>
+          <select>
+            <option>Банковская карта</option>
+            <option>Расчетный счет</option>
+            <option>Payme / Click</option>
+          </select>
+        </label>
+        <label>
+          <span>Сумма</span>
+          <input type="text" value="4 100 000 сум">
+        </label>
+        <label>
+          <span>Комментарий</span>
+          <textarea rows="3" placeholder="Например: оплата за июнь"></textarea>
+        </label>
+        <div class="form-actions">
+          <a class="ghost-button" href="#">Отмена</a>
+          <button class="primary-button" type="submit">Оплатить</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="modal" id="map-modal" aria-labelledby="map-title">
+    <a class="modal-backdrop" href="#" aria-label="Закрыть"></a>
+    <div class="modal-dialog modal-wide" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="map-title">Карта доступных зон</h2>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </div>
+      <div class="map-preview">
+        <span class="map-pin pin-one">12</span>
+        <span class="map-pin pin-two">04</span>
+        <span class="map-pin pin-three">09</span>
+      </div>
+      <div class="modal-foot">
+        <p>Выберите свободную зону при создании заявки.</p>
+        <a class="primary-button" href="create-request.html">Создать заявку</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="modal" id="invoice-warning" aria-labelledby="warning-title">
+    <a class="modal-backdrop" href="#" aria-label="Закрыть"></a>
+    <div class="modal-dialog" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="warning-title">Просроченный инвойс</h2>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </div>
+      <div class="detail-list compact">
+        <div><span>Инвойс</span><strong>INV-2026-0148</strong></div>
+        <div><span>Договор</span><strong>#TR-1021</strong></div>
+        <div><span>Срок оплаты</span><strong>10.06.2026</strong></div>
+        <div><span>Сумма</span><strong>4.1 млн сум</strong></div>
+      </div>
+      <div class="form-actions">
+        <a class="ghost-button" href="#request-history-drawer">Открыть историю</a>
+        <a class="primary-button" href="#pay-invoice">Оплатить</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="modal" id="report-modal" aria-labelledby="report-title">
+    <a class="modal-backdrop" href="#" aria-label="Закрыть"></a>
+    <div class="modal-dialog" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="report-title">Скачать отчет</h2>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </div>
+      <form class="form-grid">
+        <label>
+          <span>Период</span>
+          <select>
+            <option>Текущий месяц</option>
+            <option>Последние 3 месяца</option>
+            <option>2026 год</option>
+          </select>
+        </label>
+        <label>
+          <span>Формат</span>
+          <select>
+            <option>PDF</option>
+            <option>XLSX</option>
+          </select>
+        </label>
+        <div class="form-actions">
+          <a class="ghost-button" href="#">Отмена</a>
+          <button class="primary-button" type="submit">Скачать</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="modal" id="action-menu" aria-labelledby="action-menu-title">
+    <a class="modal-backdrop" href="#" aria-label="Закрыть"></a>
+    <div class="modal-dialog small" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="action-menu-title">Действия</h2>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </div>
+      <div class="menu-stack">
+        <a href="create-request.html">Новая заявка</a>
+        <a href="#map-modal">Открыть карту</a>
+        <a href="#pay-invoice">Оплатить инвойс</a>
+      </div>
+    </div>
+  </section>
+  <section class="side-drawer" id="request-history-drawer" aria-labelledby="drawer-title">
+    <a class="drawer-backdrop" href="#" aria-label="Закрыть"></a>
+    <aside class="drawer-panel" role="dialog" aria-modal="true">
+      <header class="drawer-header">
+        <div>
+          <p class="eyebrow">Кадастровые участки</p>
+          <h2 id="drawer-title">Заявка #A-2356</h2>
+        </div>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </header>
+      <div class="drawer-tabs" role="tablist" aria-label="Разделы заявки">
+        <button type="button" role="tab" data-drawer-tab="summary">Общий</button>
+        <button class="active" type="button" role="tab" data-drawer-tab="history">История</button>
+        <button type="button" role="tab" data-drawer-tab="actions">Действия</button>
+      </div>
+      <div class="drawer-body drawer-tab-panel active" data-drawer-panel="history">
+        <ol class="drawer-timeline">
+          <li class="done">
+            <time>19.05.2025<br>15:42</time>
+            <div class="timeline-card">
+              <h3>Заявка подана</h3>
+              <p>Предприниматель: “Polatov Boysun Gazovich” MCHJ</p>
+              <p>+99897 777 77 77</p>
+              <div class="object-info">
+                <strong>Информация об объекте</strong>
+                <span>Область: г. Ташкент</span>
+                <span>Район: Шайхантахурский район</span>
+                <span>Адрес: ул. Пайтахт, 1А</span>
+                <span>Тип объекта: Прилегающая территория</span>
+                <span>Цена за 1 кв.м: 15РВ</span>
+                <span>Кадастр: 2553772772:2672/01</span>
+              </div>
+            </div>
+          </li>
+          <li class="done">
+            <time>19.05.2025<br>16:10</time>
+            <div class="timeline-card">
+              <h3>Заявка принята на проверку</h3>
+              <p>Регулятор: Иванов А.А. +99890 888 88 88</p>
+            </div>
+          </li>
+          <li class="done">
+            <time>20.05.2025<br>10:05</time>
+            <div class="timeline-card">
+              <h3>Назначен районный сотрудник</h3>
+              <p>Районный инспектор: Абдуллаев Б.Р.</p>
+              <div class="drawer-media-grid">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="drawer-map-preview">
+                <span class="drawer-polygon"></span>
+              </div>
+            </div>
+          </li>
+          <li class="done">
+            <time>21.05.2025<br>11:10</time>
+            <div class="timeline-card">
+              <h3>Проверено обследование объекта</h3>
+              <p>A сторона: 8 м, B сторона: 10 м, площадь: 80 м²</p>
+              <div class="drawer-location-map"></div>
+            </div>
+          </li>
+          <li class="done">
+            <time>22.05.2025<br>14:10</time>
+            <div class="timeline-card">
+              <h3>Договор подписан</h3>
+              <p>Предприниматель: “Polatov Boysun Gazovich” MCHJ</p>
+            </div>
+          </li>
+          <li class="done">
+            <time>23.05.2025<br>09:18</time>
+            <div class="timeline-card">
+              <h3>Инвойс выставлен и оплачен</h3>
+              <div class="pdf-card"><span>PDF</span><strong>Счет_02356_308569478_19...</strong><small>3.0 mb</small></div>
+            </div>
+          </li>
+          <li class="done">
+            <time>23.05.2025<br>10:00</time>
+            <div class="timeline-card">
+              <h3>Процесс завершён</h3>
+              <span class="status paid">Закреплена</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div class="drawer-body drawer-tab-panel" data-drawer-panel="summary">
+        <div class="drawer-summary">
+          <div><span>№ заявки</span><strong>#A-2356</strong></div>
+          <div><span>Адрес участка</span><strong>ул. Пайтахт, 1А</strong></div>
+          <div><span>Площадь</span><strong>80 м²</strong></div>
+          <div><span>Статус участка</span><strong>Закреплена</strong></div>
+          <div><span>Проверка границ</span><strong>Проверено</strong></div>
+          <div><span>Кадастр</span><strong>2553772772:2672/01</strong></div>
+        </div>
+      </div>
+      <div class="drawer-body drawer-tab-panel" data-drawer-panel="actions">
+        <div class="drawer-action-list">
+          <a href="request-detail.html">Открыть страницу заявки</a>
+          <a href="#invoice-warning">Открыть инвойс</a>
+          <a href="#report-modal">Скачать отчет</a>
+          <a href="#pay-invoice">Оплатить инвойс</a>
+        </div>
+      </div>
+    </aside>
+  </section>
+  <script src="app.js"></script>
+</body>
+</html>

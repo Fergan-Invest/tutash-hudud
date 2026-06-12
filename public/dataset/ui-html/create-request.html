@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Forma sozdaniya zayavki na dogovor">
+  <title>Новая заявка - Tutash Hududlar Reestri</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Основная навигация">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">T</span>
+        <span>
+          <strong>Tutash hududlar reestri</strong>
+          <small>Кабинет предпринимателя</small>
+        </span>
+      </a>
+
+      <nav class="nav-list">
+        <a class="nav-link" href="index.html"><span class="nav-icon">H</span><span>Главная страница</span></a>
+        <a class="nav-link active" href="create-request.html"><span class="nav-icon">R</span><span>Запросить договор</span></a>
+        <a class="nav-link" href="request-detail.html"><span class="nav-icon">A</span><span>Заявка на договор</span></a>
+      </nav>
+    </aside>
+
+    <div class="content">
+      <header class="topbar">
+        <a class="back-link" href="index.html">&larr; Назад</a>
+        <div class="breadcrumb">Запросить договор</div>
+        <div class="user-card"><span class="user-avatar">С</span><span>Сардорбек</span></div>
+      </header>
+
+      <main>
+        <section class="page-title">
+          <p class="eyebrow">Создание заявки</p>
+          <h1>Новая заявка на террасу</h1>
+          <p>Заполните данные, выберите участок на карте, укажите размеры и прикрепите документы.</p>
+        </section>
+
+        <form class="panel form-panel">
+          <div class="stepper" aria-label="Этапы создания заявки">
+            <button class="step active" type="button" data-step-target="1">1 шаг</button>
+            <button class="step" type="button" data-step-target="2">2 шаг</button>
+            <button class="step" type="button" data-step-target="3">3 шаг</button>
+          </div>
+
+          <div class="form-step-panel active" data-step-panel="1">
+          <div class="form-section">
+            <h2>Данные предпринимателя</h2>
+            <div class="form-grid two">
+              <label><span>ФИО</span><input type="text" value="Сардорбек Абдуллаев"></label>
+              <label><span>ИНН / ПИНФЛ</span><input type="text" placeholder="Введите номер"></label>
+              <label><span>Телефон</span><input type="tel" placeholder="+998 90 000 00 00"></label>
+              <label><span>Email</span><input type="email" placeholder="name@example.com"></label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2>Информация о террасе</h2>
+            <div class="form-grid two">
+              <label><span>Регион</span><select><option>Ферганская область</option><option>Маргилан</option><option>Коканд</option></select></label>
+              <label><span>Зона</span><select><option>Зона 12 - свободна</option><option>Зона 04 - свободна</option><option>Зона 09 - требуется проверка</option></select></label>
+              <label><span>Тип деятельности</span><select><option>Кафе / общепит</option><option>Розничная торговля</option><option>Услуги</option></select></label>
+              <label><span>Наличие фасада</span><select><option>Да</option><option>Нет</option></select></label>
+              <label class="wide"><span>Адрес или ориентир</span><input type="text" placeholder="Например: ул. Мустакиллик, возле парка"></label>
+            </div>
+          </div>
+          </div>
+
+          <div class="form-step-panel" data-step-panel="2">
+          <div class="form-section">
+            <div class="section-title-row">
+              <div>
+                <h2>Выбор территории на карте</h2>
+                <p>Отметьте точки участка, проверьте стороны и итоговую площадь.</p>
+              </div>
+              <a class="secondary-button" href="#measure-map">Открыть карту</a>
+            </div>
+
+            <div class="map-selection">
+              <div class="measuring-map leaflet-shell" aria-label="Предпросмотр выбранной территории">
+                <div class="leaflet-map" id="create-map"></div>
+                <button class="map-control back" type="button" aria-label="Назад">&lsaquo;</button>
+                <div class="selected-polygon">
+                  <span class="vertex v1"></span>
+                  <span class="vertex v2"></span>
+                  <span class="vertex v3"></span>
+                  <span class="vertex v4"></span>
+                </div>
+                <span class="map-crosshair"></span>
+                <div class="map-caption">Выбранная территория, зона 12</div>
+              </div>
+
+              <div class="measure-panel">
+                <label>
+                  <span>Количество точек территории</span>
+                  <select>
+                    <option>4 точки</option>
+                    <option>3 точки</option>
+                    <option>5 точек</option>
+                  </select>
+                </label>
+
+                <div class="measure-grid">
+                  <label><span>A сторона, м</span><input type="number" value="15"></label>
+                  <label><span>B сторона, м</span><input type="number" value="10"></label>
+                  <label><span>C сторона, м</span><input type="number" value="15"></label>
+                  <label><span>D сторона, м</span><input type="number" value="10"></label>
+                </div>
+
+                <label>
+                  <span>Умумий майдон / Общая площадь</span>
+                  <input type="text" value="150 м²">
+                </label>
+
+                <a class="primary-button full-button" href="#measure-map">Заново выбрать территорию</a>
+              </div>
+            </div>
+          </div>
+          </div>
+
+          <div class="form-step-panel" data-step-panel="3">
+          <div class="form-section">
+            <h2>Документы</h2>
+            <div class="upload-grid">
+              <label class="upload-box"><input type="file"><span>Паспорт или ID-карта</span><small>PDF, JPG, PNG до 10 МБ</small></label>
+              <label class="upload-box"><input type="file"><span>Свидетельство ИП</span><small>PDF, JPG, PNG до 10 МБ</small></label>
+              <label class="upload-box"><input type="file"><span>Фото или схема террасы</span><small>PDF, JPG, PNG до 20 МБ</small></label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2>Комментарий</h2>
+            <label class="form-grid">
+              <span class="field-label">Дополнительная информация</span>
+              <textarea rows="4" placeholder="Опишите особенности участка или объекта"></textarea>
+            </label>
+          </div>
+          </div>
+
+          <div class="form-actions sticky-actions">
+            <a class="ghost-button" href="index.html">Отмена</a>
+            <button class="secondary-button" type="button" data-step-prev>Назад</button>
+            <button class="secondary-button" type="button" data-step-next>Кейингиси</button>
+            <button class="primary-button" type="submit">Отправить заявку</button>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <section class="modal" id="measure-map" aria-labelledby="measure-map-title">
+    <a class="modal-backdrop" href="#" aria-label="Закрыть"></a>
+    <div class="modal-dialog modal-wide" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="measure-map-title">Измерение территории</h2>
+        <a class="close-button" href="#" aria-label="Закрыть">&times;</a>
+      </div>
+      <div class="measuring-map modal-measuring-map">
+        <div class="leaflet-map" id="modal-map"></div>
+        <button class="map-control back" type="button" aria-label="Назад">&lsaquo;</button>
+        <div class="map-control layers" aria-hidden="true">▦</div>
+        <div class="selected-polygon large">
+          <span class="vertex v1"></span>
+          <span class="vertex v2"></span>
+          <span class="vertex v3"></span>
+          <span class="vertex v4"></span>
+        </div>
+        <span class="map-crosshair"></span>
+        <div class="map-caption">Бошлашни хоҳлаган жойингизга нуқтани қўйинг.</div>
+        <button class="add-point-button" type="button">+ Нуқта қўшиш</button>
+      </div>
+      <div class="modal-foot">
+        <p>После выбора точек размеры участка автоматически попадут в форму.</p>
+        <a class="primary-button" href="#">Применить</a>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
