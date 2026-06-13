@@ -241,7 +241,13 @@ class RequestValidationTest extends TestCase
             ->assertSee('3. O‘lcham')
             ->assertSee('Rasmlar va fayllar')
             ->assertSee('readonly-media-card')
-            ->assertSee($registryRequest->images->first()->original_name);
+            ->assertSee($registryRequest->images->first()->original_name)
+            ->assertSee('O‘zgarishlar tarixi')
+            ->assertSee('Holati')
+            ->assertSee('Oldin')
+            ->assertSee('Keyin')
+            ->assertSee('Yuborilgan')
+            ->assertDontSee('<strong>id</strong>', false);
     }
 
     public function test_duplicate_images_are_rejected_and_old_input_returns(): void

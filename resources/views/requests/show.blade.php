@@ -24,8 +24,92 @@
         'street_created' => 'Ko‘cha yaratildi',
         'street_reused' => 'Mavjud ko‘cha ishlatildi',
     ];
+    $auditFieldLabels = [
+        'status' => 'Holati',
+        'building_cadastr_number' => 'Kadastr raqami',
+        'hokimyatga_biriktirilgan_kadastr_raqami' => 'Hokimiyat kadastri',
+        'owner_type' => 'Mulk egasi turi',
+        'owner_stir_pinfl' => 'STIR/PINFL',
+        'owner_name' => 'Egasi nomi',
+        'district_id' => 'Tuman',
+        'mahalla_id' => 'Mahalla',
+        'street_id' => 'Ko‘cha',
+        'house_number' => 'Uy raqami',
+        'street_type' => 'Ko‘cha turi',
+        'director_name' => 'Rahbar F.I.SH',
+        'phone_number' => 'Telefon raqami',
+        'area_length' => 'Uzunlik',
+        'area_width' => 'Kenglik',
+        'calculated_land_area' => 'Hisoblangan maydon',
+        'total_area' => 'Umumiy maydon',
+        'building_facade_length' => 'Fasad uzunligi',
+        'summer_terrace_sides' => 'Yozgi terassa tomonlari',
+        'distance_to_roadway' => 'Yo‘lgacha masofa',
+        'distance_to_sidewalk' => 'Trotuargacha masofa',
+        'usage_purpose' => 'Foydalanish maqsadi',
+        'activity_type' => 'Faoliyat turi',
+        'terrace_buildings_available' => 'Terassada qurilmalar bor',
+        'terrace_buildings_permanent' => 'Doimiy qurilmalar bor',
+        'has_permit' => 'Ruxsatnoma bor',
+        'has_tenant' => 'Ijarachi mavjud',
+        'tenant_stir_pinfl' => 'Ijarachi STIR/PINFL',
+        'tenant_name' => 'Ijarachi nomi',
+        'tenant_activity_type' => 'Ijarachi faoliyat turi',
+        'adjacent_activity_type' => 'Tutash hududdagi faoliyat',
+        'adjacent_activity_land' => 'Tutash hudud maydoni',
+        'adjacent_facilities' => 'Tutash hudud obyektlari',
+        'additional_info' => 'Qo‘shimcha ma’lumot',
+        'latitude' => 'Xarita kengligi',
+        'longitude' => 'Xarita uzunligi',
+        'polygon_coordinates' => 'Xarita poligoni',
+        'request_number' => 'Ariza raqami',
+        'original_name' => 'Fayl nomi',
+        'mime' => 'Fayl turi',
+        'size' => 'Fayl hajmi',
+        'path' => 'Fayl manzili',
+    ];
+    $technicalAuditFields = ['id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'sha256', 'registry_request_id', 'uploaded_by'];
     $yesNo = fn($value) => $value ? 'Ha' : 'Yo‘q';
     $display = fn($value) => filled($value) ? $value : '-';
+    $formatAuditValue = function ($key, $value) use ($statusLabels, $ownerTypeLabels, $streetTypeLabels, $usagePurposeLabels, $yesNo) {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        if (is_bool($value)) {
+            return $yesNo($value);
+        }
+
+        if (in_array($key, ['terrace_buildings_available', 'terrace_buildings_permanent', 'has_permit', 'has_tenant'], true)) {
+            return $yesNo((bool) $value);
+        }
+
+        if ($key === 'status') {
+            return $statusLabels[$value] ?? $value;
+        }
+
+        if ($key === 'owner_type') {
+            return $ownerTypeLabels[$value] ?? $value;
+        }
+
+        if ($key === 'street_type') {
+            return $streetTypeLabels[$value] ?? $value;
+        }
+
+        if ($key === 'usage_purpose') {
+            return $usagePurposeLabels[$value] ?? $value;
+        }
+
+        if (is_array($value)) {
+            if ($key === 'polygon_coordinates') {
+                return 'Xarita poligoni kiritilgan';
+            }
+
+            return collect($value)->flatten()->filter(fn($item) => ! is_array($item))->implode(', ') ?: '-';
+        }
+
+        return (string) $value;
+    };
 @endphp
 
 @section('title', $requestItem->request_number)
@@ -154,7 +238,7 @@
                     <div class="readonly-media-grid">
                         @foreach($requestItem->images as $image)
                             <a class="readonly-media-card" href="{{ Storage::url($image->path) }}" target="_blank" rel="noopener">
-                                <img src="{{ Storage::url($image->path) }}" alt="{{ $image->original_name }}">
+                                <img src="{{ Storage::url($image->path) }}" alt="">
                                 <span>{{ $image->original_name }}</span>
                             </a>
                         @endforeach
@@ -181,7 +265,7 @@
                         @php
                             $oldValues = $audit->old_values ?? [];
                             $newValues = $audit->new_values ?? [];
-                            $keys = array_unique(array_merge(array_keys($oldValues), array_keys($newValues)));
+                            $keys = array_diff(array_unique(array_merge(array_keys($oldValues), array_keys($newValues))), $technicalAuditFields);
                             $changes = [];
                             foreach ($keys as $key) {
                                 $old = $oldValues[$key] ?? null;
@@ -190,22 +274,20 @@
                                     $changes[$key] = [$old, $new];
                                 }
                             }
-                            $formatValue = function ($value) {
-                                if (is_array($value)) {
-                                    return json_encode($value, JSON_UNESCAPED_UNICODE);
-                                }
-                                return filled($value) ? (string) $value : '-';
-                            };
                         @endphp
                         <li>
                             <strong>{{ $eventLabels[$audit->event] ?? $audit->event }}</strong>
-                            <span>{{ $audit->created_at->format('d.m.Y H:i') }} · {{ $audit->user?->name ?? 'Tizim' }} · IP: {{ $audit->ip_address ?? '-' }}</span>
+                            <span class="audit-meta">
+                                Sana: {{ $audit->created_at->format('d.m.Y H:i') }}
+                                <b>Foydalanuvchi: {{ $audit->user?->name ?? 'Tizim' }}</b>
+                                <b>IP: {{ $audit->ip_address ?? '-' }}</b>
+                            </span>
                             <div class="change-list">
                                 @forelse($changes as $column => [$old, $new])
-                                    <div class="change-row">
-                                        <strong>{{ $column }}</strong>
-                                        <code>{{ $formatValue($old) }}</code>
-                                        <code>{{ $formatValue($new) }}</code>
+                                    <div class="change-row readable-change-row">
+                                        <strong>{{ $auditFieldLabels[$column] ?? str_replace('_', ' ', $column) }}</strong>
+                                        <span><small>Oldin</small>{{ $formatAuditValue($column, $old) }}</span>
+                                        <span><small>Keyin</small>{{ $formatAuditValue($column, $new) }}</span>
                                     </div>
                                 @empty
                                     <span>Ko‘rsatiladigan o‘zgarish yo‘q.</span>
