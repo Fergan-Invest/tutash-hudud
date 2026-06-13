@@ -26,7 +26,7 @@ class RegistryRequestFormRequest extends FormRequest
 
         return [
             'building_cadastr_number' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([\/:].+)?$/'],
-            'hokimyatga_biriktirilgan_kadastr_raqami' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([\/:].+)?$/'],
+            'hokimyatga_biriktirilgan_kadastr_raqami' => ['nullable', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([\/:].+)?$/'],
             'owner_type' => ['required', Rule::in(['jismoniy', 'yuridik'])],
             'owner_stir_pinfl' => ['required', 'digits_between:9,14'],
             'owner_name' => ['required', 'string', 'max:255'],
@@ -116,11 +116,18 @@ class RegistryRequestFormRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $totalArea = null;
+        if (is_numeric($this->input('area_length')) && is_numeric($this->input('area_width'))) {
+            $totalArea = round((float) $this->input('area_length') * (float) $this->input('area_width'), 2);
+        }
+
         $this->merge([
             'has_tenant' => $this->boolean('has_tenant'),
             'terrace_buildings_available' => $this->boolean('terrace_buildings_available'),
             'terrace_buildings_permanent' => $this->boolean('terrace_buildings_permanent'),
             'has_permit' => $this->boolean('has_permit'),
+            'total_area' => $totalArea ?? $this->input('total_area'),
+            'calculated_land_area' => $totalArea ?? $this->input('total_area'),
         ]);
     }
 }

@@ -93,6 +93,18 @@ class RequestController extends Controller
         return view('requests.form', $this->formData($request, $registryRequest));
     }
 
+    public function keepAlive(Request $request)
+    {
+        $request->session()->put('last_keep_alive_at', now()->timestamp);
+
+        return response()->json([
+            'ok' => true,
+            'csrf_token' => csrf_token(),
+            'session_lifetime' => (int) config('session.lifetime'),
+            'server_time' => now()->toIso8601String(),
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    }
+
     public function update(RegistryRequestFormRequest $request, RegistryRequest $registryRequest, AuditLogger $auditLogger)
     {
         DB::transaction(function () use ($request, $registryRequest, $auditLogger) {
@@ -208,6 +220,10 @@ class RequestController extends Controller
 
     private function nextRequestNumber(): string
     {
-        return 'THR-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
+        do {
+            $number = 'THR-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
+        } while (RegistryRequest::where('request_number', $number)->exists());
+
+        return $number;
     }
 }

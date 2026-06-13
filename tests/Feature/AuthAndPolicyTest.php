@@ -62,6 +62,35 @@ class AuthAndPolicyTest extends TestCase
             ->assertSee('1. Egasi');
     }
 
+    public function test_authenticated_user_can_keep_session_alive(): void
+    {
+        $user = User::create(['name' => 'Invest', 'email' => 'keepalive@example.com', 'password' => 'secret', 'role' => 'invest']);
+
+        $this->actingAs($user)
+            ->getJson(route('session.keep-alive'))
+            ->assertOk()
+            ->assertJson([
+                'ok' => true,
+                'session_lifetime' => (int) config('session.lifetime'),
+            ])
+            ->assertJsonStructure(['csrf_token', 'server_time']);
+
+        auth()->logout();
+
+        $this->getJson(route('session.keep-alive'))->assertUnauthorized();
+    }
+
+    public function test_session_clear_invalidates_session_and_redirects_to_login(): void
+    {
+        $user = User::create(['name' => 'Invest', 'email' => 'clear-session@example.com', 'password' => 'secret', 'role' => 'invest']);
+
+        $this->actingAs($user)
+            ->get(route('session.clear'))
+            ->assertRedirect(route('login'));
+
+        $this->assertGuest();
+    }
+
     public function test_addresses_page_renders_counts(): void
     {
         $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona shahar']);

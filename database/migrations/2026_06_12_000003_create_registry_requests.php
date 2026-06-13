@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->string('building_cadastr_number')->index();
-            $table->string('hokimyatga_biriktirilgan_kadastr_raqami')->index();
+            $table->string('hokimyatga_biriktirilgan_kadastr_raqami')->nullable()->index();
             $table->string('owner_stir_pinfl', 32)->index();
             $table->string('owner_name')->index();
             $table->foreignId('district_id')->constrained()->restrictOnDelete();

@@ -21,12 +21,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.store');
 });
+
+Route::get('/session/clear', [AuthController::class, 'clearSession'])->name('session.clear');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::redirect('/', '/requests');
+    Route::get('/session/keep-alive', [RequestController::class, 'keepAlive'])->name('session.keep-alive');
     Route::resource('requests', RequestController::class)->parameters(['requests' => 'registryRequest']);
     Route::post('/api/check-cadastre-restriction', [RequestController::class, 'checkCadastreRestriction'])->name('cadastre.check');
     Route::delete('/request-images/{image}', [RequestImageController::class, 'destroy'])->name('request-images.destroy');

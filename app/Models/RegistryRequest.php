@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class RegistryRequest extends Model
 {
@@ -28,6 +29,13 @@ class RegistryRequest extends Model
         'adjacent_facilities' => 'array',
         'polygon_coordinates' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (RegistryRequest $request) {
+            Storage::disk('public')->deleteDirectory("requests/{$request->id}");
+        });
+    }
 
     public function creator()
     {

@@ -36,4 +36,13 @@ class AuthController extends Controller
 
         return redirect()->route('login');
     }
+
+    public function clearSession(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('success', 'Sessiya tozalandi. Qayta kiring va draftdagi maʼlumotlarni davom ettiring.');
+    }
 }

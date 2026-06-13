@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Tutash hududlar reestri')</title>
     <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}">
@@ -11,7 +11,8 @@
 </head>
 <body>
 <div class="app-shell">
-    <aside class="sidebar">
+    <div class="sidebar-backdrop" data-sidebar-close hidden></div>
+    <aside class="sidebar" id="app-sidebar">
         <a class="brand" href="{{ route('requests.index') }}">
             <span class="brand-mark">T</span>
             <span><strong>Tutash hududlar reestri</strong><small>Tadbirkor kabineti</small></span>
@@ -42,7 +43,7 @@
     <div class="content">
         <header class="topbar">
             <div class="topbar-title">
-                <button class="menu-button" type="button" aria-label="Menyuni ochish"><span></span><span></span><span></span></button>
+                <button class="menu-button" type="button" aria-label="Menyuni ochish" aria-controls="app-sidebar" aria-expanded="false"><span></span><span></span><span></span></button>
                 <span class="breadcrumb">@yield('breadcrumb', 'Kadastr uchastkalari')</span>
             </div>
 

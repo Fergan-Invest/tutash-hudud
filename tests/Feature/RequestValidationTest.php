@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\District;
 use App\Models\Mahalla;
+use App\Models\RegistryRequest;
 use App\Models\Street;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -75,6 +76,27 @@ class RequestValidationTest extends TestCase
         $this->assertDatabaseCount('registry_requests', 1);
     }
 
+    public function test_hokimiyat_cadastre_is_optional_and_area_uses_total_area(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        unset($payload['hokimyatga_biriktirilgan_kadastr_raqami'], $payload['calculated_land_area']);
+        $payload['area_length'] = 40;
+        $payload['area_width'] = 20;
+        $payload['total_area'] = 1;
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('registry_requests', [
+            'hokimyatga_biriktirilgan_kadastr_raqami' => null,
+            'calculated_land_area' => 800,
+            'total_area' => 800,
+        ]);
+    }
+
     public function test_duplicate_images_are_rejected_and_old_input_returns(): void
     {
         Storage::fake('public');
@@ -89,6 +111,53 @@ class RequestValidationTest extends TestCase
             ->assertRedirect(route('requests.create'))
             ->assertSessionHasErrors('images.1')
             ->assertSessionHasInput('owner_name', 'Owner MCHJ');
+    }
+
+    public function test_request_can_be_updated_and_deleted_with_media_cleanup(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $registryRequest = RegistryRequest::with(['images', 'files'])->firstOrFail();
+        $storedImagePath = $registryRequest->images->first()->path;
+        $storedFilePath = $registryRequest->files->first()->path;
+
+        Storage::disk('public')->assertExists($storedImagePath);
+        Storage::disk('public')->assertExists($storedFilePath);
+
+        $payload = $this->payload($district, $mahalla, $street);
+        unset($payload['images'], $payload['act_file']);
+        $payload['owner_name'] = 'Updated Owner MCHJ';
+        $payload['area_length'] = 12;
+        $payload['area_width'] = 9;
+        $payload['total_area'] = 108;
+        $payload['calculated_land_area'] = 108;
+
+        $this->actingAs($user)
+            ->put(route('requests.update', $registryRequest), $payload)
+            ->assertRedirect(route('requests.show', $registryRequest));
+
+        $this->assertDatabaseHas('registry_requests', [
+            'id' => $registryRequest->id,
+            'owner_name' => 'Updated Owner MCHJ',
+            'total_area' => 108,
+        ]);
+        $this->assertDatabaseCount('request_images', 4);
+
+        $this->actingAs($user)
+            ->delete(route('requests.destroy', $registryRequest))
+            ->assertRedirect(route('requests.index'));
+
+        $this->assertDatabaseMissing('registry_requests', ['id' => $registryRequest->id]);
+        $this->assertDatabaseCount('request_images', 0);
+        $this->assertDatabaseCount('request_files', 0);
+        Storage::disk('public')->assertMissing($storedImagePath);
+        Storage::disk('public')->assertMissing($storedFilePath);
+        Storage::disk('public')->assertMissing("requests/{$registryRequest->id}");
     }
 
     public function test_tuman_cannot_submit_another_district(): void

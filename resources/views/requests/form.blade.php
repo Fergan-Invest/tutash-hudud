@@ -47,7 +47,7 @@
                 </div>
 
                 <label>Hokimiyatga biriktirilgan kadastr raqami
-                    <input id="hokimyatga_biriktirilgan_kadastr_raqami" name="hokimyatga_biriktirilgan_kadastr_raqami" value="{{ $field('hokimyatga_biriktirilgan_kadastr_raqami') }}" required placeholder="10:08:04:01:02:5006/0001:035" maxlength="100" autocomplete="off">
+                    <input id="hokimyatga_biriktirilgan_kadastr_raqami" name="hokimyatga_biriktirilgan_kadastr_raqami" value="{{ $field('hokimyatga_biriktirilgan_kadastr_raqami') }}" placeholder="10:08:04:01:02:5006/0001:035" maxlength="100" autocomplete="off">
                     @error('hokimyatga_biriktirilgan_kadastr_raqami')<span>{{ $message }}</span>@enderror
                 </label>
 
@@ -131,8 +131,8 @@
             <div class="form-grid three">
                 <label>Uzunlik (m)<input id="area_length" name="area_length" type="number" step="0.01" value="{{ $field('area_length') }}" required>@error('area_length')<span>{{ $message }}</span>@enderror</label>
                 <label>Kenglik (m)<input id="area_width" name="area_width" type="number" step="0.01" value="{{ $field('area_width') }}" required>@error('area_width')<span>{{ $message }}</span>@enderror</label>
-                <label>Hisoblangan maydon<input id="calculated_land_area" name="calculated_land_area" type="number" step="0.01" value="{{ $field('calculated_land_area') }}" readonly required>@error('calculated_land_area')<span>{{ $message }}</span>@enderror</label>
-                <label>Umumiy maydon (m²)<input id="total_area" name="total_area" type="number" step="0.01" value="{{ $field('total_area') }}" required>@error('total_area')<span>{{ $message }}</span>@enderror</label>
+                <input id="calculated_land_area" name="calculated_land_area" type="hidden" value="{{ $field('calculated_land_area') }}">
+                <label>Umumiy maydon (m²)<input id="total_area" name="total_area" type="number" step="0.01" value="{{ $field('total_area') }}" readonly required>@error('total_area')<span>{{ $message }}</span>@enderror @error('calculated_land_area')<span>{{ $message }}</span>@enderror</label>
                 <label>Fasad uzunligi (m)<input name="building_facade_length" type="number" step="0.01" value="{{ $field('building_facade_length') }}">@error('building_facade_length')<span>{{ $message }}</span>@enderror</label>
                 <label>Yozgi terassa tomonlari (m)<input name="summer_terrace_sides" type="number" step="0.01" value="{{ $field('summer_terrace_sides') }}">@error('summer_terrace_sides')<span>{{ $message }}</span>@enderror</label>
                 <label>Yo‘lgacha masofa (m)<input name="distance_to_roadway" type="number" step="0.01" value="{{ $field('distance_to_roadway') }}" required>@error('distance_to_roadway')<span>{{ $message }}</span>@enderror</label>

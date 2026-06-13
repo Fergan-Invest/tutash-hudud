@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  initMobileNavigation();
+  initSessionKeepAlive();
   initSteps();
   initDependentSelects();
   initSearchableSelects();
@@ -14,6 +16,196 @@ document.addEventListener("DOMContentLoaded", () => {
   initShowMap();
 });
 
+function safeStorage(storage) {
+  try {
+    const key = "__storage_test__";
+    storage.setItem(key, key);
+    storage.removeItem(key);
+    return storage;
+  } catch {
+    return {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {},
+    };
+  }
+}
+
+const appSessionStorage = safeStorage(window.sessionStorage);
+const appLocalStorage = safeStorage(window.localStorage);
+let appSessionExpired = false;
+let sessionExpiredBanner = null;
+
+function cssEscape(value) {
+  if (window.CSS && typeof window.CSS.escape === "function") {
+    return window.CSS.escape(value);
+  }
+
+  return String(value).replace(/["\\]/g, "\\$&");
+}
+
+function dispatchRequestStepChanged(step) {
+  if (typeof window.CustomEvent === "function") {
+    window.dispatchEvent(new CustomEvent("requestFormStepChanged", { detail: { step } }));
+    return;
+  }
+
+  const event = document.createEvent("CustomEvent");
+  event.initCustomEvent("requestFormStepChanged", false, false, { step });
+  window.dispatchEvent(event);
+}
+
+function initMobileNavigation() {
+  const button = document.querySelector(".menu-button");
+  const sidebar = document.getElementById("app-sidebar");
+  const backdrop = document.querySelector("[data-sidebar-close]");
+  if (!button || !sidebar || !backdrop) return;
+
+  const setOpen = (open) => {
+    document.body.classList.toggle("sidebar-open", open);
+    button.setAttribute("aria-expanded", open ? "true" : "false");
+    backdrop.hidden = !open;
+  };
+
+  button.addEventListener("click", () => setOpen(!document.body.classList.contains("sidebar-open")));
+  backdrop.addEventListener("click", () => setOpen(false));
+  sidebar.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setOpen(false)));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setOpen(false);
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) setOpen(false);
+  });
+}
+
+function initSessionKeepAlive() {
+  const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+  if (!csrfMeta) return;
+
+  const endpoint = "/session/keep-alive";
+  const interval = 10 * 60 * 1000;
+  let lastPing = 0;
+  let timer = null;
+
+  const updateCsrfToken = (token) => {
+    if (!token) return;
+    csrfMeta.setAttribute("content", token);
+    document.querySelectorAll('input[name="_token"]').forEach((input) => {
+      input.value = token;
+    });
+  };
+
+  const ping = async (force = false) => {
+    const now = Date.now();
+    if (!force && now - lastPing < interval) return !appSessionExpired;
+    lastPing = now;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "GET",
+        credentials: "same-origin",
+        headers: {
+          "Accept": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        cache: "no-store",
+      });
+
+      if (!response.ok || response.redirected) {
+        appSessionExpired = true;
+        showSessionExpiredBanner();
+        return false;
+      }
+
+      const data = await response.json();
+      updateCsrfToken(data.csrf_token);
+      appSessionExpired = false;
+      hideSessionExpiredBanner();
+      return true;
+    } catch {
+      // Network hiccups in mobile WebViews should not interrupt form filling.
+      return !appSessionExpired;
+    }
+  };
+
+  timer = window.setInterval(() => {
+    if (document.visibilityState !== "hidden") ping();
+  }, interval);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") ping(true);
+  });
+
+  window.addEventListener("focus", () => ping(true));
+  document.addEventListener("input", () => ping(), { passive: true });
+
+  document.querySelectorAll("form[method='POST'], form[method='post']").forEach((form) => {
+    form.addEventListener("submit", async (event) => {
+      if (form.dataset.sessionPreflightPassed === "1") {
+        return;
+      }
+
+      event.preventDefault();
+      saveCurrentFormDraft(form);
+
+      const alive = await ping(true);
+      if (!alive || appSessionExpired) {
+        showSessionExpiredBanner();
+        showToast("Sessiya muddati tugagan. Sahifani yangilang, kiritilgan ma'lumotlar draftda saqlangan.", "error");
+        return;
+      }
+
+      form.dataset.sessionPreflightPassed = "1";
+      form.submit();
+    });
+  });
+
+  ping(true);
+  window.addEventListener("beforeunload", () => {
+    if (timer) window.clearInterval(timer);
+  });
+}
+
+function saveCurrentFormDraft(form) {
+  if (!form) return;
+  saveDraft(form, `request-form-draft:${location.pathname}`);
+}
+
+function showSessionExpiredBanner() {
+  if (sessionExpiredBanner) {
+    sessionExpiredBanner.hidden = false;
+    return;
+  }
+
+  sessionExpiredBanner = document.createElement("div");
+  sessionExpiredBanner.className = "session-expired-banner";
+  sessionExpiredBanner.setAttribute("role", "alert");
+  sessionExpiredBanner.innerHTML = `
+    <div>
+      <strong>Sessiya muddati tugadi</strong>
+      <span>Maydonlar draftda saqlanadi. Sahifani yangilang va davom eting.</span>
+    </div>
+    <button class="session-reload-button" type="button">
+      <span aria-hidden="true">↻</span>
+      <span>Yangilash</span>
+    </button>
+  `;
+
+  sessionExpiredBanner.querySelector("button")?.addEventListener("click", () => {
+    document.querySelectorAll("form").forEach(saveCurrentFormDraft);
+    window.location.reload();
+  });
+
+  document.body.appendChild(sessionExpiredBanner);
+}
+
+function hideSessionExpiredBanner() {
+  if (sessionExpiredBanner) {
+    sessionExpiredBanner.hidden = true;
+  }
+}
+
 function initSteps() {
   const steps = [...document.querySelectorAll("[data-step-target]")];
   const panels = [...document.querySelectorAll("[data-step-panel]")];
@@ -22,10 +214,10 @@ function initSteps() {
   const submit = document.querySelector('button[type="submit"]');
   if (!steps.length || !panels.length) return;
 
-  let current = Math.max(1, Number(sessionStorage.getItem("requestFormStep") || 1));
+  let current = Math.max(1, Number(appSessionStorage.getItem("requestFormStep") || 1));
   const setStep = (step) => {
     current = Math.max(1, Math.min(step, panels.length));
-    sessionStorage.setItem("requestFormStep", String(current));
+    appSessionStorage.setItem("requestFormStep", String(current));
     steps.forEach((button) => {
       const value = Number(button.dataset.stepTarget);
       button.classList.toggle("active", value === current);
@@ -35,7 +227,7 @@ function initSteps() {
     if (prev) prev.disabled = current === 1;
     if (next) next.hidden = current === panels.length;
     if (submit) submit.hidden = current !== panels.length;
-    window.dispatchEvent(new CustomEvent("requestFormStepChanged", { detail: { step: current } }));
+    dispatchRequestStepChanged(current);
     window.setTimeout(() => window.dispatchEvent(new Event("resize")), 80);
   };
   window.requestFormSetStep = setStep;
@@ -80,7 +272,7 @@ function findFirstInvalidControl(form) {
 
 function hasValue(control) {
   if (control.type === "checkbox" || control.type === "radio") {
-    return [...document.querySelectorAll(`[name="${CSS.escape(control.name)}"]`)].some((field) => field.checked);
+    return [...document.querySelectorAll(`[name="${cssEscape(control.name)}"]`)].some((field) => field.checked);
   }
 
   if (control.type === "file") {
@@ -402,12 +594,13 @@ function initAreaCalculator() {
   const width = document.getElementById("area_width");
   const calculated = document.getElementById("calculated_land_area");
   const total = document.getElementById("total_area");
-  if (!length || !width || !calculated) return;
+  if (!length || !width || !total) return;
 
   const calculate = () => {
     const result = Number(length.value || 0) * Number(width.value || 0);
-    calculated.value = result > 0 ? result.toFixed(2) : "";
-    if (total && !total.value) total.value = calculated.value;
+    const value = result > 0 ? result.toFixed(2) : "";
+    total.value = value;
+    if (calculated) calculated.value = value;
   };
 
   length.addEventListener("input", calculate);
@@ -436,7 +629,7 @@ function initImageSlots() {
       preview.removeAttribute("src");
       preview.classList.add("hidden");
       clear.classList.add("hidden");
-      localStorage.removeItem(`request-form-draft:${location.pathname}:images`);
+      appLocalStorage.removeItem(`request-form-draft:${location.pathname}:images`);
     });
   });
 
@@ -468,7 +661,7 @@ function initDraftPersistence() {
   const draft = readJson(draftKey, {});
 
   restoreDraft(form, draft);
-  localStorage.removeItem(imageKey);
+  appLocalStorage.removeItem(imageKey);
 
   form.addEventListener("input", () => saveDraft(form, draftKey));
   form.addEventListener("change", () => {
@@ -476,9 +669,9 @@ function initDraftPersistence() {
   });
 
   form.addEventListener("submit", () => {
-    sessionStorage.removeItem("requestFormStep");
-    localStorage.removeItem(draftKey);
-    localStorage.removeItem(imageKey);
+    appSessionStorage.removeItem("requestFormStep");
+    appLocalStorage.removeItem(draftKey);
+    appLocalStorage.removeItem(imageKey);
   });
 }
 
@@ -497,7 +690,7 @@ function saveDraft(form, key) {
     data[field.name] = field.value;
   });
   try {
-    localStorage.setItem(key, JSON.stringify(data));
+    appLocalStorage.setItem(key, JSON.stringify(data));
   } catch (error) {
     console.warn("Draft saqlanmadi:", error);
   }
@@ -505,7 +698,7 @@ function saveDraft(form, key) {
 
 function restoreDraft(form, data) {
   Object.entries(data || {}).forEach(([name, value]) => {
-    const fields = [...form.querySelectorAll(`[name="${CSS.escape(name)}"]`)];
+    const fields = [...form.querySelectorAll(`[name="${cssEscape(name)}"]`)];
     fields.forEach((field) => {
       if (field.type === "checkbox") field.checked = Boolean(value);
       else if (field.type === "radio") field.checked = field.value === value;
@@ -520,7 +713,7 @@ function restoreDraft(form, data) {
 
 function readJson(key, fallback) {
   try {
-    return JSON.parse(localStorage.getItem(key)) || fallback;
+    return JSON.parse(appLocalStorage.getItem(key)) || fallback;
   } catch {
     return fallback;
   }
