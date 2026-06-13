@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   initMobileNavigation();
-  initSessionKeepAlive();
   initSteps();
   initDependentSelects();
   initSearchableSelects();
@@ -12,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initImageSlots();
   initDraftPersistence();
   initFormValidation();
+  initSessionKeepAlive();
   initPolygonMap();
   initShowMap();
 });
@@ -142,22 +142,39 @@ function initSessionKeepAlive() {
 
   document.querySelectorAll("form[method='POST'], form[method='post']").forEach((form) => {
     form.addEventListener("submit", async (event) => {
+      if (event.defaultPrevented) return;
       if (form.dataset.sessionPreflightPassed === "1") {
         return;
       }
 
       event.preventDefault();
+
+      const invalid = findFirstInvalidControl(form);
+      if (invalid) {
+        showFirstInvalidControl(form, invalid);
+        return;
+      }
+
       saveCurrentFormDraft(form);
 
       const alive = await ping(true);
       if (!alive || appSessionExpired) {
+        setFormSubmitting(form, false);
         showSessionExpiredBanner();
         showToast("Sessiya muddati tugagan. Sahifani yangilang, kiritilgan ma'lumotlar draftda saqlangan.", "error");
         return;
       }
 
+      setFormSubmitting(form, true, "Tekshirilmoqda...");
+      const valid = await validateFormBeforeSubmit(form);
+      if (!valid) {
+        setFormSubmitting(form, false);
+        return;
+      }
+
+      setFormSubmitting(form, true, "Saqlanmoqda...");
       form.dataset.sessionPreflightPassed = "1";
-      form.submit();
+      window.setTimeout(() => form.submit(), 80);
     });
   });
 
@@ -170,6 +187,96 @@ function initSessionKeepAlive() {
 function saveCurrentFormDraft(form) {
   if (!form) return;
   saveDraft(form, `request-form-draft:${location.pathname}`);
+}
+
+async function validateFormBeforeSubmit(form) {
+  const url = form.dataset.validateUrl;
+  if (!url) return true;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Accept": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: new FormData(form),
+    });
+
+    if (response.ok) {
+      clearAjaxValidationSummary();
+      return true;
+    }
+
+    if (response.status === 419) {
+      appSessionExpired = true;
+      showSessionExpiredBanner();
+      showToast("Sessiya muddati tugagan. Sahifani yangilang, kiritilgan ma'lumotlar draftda saqlangan.", "error");
+      return false;
+    }
+
+    if (response.status === 422) {
+      const data = await response.json();
+      showAjaxValidationErrors(form, data.errors || {});
+      return false;
+    }
+
+    showToast("Ma'lumotlarni tekshirishda xatolik yuz berdi. Qayta urinib ko'ring.", "error");
+    return false;
+  } catch {
+    showToast("Internet yoki server bilan aloqa uzildi. Ma'lumotlar yuborilmadi.", "error");
+    return false;
+  }
+}
+
+function clearAjaxValidationSummary() {
+  document.querySelector(".ajax-validation-summary")?.remove();
+}
+
+function showAjaxValidationErrors(form, errors) {
+  clearAjaxValidationSummary();
+  const messages = Object.values(errors).flat();
+  const summary = document.createElement("div");
+  summary.className = "alert danger validation-summary ajax-validation-summary";
+  summary.innerHTML = `
+    <strong>Ma'lumotlarda xatolik bor. Ushbu ma'lumotlarni to'g'irlang:</strong>
+    <ul>${messages.map((message) => `<li>${escapeHtml(message)}</li>`).join("")}</ul>
+  `;
+
+  form.insertAdjacentElement("beforebegin", summary);
+  const firstField = Object.keys(errors)[0];
+  const control = firstField ? findControlByErrorKey(form, firstField) : null;
+  if (control) {
+    showFirstInvalidControl(form, control);
+  } else {
+    summary.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+function findControlByErrorKey(form, key) {
+  const candidates = [
+    key,
+    key.replace(/\.\d+$/, "[]"),
+    key.replace(/\.\d+\./g, "."),
+  ];
+
+  for (const name of candidates) {
+    const control = form.querySelector(`[name="${cssEscape(name)}"]`);
+    if (control) return control;
+  }
+
+  if (key.startsWith("images.")) {
+    return form.querySelector('[name="images[]"]');
+  }
+
+  return null;
+}
+
+function escapeHtml(value) {
+  const div = document.createElement("div");
+  div.textContent = String(value);
+  return div.innerHTML;
 }
 
 function showSessionExpiredBanner() {
@@ -247,15 +354,41 @@ function initFormValidation() {
     if (!invalid) return;
 
     event.preventDefault();
-    const panel = invalid.closest("[data-step-panel]");
-    if (panel) {
-      window.requestFormSetStep?.(Number(panel.dataset.stepPanel));
+    showFirstInvalidControl(form, invalid);
+  });
+}
+
+function showFirstInvalidControl(form, invalid) {
+  setFormSubmitting(form, false);
+
+  const panel = invalid.closest("[data-step-panel]");
+  if (panel) {
+    window.requestFormSetStep?.(Number(panel.dataset.stepPanel));
+  }
+
+  window.setTimeout(() => {
+    focusControl(invalid);
+    showToast(fieldLabel(invalid) + " maydonini to'ldiring.", "error");
+  }, 80);
+}
+
+function setFormSubmitting(form, submitting, label = "Saqlanmoqda...") {
+  if (!form) return;
+
+  form.classList.toggle("is-submitting", submitting);
+  form.querySelectorAll('button[type="submit"]').forEach((button) => {
+    button.disabled = submitting;
+    if (submitting) {
+      if (!button.dataset.originalText) {
+        button.dataset.originalText = button.textContent.trim();
+      }
+      button.innerHTML = `<span class="button-loader" aria-hidden="true"></span><span>${escapeHtml(label)}</span>`;
+      return;
     }
 
-    window.setTimeout(() => {
-      focusControl(invalid);
-      showToast(fieldLabel(invalid) + " maydonini to'ldiring.", "error");
-    }, 80);
+    if (button.dataset.originalText) {
+      button.textContent = button.dataset.originalText;
+    }
   });
 }
 

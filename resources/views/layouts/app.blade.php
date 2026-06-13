@@ -67,7 +67,14 @@
             <div class="alert success">{{ session('success') }}</div>
         @endif
         @if($errors->any())
-            <div class="alert danger">Ma'lumotlarda xatolik bor. Maydonlarni tekshiring.</div>
+            <div class="alert danger validation-summary">
+                <strong>Ma'lumotlarda xatolik bor. Quyidagi maydonlarni tekshiring:</strong>
+                <ul>
+                    @foreach($errors->all() as $message)
+                        <li>{{ $message }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
 
         <main>@yield('content')</main>

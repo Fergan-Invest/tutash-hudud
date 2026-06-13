@@ -50,6 +50,17 @@ input:focus, select:focus, textarea:focus { border-color: var(--teal); box-shado
 .alert { border-radius: 6px; padding: 12px 14px; margin-bottom: 14px; }
 .alert.success { background: #e7f8f0; color: #0f684f; }
 .alert.danger { background: #feecef; color: #9d2e38; }
+.validation-summary {
+  display: grid;
+  gap: 8px;
+}
+.validation-summary ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.validation-summary li {
+  margin: 3px 0;
+}
 .toast-wrap { position: fixed; z-index: 3000; top: 18px; right: 18px; display: grid; gap: 10px; width: min(380px, calc(100vw - 36px)); pointer-events: none; }
 .toast { transform: translateY(-8px); opacity: 0; border-radius: 8px; padding: 13px 15px; background: #263142; color: #fff; box-shadow: 0 16px 40px rgba(23,32,51,.2); font-weight: 700; transition: opacity .18s ease, transform .18s ease; }
 .toast.show { transform: translateY(0); opacity: 1; }
@@ -221,6 +232,23 @@ input:focus, select:focus, textarea:focus { border-color: transparent; box-shado
 .secondary-button { background: #fff; border-color: #d6dbe4; }
 .ghost-button { color: #6d7482; }
 .icon-button { background: var(--cabinet-teal-bright); }
+.is-submitting {
+  pointer-events: none;
+}
+.is-submitting button[type="submit"] {
+  opacity: .9;
+}
+.button-loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: button-spin .8s linear infinite;
+}
+@keyframes button-spin {
+  to { transform: rotate(360deg); }
+}
 
 .filters { grid-template-columns: minmax(250px, 2fr) repeat(4, minmax(125px, 1fr)) auto; }
 .table-panel { overflow: hidden; }

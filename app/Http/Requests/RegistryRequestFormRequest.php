@@ -66,7 +66,7 @@ class RegistryRequestFormRequest extends FormRequest
             'tenant_activity_type' => ['nullable', 'required_if:has_tenant,1', 'string', 'max:255'],
             'adjacent_activity_type' => ['nullable', 'string', 'max:255'],
             'adjacent_activity_land' => ['required', 'numeric', 'min:0'],
-            'adjacent_facilities' => ['required', 'array', 'min:1'],
+            'adjacent_facilities' => ['nullable', 'array'],
             'adjacent_facilities.*' => ['string', 'max:120'],
             'additional_info' => ['nullable', 'string'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
@@ -112,6 +112,80 @@ class RegistryRequestFormRequest extends FormRequest
                 $validator->errors()->add('district_id', 'Tuman foydalanuvchisi faqat o‘z hududi bo‘yicha ma’lumot kiritadi.');
             }
         });
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute maydoni majburiy.',
+            'required_if' => ':attribute maydoni majburiy.',
+            'string' => ':attribute matn ko‘rinishida bo‘lishi kerak.',
+            'integer' => ':attribute butun son bo‘lishi kerak.',
+            'numeric' => ':attribute raqam bo‘lishi kerak.',
+            'boolean' => ':attribute qiymati to‘g‘ri/noto‘g‘ri bo‘lishi kerak.',
+            'array' => ':attribute ro‘yxat ko‘rinishida bo‘lishi kerak.',
+            'json' => ':attribute JSON formatida bo‘lishi kerak.',
+            'exists' => 'Tanlangan :attribute topilmadi.',
+            'in' => 'Tanlangan :attribute noto‘g‘ri.',
+            'min' => ':attribute kamida :min bo‘lishi kerak.',
+            'max' => ':attribute :max dan oshmasligi kerak.',
+            'between' => ':attribute :min va :max oralig‘ida bo‘lishi kerak.',
+            'digits_between' => ':attribute :min va :max xonali raqam bo‘lishi kerak.',
+            'regex' => ':attribute formati noto‘g‘ri.',
+            'image' => ':attribute rasm fayli bo‘lishi kerak.',
+            'file' => ':attribute fayl bo‘lishi kerak.',
+            'mimes' => ':attribute faqat quyidagi formatlarda bo‘lishi mumkin: :values.',
+            'images.required' => 'Kamida 4 ta rasm yuklang.',
+            'images.min' => 'Kamida 4 ta rasm yuklang.',
+            'images.*.image' => 'Yuklangan fayllar rasm bo‘lishi kerak.',
+            'images.*.mimes' => 'Rasmlar faqat jpg, jpeg, png yoki webp formatida bo‘lishi kerak.',
+            'images.*.max' => 'Har bir rasm 10 MB dan oshmasligi kerak.',
+            'act_file.mimes' => 'Akt fayli faqat pdf, jpg, jpeg yoki png formatida bo‘lishi kerak.',
+            'design_code_file.mimes' => 'Loyiha kodi fayli faqat pdf, jpg, jpeg yoki png formatida bo‘lishi kerak.',
+            'qayta_organish_akti_file.mimes' => 'Qayta o‘rganish akti faqat pdf, jpg, jpeg yoki png formatida bo‘lishi kerak.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'building_cadastr_number' => 'Kadastr raqami',
+            'hokimyatga_biriktirilgan_kadastr_raqami' => 'Hokimiyatga biriktirilgan kadastr raqami',
+            'owner_type' => 'Mulk egasi turi',
+            'owner_stir_pinfl' => 'STIR/PINFL',
+            'owner_name' => 'Egasi nomi',
+            'district_id' => 'Tuman',
+            'mahalla_id' => 'Mahalla',
+            'street_id' => 'Ko‘cha',
+            'house_number' => 'Uy raqami',
+            'street_type' => 'Ko‘cha turi',
+            'director_name' => 'Rahbar F.I.SH',
+            'phone_number' => 'Telefon raqami',
+            'area_length' => 'Uzunlik',
+            'area_width' => 'Kenglik',
+            'calculated_land_area' => 'Hisoblangan maydon',
+            'total_area' => 'Umumiy maydon',
+            'building_facade_length' => 'Fasad uzunligi',
+            'summer_terrace_sides' => 'Yozgi terassa tomonlari',
+            'distance_to_roadway' => 'Yo‘lgacha masofa',
+            'distance_to_sidewalk' => 'Trotuargacha masofa',
+            'usage_purpose' => 'Foydalanish maqsadi',
+            'activity_type' => 'Faoliyat turi',
+            'tenant_stir_pinfl' => 'Ijarachi STIR/PINFL',
+            'tenant_name' => 'Ijarachi nomi',
+            'tenant_activity_type' => 'Ijarachi faoliyat turi',
+            'adjacent_activity_type' => 'Tutash hududdagi faoliyat',
+            'adjacent_activity_land' => 'Tutash hudud maydoni',
+            'adjacent_facilities' => 'Tutash hududdagi obyektlar',
+            'latitude' => 'Xarita kengligi',
+            'longitude' => 'Xarita uzunligi',
+            'polygon_coordinates' => 'Xarita poligoni',
+            'images' => 'Rasmlar',
+            'images.*' => 'Rasm',
+            'act_file' => 'Akt fayli',
+            'design_code_file' => 'Loyiha kodi fayli',
+            'qayta_organish_akti_file' => 'Qayta o‘rganish akti',
+        ];
     }
 
     protected function prepareForValidation(): void

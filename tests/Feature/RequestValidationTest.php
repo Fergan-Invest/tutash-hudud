@@ -97,6 +97,94 @@ class RequestValidationTest extends TestCase
         ]);
     }
 
+    public function test_adjacent_facilities_are_optional(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        unset($payload['adjacent_facilities']);
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('registry_requests', [
+            'owner_name' => 'Owner MCHJ',
+            'adjacent_facilities' => json_encode([]),
+        ]);
+    }
+
+    public function test_image_validation_messages_are_uzbek(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['images'][2] = UploadedFile::fake()->create('not-image.pdf', 10, 'application/pdf');
+
+        $this->actingAs($user)
+            ->from(route('requests.create'))
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect(route('requests.create'))
+            ->assertSessionHasErrors('images.2');
+
+        $errors = session('errors')->get('images.2');
+        $this->assertStringContainsString('Yuklangan fayllar rasm bo‘lishi kerak.', implode(' ', $errors));
+        $this->assertStringNotContainsString('field must be an image', implode(' ', $errors));
+    }
+
+    public function test_ajax_validate_checks_payload_without_storing(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->postJson(route('requests.validate'), $this->payload($district, $mahalla, $street))
+            ->assertOk()
+            ->assertJson(['ok' => true]);
+
+        $this->assertDatabaseCount('registry_requests', 0);
+        $this->assertDatabaseCount('request_images', 0);
+    }
+
+    public function test_ajax_validate_returns_uzbek_errors(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['images'][2] = UploadedFile::fake()->create('not-image.pdf', 10, 'application/pdf');
+
+        $this->actingAs($user)
+            ->postJson(route('requests.validate'), $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('images.2')
+            ->assertJsonFragment(['Yuklangan fayllar rasm bo‘lishi kerak.']);
+    }
+
+    public function test_ajax_validate_works_for_update_without_requiring_new_images(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $registryRequest = RegistryRequest::firstOrFail();
+        $payload = $this->payload($district, $mahalla, $street);
+        unset($payload['images'], $payload['act_file']);
+        $payload['owner_name'] = 'Update Validate Owner';
+
+        $this->actingAs($user)
+            ->postJson(route('requests.validate', $registryRequest), $payload)
+            ->assertOk()
+            ->assertJson(['ok' => true]);
+
+        $this->assertDatabaseMissing('registry_requests', [
+            'id' => $registryRequest->id,
+            'owner_name' => 'Update Validate Owner',
+        ]);
+    }
+
     public function test_duplicate_images_are_rejected_and_old_input_returns(): void
     {
         Storage::fake('public');

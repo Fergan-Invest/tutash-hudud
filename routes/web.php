@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::redirect('/', '/requests');
     Route::get('/session/keep-alive', [RequestController::class, 'keepAlive'])->name('session.keep-alive');
+    Route::post('/requests/validate/{registryRequest?}', [RequestController::class, 'validateForm'])->name('requests.validate');
     Route::resource('requests', RequestController::class)->parameters(['requests' => 'registryRequest']);
     Route::post('/api/check-cadastre-restriction', [RequestController::class, 'checkCadastreRestriction'])->name('cadastre.check');
     Route::delete('/request-images/{image}', [RequestImageController::class, 'destroy'])->name('request-images.destroy');

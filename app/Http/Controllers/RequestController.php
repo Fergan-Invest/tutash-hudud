@@ -77,6 +77,14 @@ class RequestController extends Controller
         return redirect()->route('requests.show', $registryRequest)->with('success', 'Ariza saqlandi.');
     }
 
+    public function validateForm(RegistryRequestFormRequest $request, ?RegistryRequest $registryRequest = null)
+    {
+        return response()->json([
+            'ok' => true,
+            'message' => 'Maʼlumotlar to‘g‘ri.',
+        ]);
+    }
+
     public function show(RegistryRequest $registryRequest)
     {
         $this->authorize('view', $registryRequest);

@@ -20,7 +20,7 @@
     </div>
 </section>
 
-<form class="registry-card form-panel stepped-form" method="POST" enctype="multipart/form-data" action="{{ $editing ? route('requests.update', $requestItem) : route('requests.store') }}" novalidate>
+<form class="registry-card form-panel stepped-form" method="POST" enctype="multipart/form-data" action="{{ $editing ? route('requests.update', $requestItem) : route('requests.store') }}" data-validate-url="{{ $editing ? route('requests.validate', $requestItem) : route('requests.validate') }}" novalidate>
     @csrf
     @if($editing) @method('PUT') @endif
 
