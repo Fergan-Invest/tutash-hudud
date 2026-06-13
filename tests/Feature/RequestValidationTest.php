@@ -48,7 +48,21 @@ class RequestValidationTest extends TestCase
         ]);
     }
 
-    public function test_request_accepts_missing_street_type_option(): void
+    public function test_request_accepts_new_street_type_options(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['street_type'] = 'gostronomik';
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('registry_requests', ['street_type' => 'gostronomik']);
+    }
+
+    public function test_request_rejects_old_street_type_options(): void
     {
         Storage::fake('public');
         [$user, $district, $mahalla, $street] = $this->setupActor();
@@ -56,10 +70,33 @@ class RequestValidationTest extends TestCase
         $payload['street_type'] = 'mavjud_emas';
 
         $this->actingAs($user)
+            ->from(route('requests.create'))
             ->post(route('requests.store'), $payload)
-            ->assertRedirect();
+            ->assertRedirect(route('requests.create'))
+            ->assertSessionHasErrors('street_type');
+    }
 
-        $this->assertDatabaseHas('registry_requests', ['street_type' => 'mavjud_emas']);
+    public function test_requests_index_can_filter_by_street_type(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['owner_name'] = 'Kōcha Owner';
+        $payload['street_type'] = 'kocha';
+        $this->actingAs($user)->post(route('requests.store'), $payload)->assertRedirect();
+
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['building_cadastr_number'] = '31:23:12:31:23:1232/12:02';
+        $payload['owner_name'] = 'Turizm Owner';
+        $payload['street_type'] = 'turizm';
+        $this->actingAs($user)->post(route('requests.store'), $payload)->assertRedirect();
+
+        $this->actingAs($user)
+            ->get(route('requests.index', ['street_type' => 'turizm']))
+            ->assertOk()
+            ->assertSee('Turizm Owner')
+            ->assertDontSee('Kōcha Owner');
     }
 
     public function test_act_file_is_optional(): void
@@ -183,6 +220,28 @@ class RequestValidationTest extends TestCase
             'id' => $registryRequest->id,
             'owner_name' => 'Update Validate Owner',
         ]);
+    }
+
+    public function test_show_page_renders_readonly_steps_and_image_previews(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $registryRequest = RegistryRequest::with('images')->firstOrFail();
+
+        $this->actingAs($user)
+            ->get(route('requests.show', $registryRequest))
+            ->assertOk()
+            ->assertSee('1. Egasi')
+            ->assertSee('2. Manzil')
+            ->assertSee('3. O‘lcham')
+            ->assertSee('Rasmlar va fayllar')
+            ->assertSee('readonly-media-card')
+            ->assertSee($registryRequest->images->first()->original_name);
     }
 
     public function test_duplicate_images_are_rejected_and_old_input_returns(): void

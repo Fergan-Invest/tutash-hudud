@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Storage;
 class RegistryRequest extends Model
 {
     public const STATUSES = ['draft', 'submitted', 'in_review', 'approved', 'rejected'];
+    public const STREET_TYPES = [
+        'kocha' => 'Kōcha',
+        'gostronomik' => 'Gostronomik',
+        'turizm' => 'Turizm',
+    ];
 
     protected $fillable = [
         'request_number', 'status', 'created_by', 'updated_by', 'building_cadastr_number',

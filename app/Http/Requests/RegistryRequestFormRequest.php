@@ -44,7 +44,7 @@ class RegistryRequestFormRequest extends FormRequest
                     ->where('mahalla_id', $mahallaId),
             ],
             'house_number' => ['required', 'string', 'max:80'],
-            'street_type' => ['required', Rule::in(['kocha', 'shohkocha', 'tor_kocha', 'berk_kocha', 'mavjud_emas'])],
+            'street_type' => ['required', Rule::in(array_keys(RegistryRequest::STREET_TYPES))],
             'director_name' => ['required', 'string', 'max:255'],
             'phone_number' => ['nullable', 'regex:/^\+998 \(\d{2}\) \d{3}-\d{2}-\d{2}$/'],
             'area_length' => ['required', 'numeric', 'min:0.01'],

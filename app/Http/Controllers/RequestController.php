@@ -29,6 +29,7 @@ class RequestController extends Controller
         }
 
         $query->when($request->filled('status'), fn ($q) => $q->where('status', $request->status));
+        $query->when($request->filled('street_type'), fn ($q) => $q->where('street_type', $request->street_type));
         $query->when($request->filled('district_id'), fn ($q) => $q->where('district_id', $request->district_id));
         $query->when($request->filled('mahalla_id'), fn ($q) => $q->where('mahalla_id', $request->mahalla_id));
         $query->when($request->filled('date_from'), fn ($q) => $q->whereDate('created_at', '>=', $request->date_from));
@@ -48,6 +49,7 @@ class RequestController extends Controller
             'districts' => District::orderBy('name')->get(),
             'mahallas' => Mahalla::orderBy('name')->get(),
             'statuses' => RegistryRequest::STATUSES,
+            'streetTypes' => RegistryRequest::STREET_TYPES,
         ]);
     }
 
@@ -178,7 +180,7 @@ class RequestController extends Controller
             'districts' => $districts,
             'mahallas' => $mahallas,
             'streets' => $streets,
-            'streetTypes' => ['kocha' => 'Ko‘cha', 'shohkocha' => 'Shohko‘cha', 'tor_kocha' => 'Tor ko‘cha', 'berk_kocha' => 'Berk ko‘cha', 'mavjud_emas' => 'Mavjud emas'],
+            'streetTypes' => RegistryRequest::STREET_TYPES,
             'usagePurposes' => ['savdo' => 'Savdo', 'xizmat' => 'Xizmat', 'umumiy_ovqatlanish' => 'Umumiy ovqatlanish', 'boshqa' => 'Boshqa'],
             'facilities' => ['soyabon', 'stol_stul', 'vitrina', 'yengil_konstruksiya', 'reklama'],
         ];

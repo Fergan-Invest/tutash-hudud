@@ -21,6 +21,12 @@
             <option value="{{ $status }}" @selected(request('status') === $status)>{{ str_replace('_', ' ', $status) }}</option>
         @endforeach
     </select>
+    <select name="street_type">
+        <option value="">Barcha ko‘cha turlari</option>
+        @foreach($streetTypes as $key => $label)
+            <option value="{{ $key }}" @selected(request('street_type') === $key)>{{ $label }}</option>
+        @endforeach
+    </select>
     <select name="district_id">
         <option value="">Barcha tumanlar</option>
         @foreach($districts as $district)
@@ -52,13 +58,14 @@
     <section class="panel table-panel registry-card">
         <div class="table-wrap">
             <table>
-                <thead><tr><th>Raqam</th><th>Egasi</th><th>Hudud</th><th>Kadastr</th><th>Status</th><th>Sana</th><th></th></tr></thead>
+                <thead><tr><th>Raqam</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Status</th><th>Sana</th><th></th></tr></thead>
                 <tbody>
                 @foreach($requests as $item)
                     <tr>
                         <td>{{ $item->request_number }}</td>
                         <td>{{ $item->owner_name }}<small>{{ $item->owner_stir_pinfl }}</small></td>
                         <td>{{ $item->district->name }}<small>{{ $item->mahalla->name }}, {{ $item->street->name }}</small></td>
+                        <td>{{ $streetTypes[$item->street_type] ?? $item->street_type }}</td>
                         <td>{{ $item->building_cadastr_number }}</td>
                         <td><span class="status {{ $item->status }}">{{ str_replace('_', ' ', $item->status) }}</span></td>
                         <td>{{ $item->created_at->format('d.m.Y H:i') }}</td>

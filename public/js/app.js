@@ -189,6 +189,21 @@ function saveCurrentFormDraft(form) {
   saveDraft(form, `request-form-draft:${location.pathname}`);
 }
 
+function clearStepStorageForCurrentPage() {
+  const prefix = `requestFormStep:${location.pathname}`;
+  try {
+    for (let index = window.sessionStorage.length - 1; index >= 0; index -= 1) {
+      const key = window.sessionStorage.key(index);
+      if (key && key.startsWith(prefix)) {
+        appSessionStorage.removeItem(key);
+      }
+    }
+  } catch {
+    // Some mobile WebViews can block sessionStorage access.
+  }
+  appSessionStorage.removeItem("requestFormStep");
+}
+
 async function validateFormBeforeSubmit(form) {
   const url = form.dataset.validateUrl;
   if (!url) return true;
@@ -314,35 +329,42 @@ function hideSessionExpiredBanner() {
 }
 
 function initSteps() {
-  const steps = [...document.querySelectorAll("[data-step-target]")];
-  const panels = [...document.querySelectorAll("[data-step-panel]")];
-  const next = document.querySelector("[data-step-next]");
-  const prev = document.querySelector("[data-step-prev]");
-  const submit = document.querySelector('button[type="submit"]');
-  if (!steps.length || !panels.length) return;
+  document.querySelectorAll(".stepper").forEach((stepper, index) => {
+    const root = stepper.closest(".registry-card") || document;
+    const steps = [...root.querySelectorAll("[data-step-target]")];
+    const panels = [...root.querySelectorAll("[data-step-panel]")];
+    const next = root.querySelector("[data-step-next]");
+    const prev = root.querySelector("[data-step-prev]");
+    const submit = root.querySelector('button[type="submit"]');
+    if (!steps.length || !panels.length) return;
 
-  let current = Math.max(1, Number(appSessionStorage.getItem("requestFormStep") || 1));
-  const setStep = (step) => {
-    current = Math.max(1, Math.min(step, panels.length));
-    appSessionStorage.setItem("requestFormStep", String(current));
-    steps.forEach((button) => {
-      const value = Number(button.dataset.stepTarget);
-      button.classList.toggle("active", value === current);
-      button.classList.toggle("complete", value < current);
-    });
-    panels.forEach((panel) => panel.classList.toggle("active", Number(panel.dataset.stepPanel) === current));
-    if (prev) prev.disabled = current === 1;
-    if (next) next.hidden = current === panels.length;
-    if (submit) submit.hidden = current !== panels.length;
-    dispatchRequestStepChanged(current);
-    window.setTimeout(() => window.dispatchEvent(new Event("resize")), 80);
-  };
-  window.requestFormSetStep = setStep;
+    const storageKey = `requestFormStep:${location.pathname}:${index}`;
+    let current = Math.max(1, Number(appSessionStorage.getItem(storageKey) || 1));
+    const setStep = (step) => {
+      current = Math.max(1, Math.min(step, panels.length));
+      appSessionStorage.setItem(storageKey, String(current));
+      steps.forEach((button) => {
+        const value = Number(button.dataset.stepTarget);
+        button.classList.toggle("active", value === current);
+        button.classList.toggle("complete", value < current);
+      });
+      panels.forEach((panel) => panel.classList.toggle("active", Number(panel.dataset.stepPanel) === current));
+      if (prev) prev.disabled = current === 1;
+      if (next) next.hidden = current === panels.length;
+      if (submit) submit.hidden = current !== panels.length;
+      dispatchRequestStepChanged(current);
+      window.setTimeout(() => window.dispatchEvent(new Event("resize")), 80);
+    };
 
-  steps.forEach((button) => button.addEventListener("click", () => setStep(Number(button.dataset.stepTarget))));
-  next?.addEventListener("click", () => setStep(current + 1));
-  prev?.addEventListener("click", () => setStep(current - 1));
-  setStep(current);
+    if (index === 0) {
+      window.requestFormSetStep = setStep;
+    }
+
+    steps.forEach((button) => button.addEventListener("click", () => setStep(Number(button.dataset.stepTarget))));
+    next?.addEventListener("click", () => setStep(current + 1));
+    prev?.addEventListener("click", () => setStep(current - 1));
+    setStep(current);
+  });
 }
 
 function initFormValidation() {
@@ -802,7 +824,7 @@ function initDraftPersistence() {
   });
 
   form.addEventListener("submit", () => {
-    appSessionStorage.removeItem("requestFormStep");
+    clearStepStorageForCurrentPage();
     appLocalStorage.removeItem(draftKey);
     appLocalStorage.removeItem(imageKey);
   });
