@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Tutash hududlar reestri')</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
 <body>
@@ -15,28 +14,51 @@
     <aside class="sidebar">
         <a class="brand" href="{{ route('requests.index') }}">
             <span class="brand-mark">T</span>
-            <span><strong>Tutash hududlar reestri</strong><small>Farg‘ona viloyati</small></span>
+            <span><strong>Tutash hududlar reestri</strong><small>Tadbirkor kabineti</small></span>
         </a>
-        <nav class="nav-list">
-            <a class="nav-link {{ request()->routeIs('requests.index') ? 'active' : '' }}" href="{{ route('requests.index') }}">Reestr</a>
+
+        <nav class="nav-list" aria-label="Asosiy menyu">
+            <a class="nav-link {{ request()->routeIs('requests.index') ? 'active' : '' }}" href="{{ route('requests.index') }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+                <span>Bosh sahifa</span>
+            </a>
             @can('create', App\Models\RegistryRequest::class)
-                <a class="nav-link {{ request()->routeIs('requests.create') ? 'active' : '' }}" href="{{ route('requests.create') }}">Yangi ariza</a>
+                <a class="nav-link {{ request()->routeIs('requests.create') ? 'active' : '' }}" href="{{ route('requests.create') }}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/><path d="M8 9.5h8M8 13h5"/></svg>
+                    <span>Yangi ariza</span>
+                </a>
             @endcan
-            <a class="nav-link {{ request()->routeIs('addresses.index') ? 'active' : '' }}" href="{{ route('addresses.index') }}">Manzillar</a>
-            <a class="nav-link" href="{{ route('users.online') }}">Online foydalanuvchilar</a>
+            <a class="nav-link {{ request()->routeIs('addresses.*') ? 'active' : '' }}" href="{{ route('addresses.index') }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>
+                <span>Manzillar</span>
+            </a>
+            <a class="nav-link {{ request()->routeIs('users.online') ? 'active' : '' }}" href="{{ route('users.online') }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 10 18H2z"/><path d="M12 9v5M12 17h.01"/></svg>
+                <span>Online foydalanuvchilar</span>
+            </a>
         </nav>
     </aside>
 
     <div class="content">
         <header class="topbar">
-            <div>
+            <div class="topbar-title">
                 <button class="menu-button" type="button" aria-label="Menyuni ochish"><span></span><span></span><span></span></button>
-                <span class="breadcrumb">@yield('breadcrumb', 'Reestr')</span>
+                <span class="breadcrumb">@yield('breadcrumb', 'Kadastr uchastkalari')</span>
             </div>
-            <div class="user-card">
-                <span class="user-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
-                <span>{{ auth()->user()->name }}</span>
-                <form method="POST" action="{{ route('logout') }}">@csrf<button class="link-button" type="submit">Chiqish</button></form>
+
+            <div class="topbar-actions">
+                <a class="report-link" href="mailto:invest.abdusattorov@gmail.com">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8M8 13h5"/></svg>
+                    <span>Xatolik haqida xabar berish</span>
+                </a>
+                <button class="bell-button" type="button" aria-label="Bildirishnomalar">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+                </button>
+                <div class="user-card">
+                    <span class="user-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
+                    <span>{{ auth()->user()->name }}</span>
+                    <form method="POST" action="{{ route('logout') }}">@csrf<button class="link-button" type="submit">Chiqish</button></form>
+                </div>
             </div>
         </header>
 
@@ -44,7 +66,7 @@
             <div class="alert success">{{ session('success') }}</div>
         @endif
         @if($errors->any())
-            <div class="alert danger">Ma’lumotlarda xatolik bor. Maydonlarni tekshiring.</div>
+            <div class="alert danger">Ma'lumotlarda xatolik bor. Maydonlarni tekshiring.</div>
         @endif
 
         <main>@yield('content')</main>

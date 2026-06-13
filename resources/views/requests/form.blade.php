@@ -8,17 +8,19 @@
 @endphp
 
 @section('title', $editing ? 'Arizani tahrirlash' : 'Yangi ariza')
-@section('breadcrumb', $editing ? 'Arizani tahrirlash' : 'Yangi ariza')
+@section('breadcrumb', 'Kadastr uchastkalari')
 
 @section('content')
-<section class="page-title">
+<section class="page-title compact-title">
     <div>
-        <p class="eyebrow">{{ $editing ? 'Tahrirlash' : 'Yaratish' }}</p>
-        <h1>{{ $editing ? $requestItem->request_number : 'Yangi ariza' }}</h1>
+        <h1>{{ $editing ? 'Arizani tahrirlash' : 'Yangi ariza kiritish' }}</h1>
+        @if($editing)
+            <p>{{ $requestItem->request_number }}</p>
+        @endif
     </div>
 </section>
 
-<form class="panel form-panel stepped-form" method="POST" enctype="multipart/form-data" action="{{ $editing ? route('requests.update', $requestItem) : route('requests.store') }}">
+<form class="registry-card form-panel stepped-form" method="POST" enctype="multipart/form-data" action="{{ $editing ? route('requests.update', $requestItem) : route('requests.store') }}" novalidate>
     @csrf
     @if($editing) @method('PUT') @endif
 
@@ -84,26 +86,26 @@
             <h2>Manzil</h2>
             <div class="form-grid two">
                 <label>Tuman
-                    <select name="district_id" id="district_id" required>
+                    <select name="district_id" id="district_id" class="searchable-select" required>
                         <option value="">Tanlang</option>
                         @foreach($districts as $district)<option value="{{ $district->id }}" @selected((string) $field('district_id') === (string) $district->id)>{{ $district->name }}</option>@endforeach
                     </select>
                     @error('district_id')<span>{{ $message }}</span>@enderror
                 </label>
                 <label>Mahalla
-                    <select name="mahalla_id" id="mahalla_id" required>
+                    <select name="mahalla_id" id="mahalla_id" class="searchable-select" required>
                         <option value="">Tanlang</option>
                         @foreach($mahallas as $mahalla)<option value="{{ $mahalla->id }}" data-district="{{ $mahalla->district_id }}" @selected((string) $field('mahalla_id') === (string) $mahalla->id)>{{ $mahalla->name }}</option>@endforeach
                     </select>
                     @error('mahalla_id')<span>{{ $message }}</span>@enderror
                 </label>
                 <label>Ko‘cha turi
-                    <select name="street_type" id="street_type" required>@foreach($streetTypes as $key => $label)<option value="{{ $key }}" @selected($field('street_type', 'kocha') === $key)>{{ $label }}</option>@endforeach</select>
+                    <select name="street_type" id="street_type" class="searchable-select" required>@foreach($streetTypes as $key => $label)<option value="{{ $key }}" @selected($field('street_type', 'kocha') === $key)>{{ $label }}</option>@endforeach</select>
                     @error('street_type')<span>{{ $message }}</span>@enderror
                 </label>
                 <label>Ko‘cha
                     <div class="inline-field">
-                        <select name="street_id" id="street_id" required>
+                        <select name="street_id" id="street_id" class="searchable-select" required>
                             <option value="">Tanlang</option>
                             @foreach($streets as $street)<option value="{{ $street->id }}" data-district="{{ $street->district_id }}" data-mahalla="{{ $street->mahalla_id }}" @selected((string) $field('street_id') === (string) $street->id)>{{ $street->name }}</option>@endforeach
                         </select>
@@ -169,6 +171,7 @@
                 <div class="map-shell">
                     <div class="map-toolbar" aria-label="Xarita asboblari">
                         <button type="button" class="map-tool active" id="draw-polygon">Chizish</button>
+                        <button type="button" class="map-tool finish" id="finish-polygon">Yakunlash</button>
                         <button type="button" class="map-tool" id="undo-point">Oxirgi nuqta</button>
                         <button type="button" class="map-tool" id="fit-polygon">Ko‘rsatish</button>
                         <button type="button" class="map-tool danger" id="reset-polygon">Tozalash</button>
@@ -221,7 +224,7 @@
                     @error('images.*')<p class="field-error">{{ $message }}</p>@enderror
                 </div>
 
-                <label>Akt fayli<input name="act_file" type="file" accept=".pdf,image/*" {{ $editing ? '' : 'required' }}>@error('act_file')<span>{{ $message }}</span>@enderror</label>
+                <label>Akt fayli<input name="act_file" type="file" accept=".pdf,image/*">@error('act_file')<span>{{ $message }}</span>@enderror</label>
                 <label>Loyiha kodi fayli<input name="design_code_file" type="file" accept=".pdf,image/*">@error('design_code_file')<span>{{ $message }}</span>@enderror</label>
                 <label>Qayta o‘rganish akti<input name="qayta_organish_akti_file" type="file" accept=".pdf,image/*">@error('qayta_organish_akti_file')<span>{{ $message }}</span>@enderror</label>
             </div>

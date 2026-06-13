@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   initSteps();
   initDependentSelects();
+  initSearchableSelects();
   initStreetCreator();
   initOwnerType();
   initMasks();
@@ -8,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initAreaCalculator();
   initImageSlots();
   initDraftPersistence();
+  initFormValidation();
   initPolygonMap();
   initShowMap();
 });
@@ -33,13 +35,95 @@ function initSteps() {
     if (prev) prev.disabled = current === 1;
     if (next) next.hidden = current === panels.length;
     if (submit) submit.hidden = current !== panels.length;
+    window.dispatchEvent(new CustomEvent("requestFormStepChanged", { detail: { step: current } }));
     window.setTimeout(() => window.dispatchEvent(new Event("resize")), 80);
   };
+  window.requestFormSetStep = setStep;
 
   steps.forEach((button) => button.addEventListener("click", () => setStep(Number(button.dataset.stepTarget))));
   next?.addEventListener("click", () => setStep(current + 1));
   prev?.addEventListener("click", () => setStep(current - 1));
   setStep(current);
+}
+
+function initFormValidation() {
+  const form = document.querySelector(".stepped-form");
+  if (!form) return;
+
+  form.addEventListener("submit", (event) => {
+    const invalid = findFirstInvalidControl(form);
+    if (!invalid) return;
+
+    event.preventDefault();
+    const panel = invalid.closest("[data-step-panel]");
+    if (panel) {
+      window.requestFormSetStep?.(Number(panel.dataset.stepPanel));
+    }
+
+    window.setTimeout(() => {
+      focusControl(invalid);
+      showToast(fieldLabel(invalid) + " maydonini to'ldiring.", "error");
+    }, 80);
+  });
+}
+
+function findFirstInvalidControl(form) {
+  const controls = [...form.querySelectorAll("input, select, textarea")];
+
+  return controls.find((control) => {
+    if (control.disabled || control.type === "hidden") return false;
+    if (control.required && !hasValue(control)) return true;
+    if (control.validity && !control.validity.valid) return true;
+    return false;
+  });
+}
+
+function hasValue(control) {
+  if (control.type === "checkbox" || control.type === "radio") {
+    return [...document.querySelectorAll(`[name="${CSS.escape(control.name)}"]`)].some((field) => field.checked);
+  }
+
+  if (control.type === "file") {
+    return control.files?.length > 0;
+  }
+
+  return String(control.value || "").trim() !== "";
+}
+
+function focusControl(control) {
+  const searchable = control.matches("select.searchable-select")
+    ? control.nextElementSibling?.querySelector(".searchable-select-input")
+    : null;
+  const target = searchable || control;
+
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+  target.focus({ preventScroll: true });
+}
+
+function fieldLabel(control) {
+  const label = control.closest("label");
+  const text = label?.childNodes?.[0]?.textContent?.trim();
+  return text || control.name || "Maydon";
+}
+
+function showToast(message, type = "info") {
+  let wrap = document.querySelector(".toast-wrap");
+  if (!wrap) {
+    wrap = document.createElement("div");
+    wrap.className = "toast-wrap";
+    document.body.appendChild(wrap);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  wrap.appendChild(toast);
+
+  window.setTimeout(() => toast.classList.add("show"), 20);
+  window.setTimeout(() => {
+    toast.classList.remove("show");
+    toast.addEventListener("transitionend", () => toast.remove(), { once: true });
+  }, 3800);
 }
 
 function initDependentSelects() {
@@ -61,11 +145,112 @@ function initDependentSelects() {
       option.hidden = option.dataset.district !== districtId || option.dataset.mahalla !== mahallaId;
       if (option.hidden && option.selected) street.value = "";
     });
+    window.refreshSearchableSelects?.();
   };
 
   district.addEventListener("change", sync);
   mahalla.addEventListener("change", sync);
   sync();
+}
+
+function initSearchableSelects() {
+  const selects = [...document.querySelectorAll("select.searchable-select")];
+  if (!selects.length) return;
+
+  selects.forEach((select) => {
+    if (select.dataset.searchableReady === "1") return;
+    select.dataset.searchableReady = "1";
+    select.classList.add("native-select-hidden");
+
+    const shell = document.createElement("div");
+    shell.className = "searchable-select-shell";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "searchable-select-input";
+    input.autocomplete = "off";
+    input.placeholder = select.options[0]?.textContent?.trim() || "Tanlang";
+    const list = document.createElement("div");
+    list.className = "searchable-select-list";
+    list.hidden = true;
+
+    shell.append(input, list);
+    select.insertAdjacentElement("afterend", shell);
+
+    const visibleOptions = () => [...select.options].filter((option) => !option.hidden);
+    const selectedLabel = () => select.selectedOptions[0]?.textContent?.trim() || "";
+
+    const close = () => { list.hidden = true; };
+    const open = () => {
+      render(input.value);
+      list.hidden = false;
+    };
+
+    const render = (term = "") => {
+      const normalized = term.trim().toLowerCase();
+      list.innerHTML = "";
+      const matches = visibleOptions().filter((option) => option.textContent.toLowerCase().includes(normalized));
+
+      if (!matches.length) {
+        const empty = document.createElement("div");
+        empty.className = "searchable-select-empty";
+        empty.textContent = "Ma'lumot topilmadi";
+        list.append(empty);
+        return;
+      }
+
+      matches.forEach((option) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "searchable-select-option";
+        item.textContent = option.textContent;
+        item.dataset.value = option.value;
+        item.setAttribute("aria-selected", option.selected ? "true" : "false");
+        item.addEventListener("mousedown", (event) => {
+          event.preventDefault();
+          select.value = option.value;
+          input.value = option.value ? option.textContent.trim() : "";
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          close();
+        });
+        list.append(item);
+      });
+    };
+
+    const syncInput = () => {
+      input.value = select.value ? selectedLabel() : "";
+    };
+    select.searchableSync = syncInput;
+
+    input.addEventListener("focus", open);
+    input.addEventListener("click", open);
+    input.addEventListener("input", () => open());
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") close();
+      if (event.key === "Enter") {
+        const first = list.querySelector(".searchable-select-option");
+        if (first) {
+          event.preventDefault();
+          first.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+        }
+      }
+    });
+    select.addEventListener("change", syncInput);
+
+    syncInput();
+  });
+
+  document.addEventListener("click", (event) => {
+    document.querySelectorAll(".searchable-select-shell").forEach((shell) => {
+      if (!shell.contains(event.target)) {
+        const list = shell.querySelector(".searchable-select-list");
+        if (list) list.hidden = true;
+      }
+    });
+  });
+
+  window.refreshSearchableSelects = () => {
+    selects.forEach((select) => select.searchableSync?.());
+  };
 }
 
 function initStreetCreator() {
@@ -110,6 +295,7 @@ function initStreetCreator() {
     option.dataset.district = created.district_id;
     option.dataset.mahalla = created.mahalla_id;
     street.add(option);
+    street.dispatchEvent(new Event("change", { bubbles: true }));
     input.value = "";
     wrap.classList.add("hidden");
   });
@@ -168,11 +354,24 @@ function initMasks() {
 
 function formatCadastre(value) {
   const raw = String(value || "");
-  const slashIndex = raw.indexOf("/");
-  const beforeSlash = slashIndex >= 0 ? raw.slice(0, slashIndex) : raw;
-  const typedSuffix = slashIndex >= 0 ? raw.slice(slashIndex + 1) : "";
-  const digits = beforeSlash.replace(/\D/g, "").slice(0, 14);
-  const overflow = beforeSlash.replace(/\D/g, "").slice(14);
+  let digits = "";
+  let separator = "";
+  let suffix = "";
+
+  for (const char of raw) {
+    if (digits.length < 14) {
+      if (/\d/.test(char)) digits += char;
+      continue;
+    }
+
+    if (!separator) {
+      if (char === "/" || char === ":") separator = char;
+      continue;
+    }
+
+    suffix += char.replace(/[^\d:]/g, "");
+  }
+
   const mainGroups = [2, 2, 2, 2, 2, 4];
   const mainParts = [];
   let offset = 0;
@@ -184,9 +383,11 @@ function formatCadastre(value) {
   });
 
   const main = mainParts.join(":");
-  const suffix = slashIndex >= 0 ? typedSuffix : overflow;
 
-  return suffix ? `${main}/${suffix}` : main;
+  if (suffix) return `${main}${separator}${suffix}`;
+  if (separator) return `${main}${separator}`;
+
+  return main;
 }
 
 function initCadastreCheck() {
@@ -235,11 +436,7 @@ function initImageSlots() {
       preview.removeAttribute("src");
       preview.classList.add("hidden");
       clear.classList.add("hidden");
-      const imageKey = `request-form-draft:${location.pathname}:images`;
-      const index = [...document.querySelectorAll('[data-image-slot] input[type="file"]')].indexOf(input);
-      const data = readJson(imageKey, {});
-      delete data[index];
-      localStorage.setItem(imageKey, JSON.stringify(data));
+      localStorage.removeItem(`request-form-draft:${location.pathname}:images`);
     });
   });
 
@@ -269,17 +466,13 @@ function initDraftPersistence() {
   const draftKey = `request-form-draft:${location.pathname}`;
   const imageKey = `${draftKey}:images`;
   const draft = readJson(draftKey, {});
-  const imageDraft = readJson(imageKey, {});
 
   restoreDraft(form, draft);
-  restoreImageDrafts(form, imageDraft, imageKey);
+  localStorage.removeItem(imageKey);
 
   form.addEventListener("input", () => saveDraft(form, draftKey));
-  form.addEventListener("change", (event) => {
+  form.addEventListener("change", () => {
     saveDraft(form, draftKey);
-    if (event.target.matches('[data-image-slot] input[type="file"]')) {
-      saveImageSlot(event.target, imageKey);
-    }
   });
 
   form.addEventListener("submit", () => {
@@ -325,66 +518,6 @@ function restoreDraft(form, data) {
   document.getElementById("area_length")?.dispatchEvent(new Event("input"));
 }
 
-async function saveImageSlot(input, imageKey) {
-  const file = input.files?.[0];
-  if (!file) return;
-  const slot = [...document.querySelectorAll('[data-image-slot] input[type="file"]')].indexOf(input);
-  const data = readJson(imageKey, {});
-  try {
-    data[slot] = {
-      name: file.name,
-      type: file.type || "image/jpeg",
-      dataUrl: await fileToDataUrl(file),
-    };
-    localStorage.setItem(imageKey, JSON.stringify(data));
-  } catch (error) {
-    console.warn("Rasm draft sifatida saqlanmadi:", error);
-  }
-}
-
-function restoreImageDrafts(form, imageDraft, imageKey) {
-  form.querySelectorAll("[data-image-slot]").forEach((slot, index) => {
-    const saved = imageDraft?.[index];
-    if (!saved?.dataUrl) return;
-    const input = slot.querySelector('input[type="file"]');
-    const preview = slot.querySelector(".image-preview");
-    const clear = slot.querySelector(".image-clear");
-    if (!input || !preview || !clear) return;
-
-    const file = dataUrlToFile(saved.dataUrl, saved.name || `rasm-${index + 1}.jpg`, saved.type || "image/jpeg");
-    const transfer = new DataTransfer();
-    transfer.items.add(file);
-    input.files = transfer.files;
-    preview.src = saved.dataUrl;
-    preview.classList.remove("hidden");
-    clear.classList.remove("hidden");
-
-    clear.addEventListener("click", () => {
-      const data = readJson(imageKey, {});
-      delete data[index];
-      localStorage.setItem(imageKey, JSON.stringify(data));
-    });
-  });
-}
-
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-function dataUrlToFile(dataUrl, name, type) {
-  const [header, body] = dataUrl.split(",");
-  const mime = type || header.match(/data:(.*?);/)?.[1] || "application/octet-stream";
-  const binary = atob(body);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return new File([bytes], name, { type: mime });
-}
-
 function readJson(key, fallback) {
   try {
     return JSON.parse(localStorage.getItem(key)) || fallback;
@@ -395,7 +528,24 @@ function readJson(key, fallback) {
 
 function initPolygonMap() {
   const container = document.getElementById("polygon-map");
-  if (!container || typeof L === "undefined") return;
+  if (!container) return;
+  if (container.dataset.mapReady === "1") return;
+  if (container.offsetParent === null) {
+    const initWhenVisible = () => {
+      if (container.offsetParent === null) return;
+      window.removeEventListener("requestFormStepChanged", initWhenVisible);
+      initPolygonMap();
+    };
+    window.addEventListener("requestFormStepChanged", initWhenVisible);
+    return;
+  }
+  if (typeof L === "undefined") {
+    loadLeaflet().then(initPolygonMap).catch(() => {
+      container.textContent = "Xaritani yuklab bo'lmadi.";
+    });
+    return;
+  }
+  container.dataset.mapReady = "1";
 
   const latInput = document.getElementById("latitude");
   const lngInput = document.getElementById("longitude");
@@ -405,6 +555,7 @@ function initPolygonMap() {
   const undo = document.getElementById("undo-point");
   const fit = document.getElementById("fit-polygon");
   const draw = document.getElementById("draw-polygon");
+  const finish = document.getElementById("finish-polygon");
   const map = L.map(container).setView([40.3777, 71.7978], 13);
   addTiles(map);
 
@@ -426,8 +577,17 @@ function initPolygonMap() {
 
   draw?.addEventListener("click", () => {
     drawing = !drawing;
-    draw.classList.toggle("active", drawing);
-    draw.textContent = drawing ? "Chizish" : "Pauza";
+    syncDrawingState();
+  });
+  finish?.addEventListener("click", () => {
+    if (points.length < 3) {
+      if (summary) summary.textContent = "Yakunlash uchun kamida 3 ta nuqta belgilang.";
+      return;
+    }
+    drawing = false;
+    redraw(true);
+    syncDrawingState(true);
+    fitBounds();
   });
   undo?.addEventListener("click", () => {
     const marker = markers.pop();
@@ -437,6 +597,7 @@ function initPolygonMap() {
   });
   fit?.addEventListener("click", fitBounds);
   reset?.addEventListener("click", clearPolygon);
+  syncDrawingState(false);
 
   function addPoint(latlng, shouldRedraw = true) {
     points.push(latlng);
@@ -457,7 +618,7 @@ function initPolygonMap() {
     if (shouldRedraw) redraw();
   }
 
-  function redraw() {
+  function redraw(finished = false) {
     if (polygon) polygon.remove();
     polygon = null;
     if (points.length < 3) {
@@ -480,7 +641,18 @@ function initPolygonMap() {
       },
       properties: {},
     });
-    if (summary) summary.textContent = `${points.length} ta nuqta tanlandi. Markaz: ${latInput.value}, ${lngInput.value}`;
+    if (summary) {
+      summary.textContent = finished
+        ? `Poligon yakunlandi. ${points.length} ta nuqta tanlandi. Markaz: ${latInput.value}, ${lngInput.value}`
+        : `${points.length} ta nuqta tanlandi. Yakunlash tugmasini bosing yoki chizishni davom ettiring.`;
+    }
+  }
+
+  function syncDrawingState(finished = false) {
+    draw?.classList.toggle("active", drawing);
+    finish?.classList.toggle("active", finished);
+    if (draw) draw.textContent = drawing ? "Chizish" : "Davom ettirish";
+    if (finish) finish.textContent = finished ? "Yakunlandi" : "Yakunlash";
   }
 
   function fitBounds() {
@@ -492,6 +664,8 @@ function initPolygonMap() {
     points.splice(0);
     if (polygon) polygon.remove();
     polygon = null;
+    drawing = true;
+    syncDrawingState(false);
     latInput.value = "";
     lngInput.value = "";
     polygonInput.value = "";
@@ -501,7 +675,15 @@ function initPolygonMap() {
 
 function initShowMap() {
   const container = document.getElementById("show-map");
-  if (!container || typeof L === "undefined") return;
+  if (!container) return;
+  if (container.dataset.mapReady === "1") return;
+  if (typeof L === "undefined") {
+    loadLeaflet().then(initShowMap).catch(() => {
+      container.textContent = "Xaritani yuklab bo'lmadi.";
+    });
+    return;
+  }
+  container.dataset.mapReady = "1";
   const map = L.map(container).setView([40.3777, 71.7978], 13);
   addTiles(map);
   const coords = parseGeoJson(container.dataset.polygon);
@@ -511,9 +693,27 @@ function initShowMap() {
   map.fitBounds(polygon.getBounds(), { padding: [30, 30] });
 }
 
+function loadLeaflet() {
+  if (typeof L !== "undefined") return Promise.resolve();
+  if (window.leafletLoadingPromise) return window.leafletLoadingPromise;
+
+  window.leafletLoadingPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "/vendor/leaflet/leaflet.js";
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+
+  return window.leafletLoadingPromise;
+}
+
 function addTiles(map) {
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
+    updateWhenIdle: true,
+    keepBuffer: 1,
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map);
 }
@@ -544,11 +744,11 @@ window.checkCadastreRestriction = async function (cadastreNumber) {
     return;
   }
 
-  if (!/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}(\/.+)?$/.test(value)) {
+  if (!/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([/:].+)?$/.test(value)) {
     warningDiv.classList.remove("hidden", "success");
     warningDiv.classList.add("danger");
     if (titleEl) titleEl.textContent = "Kadastr formati noto‘g‘ri";
-    messageEl.textContent = "Asosiy qism 10:08:04:01:02:5006 formatida bo‘lishi shart. Undan keyingi / qismi erkin.";
+    messageEl.textContent = "Asosiy qism 10:08:04:01:02:5006 formatida bo'lishi shart. Undan keyingi / yoki : qismi erkin.";
     input.classList.add("border-red-500");
     if (submitButton) {
       submitButton.disabled = true;

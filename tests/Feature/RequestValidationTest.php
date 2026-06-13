@@ -29,6 +29,52 @@ class RequestValidationTest extends TestCase
         $this->assertDatabaseCount('audit_logs', 1);
     }
 
+    public function test_cadastre_number_accepts_colon_suffix(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['building_cadastr_number'] = '31:23:12:31:23:1232:12321312321';
+        $payload['hokimyatga_biriktirilgan_kadastr_raqami'] = '10:08:04:01:02:5006:0001035';
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('registry_requests', [
+            'building_cadastr_number' => '31:23:12:31:23:1232:12321312321',
+            'hokimyatga_biriktirilgan_kadastr_raqami' => '10:08:04:01:02:5006:0001035',
+        ]);
+    }
+
+    public function test_request_accepts_missing_street_type_option(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['street_type'] = 'mavjud_emas';
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('registry_requests', ['street_type' => 'mavjud_emas']);
+    }
+
+    public function test_act_file_is_optional(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        unset($payload['act_file']);
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect();
+
+        $this->assertDatabaseCount('registry_requests', 1);
+    }
+
     public function test_duplicate_images_are_rejected_and_old_input_returns(): void
     {
         Storage::fake('public');

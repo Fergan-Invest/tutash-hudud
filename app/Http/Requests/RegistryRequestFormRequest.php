@@ -21,18 +21,30 @@ class RegistryRequestFormRequest extends FormRequest
     public function rules(): array
     {
         $requestId = $this->route('registryRequest')?->id;
+        $districtId = (int) $this->input('district_id');
+        $mahallaId = (int) $this->input('mahalla_id');
 
         return [
-            'building_cadastr_number' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}(\/.+)?$/'],
-            'hokimyatga_biriktirilgan_kadastr_raqami' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}(\/.+)?$/'],
+            'building_cadastr_number' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([\/:].+)?$/'],
+            'hokimyatga_biriktirilgan_kadastr_raqami' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([\/:].+)?$/'],
             'owner_type' => ['required', Rule::in(['jismoniy', 'yuridik'])],
             'owner_stir_pinfl' => ['required', 'digits_between:9,14'],
             'owner_name' => ['required', 'string', 'max:255'],
             'district_id' => ['required', 'integer', 'exists:districts,id'],
-            'mahalla_id' => ['required', 'integer', 'exists:mahallas,id'],
-            'street_id' => ['required', 'integer', 'exists:streets,id'],
+            'mahalla_id' => [
+                'required',
+                'integer',
+                Rule::exists('mahallas', 'id')->where('district_id', $districtId),
+            ],
+            'street_id' => [
+                'required',
+                'integer',
+                Rule::exists('streets', 'id')
+                    ->where('district_id', $districtId)
+                    ->where('mahalla_id', $mahallaId),
+            ],
             'house_number' => ['required', 'string', 'max:80'],
-            'street_type' => ['required', Rule::in(['kocha', 'shohkocha', 'tor_kocha', 'berk_kocha'])],
+            'street_type' => ['required', Rule::in(['kocha', 'shohkocha', 'tor_kocha', 'berk_kocha', 'mavjud_emas'])],
             'director_name' => ['required', 'string', 'max:255'],
             'phone_number' => ['nullable', 'regex:/^\+998 \(\d{2}\) \d{3}-\d{2}-\d{2}$/'],
             'area_length' => ['required', 'numeric', 'min:0.01'],
@@ -62,7 +74,7 @@ class RegistryRequestFormRequest extends FormRequest
             'polygon_coordinates' => ['required', 'json'],
             'images' => [$requestId ? 'nullable' : 'required', 'array', $requestId ? 'min:0' : 'min:4'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
-            'act_file' => [$requestId ? 'nullable' : 'required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            'act_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'design_code_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'qayta_organish_akti_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
         ];

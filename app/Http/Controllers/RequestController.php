@@ -124,7 +124,7 @@ class RequestController extends Controller
     public function checkCadastreRestriction(Request $request)
     {
         $data = $request->validate([
-            'cadastre_number' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}(\/.+)?$/'],
+            'cadastre_number' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([\/:].+)?$/'],
         ]);
 
         $existing = RegistryRequest::query()
@@ -158,7 +158,7 @@ class RequestController extends Controller
             'districts' => $districts,
             'mahallas' => $mahallas,
             'streets' => $streets,
-            'streetTypes' => ['kocha' => 'Ko‘cha', 'shohkocha' => 'Shohko‘cha', 'tor_kocha' => 'Tor ko‘cha', 'berk_kocha' => 'Berk ko‘cha'],
+            'streetTypes' => ['kocha' => 'Ko‘cha', 'shohkocha' => 'Shohko‘cha', 'tor_kocha' => 'Tor ko‘cha', 'berk_kocha' => 'Berk ko‘cha', 'mavjud_emas' => 'Mavjud emas'],
             'usagePurposes' => ['savdo' => 'Savdo', 'xizmat' => 'Xizmat', 'umumiy_ovqatlanish' => 'Umumiy ovqatlanish', 'boshqa' => 'Boshqa'],
             'facilities' => ['soyabon', 'stol_stul', 'vitrina', 'yengil_konstruksiya', 'reklama'],
         ];

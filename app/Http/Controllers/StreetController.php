@@ -18,7 +18,7 @@ class StreetController extends Controller
             'district_id' => ['required', 'integer', 'exists:districts,id'],
             'mahalla_id' => ['required', 'integer', 'exists:mahallas,id'],
             'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', Rule::in(['kocha', 'shohkocha', 'tor_kocha', 'berk_kocha'])],
+            'type' => ['required', Rule::in(['kocha', 'shohkocha', 'tor_kocha', 'berk_kocha', 'mavjud_emas'])],
         ]);
 
         if ($request->user()->isTuman() && (int) $data['district_id'] !== (int) $request->user()->district_id) {

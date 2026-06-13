@@ -3,6 +3,8 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -25,6 +27,16 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        $this->renderable(function (TokenMismatchException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Sessiya muddati tugadi. Sahifani yangilab qayta urinib ko‘ring.',
+                ], 419);
+            }
+
+            return response()->view('errors.419', [], 419);
         });
     }
 }
