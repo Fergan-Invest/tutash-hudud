@@ -1024,10 +1024,29 @@ function initPolygonMap() {
     if (summary) summary.textContent = "Poligon hali chizilmagan.";
   }
 
-  function locatePosition() {
+  async function locatePosition() {
     if (!navigator.geolocation) {
-      showToast("Brauzer joylashuvni aniqlashni qo'llab-quvvatlamaydi.", "error");
+      showToast("Brauzer joylashuvni aniqlashni qo'llab-quvvatlamaydi yoki sahifa xavfsiz HTTPS orqali ochilmagan.", "error");
       return;
+    }
+
+    if (!window.isSecureContext) {
+      alert("Joylashuvni aniqlash uchun sahifani ishonchli HTTPS orqali ochish kerak. HTTP yoki self-signed SSL bo'lsa browser ruxsat oynasini ko'rsatmaydi.");
+      return;
+    }
+
+    if (!confirm("Brauzer joylashuvingizni aniqlash uchun ruxsat so'raydi. Ruxsat berasizmi?")) {
+      return;
+    }
+
+    try {
+      const permission = await navigator.permissions?.query({ name: "geolocation" });
+      if (permission?.state === "denied") {
+        alert("Joylashuvga ruxsat oldin bloklangan. Browser sozlamalaridan ushbu sayt uchun Location/Geolocation ruxsatini yoqing.");
+        return;
+      }
+    } catch {
+      // Some browsers do not expose geolocation through the Permissions API.
     }
 
     const originalText = locate?.textContent || "Joylashuvni top";
@@ -1067,7 +1086,7 @@ function initPolygonMap() {
       },
       (error) => {
         const messages = {
-          1: "Joylashuvga ruxsat berilmadi.",
+          1: "Joylashuvga ruxsat berilmadi. Browser manzil qatoridagi ruxsat sozlamalaridan Location ruxsatini yoqing.",
           2: "Joylashuvni aniqlab bo'lmadi.",
           3: "Joylashuvni aniqlash vaqti tugadi.",
         };
