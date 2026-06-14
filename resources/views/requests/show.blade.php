@@ -56,7 +56,6 @@
         'tenant_name' => 'Ijarachi nomi',
         'tenant_activity_type' => 'Ijarachi faoliyat turi',
         'adjacent_activity_type' => 'Tutash hududdagi faoliyat',
-        'adjacent_activity_land' => 'Tutash hudud maydoni',
         'adjacent_facilities' => 'Tutash hudud obyektlari',
         'additional_info' => 'Qo‘shimcha ma’lumot',
         'latitude' => 'Xarita kengligi',
@@ -126,6 +125,13 @@
         @can('update', $requestItem)
             <a class="secondary-button" href="{{ route('requests.edit', $requestItem) }}">Tahrirlash</a>
         @endcan
+        @can('delete', $requestItem)
+            <form method="POST" action="{{ route('requests.destroy', $requestItem) }}" onsubmit="return confirm('Arizani o‘chirishni tasdiqlaysizmi?');">
+                @csrf
+                @method('DELETE')
+                <button class="danger-button" type="submit">O‘chirish</button>
+            </form>
+        @endcan
     </div>
 </section>
 
@@ -177,7 +183,6 @@
                 <div class="readonly-field"><span>Umumiy maydon (m²)</span><strong>{{ $requestItem->total_area }}</strong></div>
                 <div class="readonly-field"><span>Fasad uzunligi (m)</span><strong>{{ $display($requestItem->building_facade_length) }}</strong></div>
                 <div class="readonly-field"><span>Yozgi terassa tomonlari (m)</span><strong>{{ $display($requestItem->summer_terrace_sides) }}</strong></div>
-                <div class="readonly-field"><span>Tutash hudud maydoni</span><strong>{{ $requestItem->adjacent_activity_land }}</strong></div>
                 <div class="readonly-field"><span>Yo‘lgacha masofa (m)</span><strong>{{ $requestItem->distance_to_roadway }}</strong></div>
                 <div class="readonly-field"><span>Trotuargacha masofa (m)</span><strong>{{ $requestItem->distance_to_sidewalk }}</strong></div>
                 <div class="readonly-field"><span>Foydalanish maqsadi</span><strong>{{ $usagePurposeLabels[$requestItem->usage_purpose] ?? $requestItem->usage_purpose }}</strong></div>
@@ -306,6 +311,13 @@
         <button class="secondary-button" type="button" data-step-next>Keyingisi</button>
         @can('update', $requestItem)
             <a class="primary-button" href="{{ route('requests.edit', $requestItem) }}">Tahrirlash</a>
+        @endcan
+        @can('delete', $requestItem)
+            <form method="POST" action="{{ route('requests.destroy', $requestItem) }}" onsubmit="return confirm('Arizani o‘chirishni tasdiqlaysizmi?');">
+                @csrf
+                @method('DELETE')
+                <button class="danger-button" type="submit">O‘chirish</button>
+            </form>
         @endcan
     </div>
 </section>

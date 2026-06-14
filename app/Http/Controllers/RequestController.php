@@ -158,9 +158,20 @@ class RequestController extends Controller
         return response()->json([
             'restricted' => filled($existing),
             'message' => filled($existing)
-                ? "Bu kadastr raqami {$existing->request_number} arizasida ishlatilgan. Status: {$existing->status}."
+                ? "Bu kadastr raqami {$existing->request_number} arizasida ishlatilgan. Holati: ".$this->statusLabels()[$existing->status].'.'
                 : 'Kadastr raqami bo‘yicha cheklov topilmadi.',
         ]);
+    }
+
+    private function statusLabels(): array
+    {
+        return [
+            'draft' => 'Qoralama',
+            'submitted' => 'Yuborilgan',
+            'in_review' => 'Ko‘rib chiqilmoqda',
+            'approved' => 'Tasdiqlangan',
+            'rejected' => 'Rad etilgan',
+        ];
     }
 
     private function formData(Request $request, ?RegistryRequest $registryRequest = null): array

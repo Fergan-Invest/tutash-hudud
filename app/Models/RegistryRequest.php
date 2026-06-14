@@ -3,13 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class RegistryRequest extends Model
 {
+    use SoftDeletes;
+
     public const STATUSES = ['draft', 'submitted', 'in_review', 'approved', 'rejected'];
     public const STREET_TYPES = [
-        'kocha' => 'Kōcha',
+        'kocha' => 'Ko‘cha',
         'gostronomik' => 'Gostronomik',
         'turizm' => 'Turizm',
     ];
@@ -38,7 +41,9 @@ class RegistryRequest extends Model
     protected static function booted(): void
     {
         static::deleting(function (RegistryRequest $request) {
-            Storage::disk('public')->deleteDirectory("requests/{$request->id}");
+            if ($request->isForceDeleting()) {
+                Storage::disk('public')->deleteDirectory("requests/{$request->id}");
+            }
         });
     }
 

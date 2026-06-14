@@ -3,6 +3,16 @@
 @section('title', 'Reestr')
 @section('breadcrumb', 'Kadastr uchastkalari')
 
+@php
+    $statusLabels = [
+        'draft' => 'Qoralama',
+        'submitted' => 'Yuborilgan',
+        'in_review' => 'Ko‘rib chiqilmoqda',
+        'approved' => 'Tasdiqlangan',
+        'rejected' => 'Rad etilgan',
+    ];
+@endphp
+
 @section('content')
 <section class="page-title compact-title">
     <div>
@@ -18,7 +28,7 @@
     <select name="status">
         <option value="">Barcha statuslar</option>
         @foreach($statuses as $status)
-            <option value="{{ $status }}" @selected(request('status') === $status)>{{ str_replace('_', ' ', $status) }}</option>
+            <option value="{{ $status }}" @selected(request('status') === $status)>{{ $statusLabels[$status] ?? $status }}</option>
         @endforeach
     </select>
     <select name="street_type">
@@ -35,7 +45,7 @@
     </select>
     <input name="date_from" type="date" value="{{ request('date_from') }}">
     <input name="date_to" type="date" value="{{ request('date_to') }}">
-    <button class="secondary-button" type="submit">Filter</button>
+    <button class="secondary-button" type="submit">Filtrlash</button>
 </form>
 
 @if($requests->isEmpty())
@@ -57,17 +67,17 @@
 @else
     <section class="panel table-panel registry-card">
         <div class="table-wrap">
-            <table>
-                <thead><tr><th>Raqam</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Status</th><th>Sana</th><th></th></tr></thead>
+            <table class="registry-table">
+                <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Holati</th><th>Sana</th><th></th></tr></thead>
                 <tbody>
                 @foreach($requests as $item)
                     <tr>
-                        <td>{{ $item->request_number }}</td>
+                        <td><span class="row-number">{{ $requests->firstItem() + $loop->index }}</span></td>
                         <td>{{ $item->owner_name }}<small>{{ $item->owner_stir_pinfl }}</small></td>
                         <td>{{ $item->district->name }}<small>{{ $item->mahalla->name }}, {{ $item->street->name }}</small></td>
                         <td>{{ $streetTypes[$item->street_type] ?? $item->street_type }}</td>
                         <td>{{ $item->building_cadastr_number }}</td>
-                        <td><span class="status {{ $item->status }}">{{ str_replace('_', ' ', $item->status) }}</span></td>
+                        <td><span class="status {{ $item->status }}">{{ $statusLabels[$item->status] ?? $item->status }}</span></td>
                         <td>{{ $item->created_at->format('d.m.Y H:i') }}</td>
                         <td><a class="row-link" href="{{ route('requests.show', $item) }}">Ko'rish</a></td>
                     </tr>

@@ -95,6 +95,10 @@ class RequestValidationTest extends TestCase
         $this->actingAs($user)
             ->get(route('requests.index', ['street_type' => 'turizm']))
             ->assertOk()
+            ->assertSee('T/r')
+            ->assertSee('Yuborilgan')
+            ->assertSee('Filtrlash')
+            ->assertDontSee('THR-')
             ->assertSee('Turizm Owner')
             ->assertDontSee('Kōcha Owner');
     }
@@ -247,6 +251,8 @@ class RequestValidationTest extends TestCase
             ->assertSee('Oldin')
             ->assertSee('Keyin')
             ->assertSee('Yuborilgan')
+            ->assertSee('O‘chirish')
+            ->assertDontSee('Tutash hudud maydoni')
             ->assertDontSee('<strong>id</strong>', false);
     }
 
@@ -266,7 +272,7 @@ class RequestValidationTest extends TestCase
             ->assertSessionHasInput('owner_name', 'Owner MCHJ');
     }
 
-    public function test_request_can_be_updated_and_deleted_with_media_cleanup(): void
+    public function test_request_can_be_updated_and_soft_deleted_without_media_cleanup(): void
     {
         Storage::fake('public');
         [$user, $district, $mahalla, $street] = $this->setupActor();
@@ -305,12 +311,12 @@ class RequestValidationTest extends TestCase
             ->delete(route('requests.destroy', $registryRequest))
             ->assertRedirect(route('requests.index'));
 
-        $this->assertDatabaseMissing('registry_requests', ['id' => $registryRequest->id]);
-        $this->assertDatabaseCount('request_images', 0);
-        $this->assertDatabaseCount('request_files', 0);
-        Storage::disk('public')->assertMissing($storedImagePath);
-        Storage::disk('public')->assertMissing($storedFilePath);
-        Storage::disk('public')->assertMissing("requests/{$registryRequest->id}");
+        $this->assertSoftDeleted('registry_requests', ['id' => $registryRequest->id]);
+        $this->assertDatabaseCount('request_images', 4);
+        $this->assertDatabaseCount('request_files', 1);
+        Storage::disk('public')->assertExists($storedImagePath);
+        Storage::disk('public')->assertExists($storedFilePath);
+        Storage::disk('public')->assertExists("requests/{$registryRequest->id}");
     }
 
     public function test_tuman_cannot_submit_another_district(): void
