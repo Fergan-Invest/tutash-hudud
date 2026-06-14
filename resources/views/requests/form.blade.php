@@ -171,6 +171,7 @@
                     <div class="map-toolbar" aria-label="Xarita asboblari">
                         <button type="button" class="map-tool active" id="draw-polygon">Chizish</button>
                         <button type="button" class="map-tool finish" id="finish-polygon">Yakunlash</button>
+                        <button type="button" class="map-tool locate" id="locate-position">Joylashuvni top</button>
                         <button type="button" class="map-tool" id="undo-point">Oxirgi nuqta</button>
                         <button type="button" class="map-tool" id="fit-polygon">Ko‘rsatish</button>
                         <button type="button" class="map-tool danger" id="reset-polygon">Tozalash</button>

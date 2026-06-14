@@ -133,6 +133,8 @@ label small { color: var(--muted); }
 .map-tool.active { background: var(--teal); border-color: var(--teal); color: #fff; }
 .map-tool.finish { border-color: #b9e5dc; color: #0f6f61; }
 .map-tool.finish.active { background: #e3f8ef; border-color: #78d7bd; color: #0f6f61; }
+.map-tool.locate { border-color: #b8d6e4; color: #0b6f78; }
+.map-tool.locate:disabled { opacity: .7; cursor: wait; }
 .map-tool.danger { color: var(--danger); }
 .leaflet-map { min-height: 430px; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); background: #dfe8ef; }
 .leaflet-container, .leaflet-grab, .leaflet-dragging .leaflet-grab { cursor: crosshair !important; }

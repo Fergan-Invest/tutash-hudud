@@ -263,6 +263,7 @@ class RequestValidationTest extends TestCase
         $this->actingAs($user)
             ->get(route('requests.create'))
             ->assertOk()
+            ->assertSee('Joylashuvni top')
             ->assertDontSee('Tutash hudud maydoni')
             ->assertDontSee('name="adjacent_activity_land"', false);
     }

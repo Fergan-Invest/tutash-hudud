@@ -904,12 +904,15 @@ function initPolygonMap() {
   const fit = document.getElementById("fit-polygon");
   const draw = document.getElementById("draw-polygon");
   const finish = document.getElementById("finish-polygon");
+  const locate = document.getElementById("locate-position");
   const map = L.map(container).setView([40.3777, 71.7978], 13);
   addTiles(map);
 
   const points = [];
   const markers = [];
   let polygon = null;
+  let locationMarker = null;
+  let locationCircle = null;
   let drawing = true;
 
   const fromExisting = parseGeoJson(polygonInput.value || container.dataset.polygon);
@@ -944,6 +947,7 @@ function initPolygonMap() {
     redraw();
   });
   fit?.addEventListener("click", fitBounds);
+  locate?.addEventListener("click", locatePosition);
   reset?.addEventListener("click", clearPolygon);
   syncDrawingState(false);
 
@@ -1018,6 +1022,66 @@ function initPolygonMap() {
     lngInput.value = "";
     polygonInput.value = "";
     if (summary) summary.textContent = "Poligon hali chizilmagan.";
+  }
+
+  function locatePosition() {
+    if (!navigator.geolocation) {
+      showToast("Brauzer joylashuvni aniqlashni qo'llab-quvvatlamaydi.", "error");
+      return;
+    }
+
+    const originalText = locate?.textContent || "Joylashuvni top";
+    if (locate) {
+      locate.disabled = true;
+      locate.textContent = "Aniqlanmoqda...";
+    }
+    const restoreLocateButton = () => {
+      if (locate) {
+        locate.disabled = false;
+        locate.textContent = originalText;
+      }
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const latlng = [position.coords.latitude, position.coords.longitude];
+        const accuracy = position.coords.accuracy || 0;
+
+        if (locationMarker) locationMarker.remove();
+        if (locationCircle) locationCircle.remove();
+
+        locationMarker = L.marker(latlng).addTo(map).bindPopup("Joriy joylashuv").openPopup();
+        locationCircle = L.circle(latlng, {
+          radius: accuracy,
+          color: "#0b6f78",
+          fillColor: "#0b6f78",
+          fillOpacity: .12,
+          weight: 1,
+        }).addTo(map);
+
+        map.setView(latlng, 17);
+        if (summary) {
+          summary.textContent = "Joriy joylashuv topildi. Poligon chizish uchun xaritada nuqtalarni belgilang.";
+        }
+        restoreLocateButton();
+      },
+      (error) => {
+        const messages = {
+          1: "Joylashuvga ruxsat berilmadi.",
+          2: "Joylashuvni aniqlab bo'lmadi.",
+          3: "Joylashuvni aniqlash vaqti tugadi.",
+        };
+        showToast(messages[error.code] || "Joylashuvni aniqlashda xatolik yuz berdi.", "error");
+        restoreLocateButton();
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 30000,
+      },
+    );
+
+    window.setTimeout(restoreLocateButton, 13000);
   }
 }
 
