@@ -2,6 +2,9 @@
 
 @section('title', 'Reestr')
 @section('breadcrumb', 'Kadastr uchastkalari')
+@section('topbar-actions')
+    <a class="secondary-button topbar-export-button" href="{{ route('requests.export', request()->query()) }}">Excel</a>
+@endsection
 
 @php
     $statusLabels = [
@@ -46,7 +49,6 @@
     <input name="date_from" type="date" value="{{ request('date_from') }}">
     <input name="date_to" type="date" value="{{ request('date_to') }}">
     <button class="secondary-button" type="submit">Filtrlash</button>
-    <button class="secondary-button" type="submit" formaction="{{ route('requests.export') }}">Excel</button>
 </form>
 
 @if($requests->isEmpty())

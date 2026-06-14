@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Tutash hududlar reestri')</title>
     <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
+    <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 </head>
 <body>
 <div class="app-shell">
@@ -48,6 +48,7 @@
             </div>
 
             <div class="topbar-actions">
+                @yield('topbar-actions')
                 <a class="report-link" href="mailto:invest.abdusattorov@gmail.com">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8M8 13h5"/></svg>
                     <span>Xatolik haqida xabar berish</span>
