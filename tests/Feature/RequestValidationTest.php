@@ -256,6 +256,17 @@ class RequestValidationTest extends TestCase
             ->assertDontSee('<strong>id</strong>', false);
     }
 
+    public function test_create_form_does_not_render_adjacent_activity_land_field(): void
+    {
+        [$user] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->get(route('requests.create'))
+            ->assertOk()
+            ->assertDontSee('Tutash hudud maydoni')
+            ->assertDontSee('name="adjacent_activity_land"', false);
+    }
+
     public function test_duplicate_images_are_rejected_and_old_input_returns(): void
     {
         Storage::fake('public');

@@ -202,6 +202,7 @@ class RegistryRequestFormRequest extends FormRequest
             'has_permit' => $this->boolean('has_permit'),
             'total_area' => $totalArea ?? $this->input('total_area'),
             'calculated_land_area' => $totalArea ?? $this->input('total_area'),
+            'adjacent_activity_land' => $totalArea ?? $this->input('adjacent_activity_land', 0),
         ]);
     }
 }
