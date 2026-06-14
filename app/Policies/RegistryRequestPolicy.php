@@ -30,8 +30,7 @@ class RegistryRequestPolicy
             return false;
         }
 
-        return $user->isInvest()
-            || ($user->isTuman() && (int) $user->district_id === (int) $request->district_id);
+        return $user->isInvest();
     }
 
     public function delete(User $user, RegistryRequest $request): bool

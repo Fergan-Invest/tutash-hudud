@@ -117,6 +117,57 @@ class RequestValidationTest extends TestCase
         $this->assertDatabaseCount('registry_requests', 1);
     }
 
+    public function test_requests_export_uses_current_filters(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['owner_name'] = 'Export Kocha Owner';
+        $payload['street_type'] = 'kocha';
+        $this->actingAs($user)->post(route('requests.store'), $payload)->assertRedirect();
+
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['building_cadastr_number'] = '31:23:12:31:23:1232/12:02';
+        $payload['owner_name'] = 'Export Turizm Owner';
+        $payload['street_type'] = 'turizm';
+        $this->actingAs($user)->post(route('requests.store'), $payload)->assertRedirect();
+
+        $response = $this->actingAs($user)->get(route('requests.export', ['street_type' => 'turizm']));
+
+        $response->assertOk();
+        $this->assertStringContainsString('application/vnd.ms-excel', $response->headers->get('content-type'));
+        $content = $response->streamedContent();
+        $this->assertStringContainsString('Export Turizm Owner', $content);
+        $this->assertStringNotContainsString('Export Kocha Owner', $content);
+    }
+
+    public function test_tuman_export_only_contains_own_district_data(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor('tuman');
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $otherDistrict = District::create(['external_id' => 2, 'name' => 'Other']);
+        $otherMahalla = Mahalla::create(['district_id' => $otherDistrict->id, 'name' => 'Other mahalla']);
+        $otherStreet = Street::create(['district_id' => $otherDistrict->id, 'mahalla_id' => $otherMahalla->id, 'name' => 'Other street', 'type' => 'kocha']);
+        $invest = User::create(['name' => 'Invest', 'email' => 'export-invest@example.com', 'password' => 'secret', 'role' => 'invest']);
+        $payload = $this->payload($otherDistrict, $otherMahalla, $otherStreet);
+        $payload['owner_name'] = 'Other District Owner';
+        $payload['building_cadastr_number'] = '31:23:12:31:23:1232/12:02';
+        $this->actingAs($invest)->post(route('requests.store'), $payload)->assertRedirect();
+
+        $content = $this->actingAs($user)
+            ->get(route('requests.export', ['district_id' => $otherDistrict->id]))
+            ->streamedContent();
+
+        $this->assertStringContainsString('Owner MCHJ', $content);
+        $this->assertStringNotContainsString('Other District Owner', $content);
+    }
+
     public function test_hokimiyat_cadastre_is_optional_and_area_uses_total_area(): void
     {
         Storage::fake('public');

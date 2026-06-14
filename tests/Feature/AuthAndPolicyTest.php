@@ -50,6 +50,22 @@ class AuthAndPolicyTest extends TestCase
         $this->actingAs($user)->get(route('requests.create'))->assertForbidden();
     }
 
+    public function test_tuman_user_cannot_edit_even_own_district_request(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'A']);
+        $user = User::create(['name' => 'A operator', 'email' => 'edit-a@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $district->id]);
+        $request = $this->registryRequest($district, $user);
+
+        $this->actingAs($user)
+            ->get(route('requests.show', $request))
+            ->assertOk()
+            ->assertDontSee('Tahrirlash');
+
+        $this->actingAs($user)
+            ->get(route('requests.edit', $request))
+            ->assertForbidden();
+    }
+
     public function test_invest_create_form_renders(): void
     {
         District::create(['external_id' => 1, 'name' => 'Farg‘ona shahar']);

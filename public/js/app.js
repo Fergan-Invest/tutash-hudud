@@ -209,6 +209,9 @@ async function validateFormBeforeSubmit(form) {
   if (!url) return true;
 
   try {
+    const payload = new FormData(form);
+    payload.delete("_method");
+
     const response = await fetch(url, {
       method: "POST",
       credentials: "same-origin",
@@ -216,7 +219,7 @@ async function validateFormBeforeSubmit(form) {
         "Accept": "application/json",
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: new FormData(form),
+      body: payload,
     });
 
     if (response.ok) {
