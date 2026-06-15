@@ -48,6 +48,102 @@ class RequestValidationTest extends TestCase
         ]);
     }
 
+    public function test_duplicate_building_cadastre_is_rejected_on_create(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $this->actingAs($user)
+            ->from(route('requests.create'))
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect(route('requests.create'))
+            ->assertSessionHasErrors('building_cadastr_number');
+
+        $this->assertDatabaseCount('registry_requests', 1);
+    }
+
+    public function test_building_cadastre_can_stay_the_same_on_edit(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $registryRequest = RegistryRequest::firstOrFail();
+        $payload = $this->payload($district, $mahalla, $street);
+        unset($payload['images'], $payload['act_file']);
+        $payload['owner_name'] = 'Same Cadastre Updated';
+
+        $this->actingAs($user)
+            ->put(route('requests.update', $registryRequest), $payload)
+            ->assertRedirect(route('requests.show', $registryRequest));
+
+        $this->assertDatabaseHas('registry_requests', [
+            'id' => $registryRequest->id,
+            'owner_name' => 'Same Cadastre Updated',
+            'building_cadastr_number' => '31:23:12:31:23:1231/12:01',
+        ]);
+    }
+
+    public function test_duplicate_building_cadastre_is_rejected_on_edit(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['building_cadastr_number'] = '31:23:12:31:23:1232/12:02';
+        $payload['owner_name'] = 'Second Owner';
+        $this->actingAs($user)->post(route('requests.store'), $payload)->assertRedirect();
+
+        $second = RegistryRequest::where('owner_name', 'Second Owner')->firstOrFail();
+        $payload = $this->payload($district, $mahalla, $street);
+        unset($payload['images'], $payload['act_file']);
+        $payload['building_cadastr_number'] = '31:23:12:31:23:1231/12:01';
+
+        $this->actingAs($user)
+            ->from(route('requests.edit', $second))
+            ->put(route('requests.update', $second), $payload)
+            ->assertRedirect(route('requests.edit', $second))
+            ->assertSessionHasErrors('building_cadastr_number');
+    }
+
+    public function test_ajax_cadastre_check_reports_duplicates_and_ignores_current_request(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $registryRequest = RegistryRequest::firstOrFail();
+
+        $this->actingAs($user)
+            ->postJson(route('cadastre.check'), [
+                'cadastre_number' => $registryRequest->building_cadastr_number,
+            ])
+            ->assertOk()
+            ->assertJson(['restricted' => true]);
+
+        $this->actingAs($user)
+            ->postJson(route('cadastre.check'), [
+                'cadastre_number' => $registryRequest->building_cadastr_number,
+                'registry_request_id' => $registryRequest->id,
+            ])
+            ->assertOk()
+            ->assertJson(['restricted' => false]);
+    }
+
     public function test_request_accepts_new_street_type_options(): void
     {
         Storage::fake('public');

@@ -21,7 +21,7 @@
     </div>
 </section>
 
-<form class="registry-card form-panel stepped-form" method="POST" enctype="multipart/form-data" action="{{ $editing ? route('requests.update', $requestItem) : route('requests.store') }}" data-validate-url="{{ $editing ? route('requests.validate', $requestItem) : route('requests.validate') }}" novalidate>
+<form class="registry-card form-panel stepped-form" method="POST" enctype="multipart/form-data" action="{{ $editing ? route('requests.update', $requestItem) : route('requests.store') }}" data-validate-url="{{ $editing ? route('requests.validate', $requestItem) : route('requests.validate') }}" data-request-id="{{ $requestItem?->id }}" novalidate>
     @csrf
     @if($editing) @method('PUT') @endif
 

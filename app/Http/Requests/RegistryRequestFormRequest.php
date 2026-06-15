@@ -112,6 +112,14 @@ class RegistryRequestFormRequest extends FormRequest
             if ($this->user()?->isTuman() && (int) $this->input('district_id') !== (int) $this->user()->district_id) {
                 $validator->errors()->add('district_id', 'Tuman foydalanuvchisi faqat o‘z hududi bo‘yicha ma’lumot kiritadi.');
             }
+            $duplicateCadastre = RegistryRequest::query()
+                ->where('building_cadastr_number', $this->input('building_cadastr_number'))
+                ->when($this->route('registryRequest'), fn ($query, RegistryRequest $registryRequest) => $query->whereKeyNot($registryRequest->id))
+                ->exists();
+
+            if ($duplicateCadastre) {
+                $validator->errors()->add('building_cadastr_number', 'Joriy kadastr raqami allaqachon mavjud.');
+            }
         });
     }
 

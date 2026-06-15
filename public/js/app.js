@@ -743,7 +743,12 @@ function formatCadastre(value) {
 function initCadastreCheck() {
   const input = document.getElementById("building_cadastr_number");
   if (!input) return;
+  let timer;
 
+  input.addEventListener("input", () => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => window.checkCadastreRestriction(input.value), 450);
+  });
   input.addEventListener("blur", () => window.checkCadastreRestriction(input.value));
 }
 
@@ -1212,7 +1217,10 @@ window.checkCadastreRestriction = async function (cadastreNumber) {
         "Accept": "application/json",
         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
       },
-      body: JSON.stringify({ cadastre_number: value }),
+      body: JSON.stringify({
+        cadastre_number: value,
+        registry_request_id: input.closest("form")?.dataset.requestId || null,
+      }),
     });
 
     if (!response.ok) {

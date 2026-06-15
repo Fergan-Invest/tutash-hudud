@@ -205,11 +205,12 @@ class RequestController extends Controller
     {
         $data = $request->validate([
             'cadastre_number' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([\/:].+)?$/'],
+            'registry_request_id' => ['nullable', 'integer', 'exists:registry_requests,id'],
         ]);
 
         $existing = RegistryRequest::query()
             ->where('building_cadastr_number', $data['cadastre_number'])
-            ->whereIn('status', ['submitted', 'in_review', 'approved'])
+            ->when($data['registry_request_id'] ?? null, fn ($query, $id) => $query->whereKeyNot($id))
             ->latest()
             ->first();
 
