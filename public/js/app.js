@@ -752,18 +752,25 @@ function initAreaCalculator() {
   const width = document.getElementById("area_width");
   const calculated = document.getElementById("calculated_land_area");
   const total = document.getElementById("total_area");
+  const manual = document.getElementById("total_area_manual");
   if (!length || !width || !total) return;
 
   const calculate = () => {
     const result = Number(length.value || 0) * Number(width.value || 0);
     const value = result > 0 ? result.toFixed(2) : "";
-    total.value = value;
     if (calculated) calculated.value = value;
+    if (!manual?.checked) total.value = value;
+  };
+
+  const syncMode = () => {
+    total.readOnly = !manual?.checked;
+    if (!manual?.checked) calculate();
   };
 
   length.addEventListener("input", calculate);
   width.addEventListener("input", calculate);
-  calculate();
+  manual?.addEventListener("change", syncMode);
+  syncMode();
 }
 
 function initImageSlots() {
@@ -866,6 +873,7 @@ function restoreDraft(form, data) {
   document.getElementById("district_id")?.dispatchEvent(new Event("change"));
   document.getElementById("mahalla_id")?.dispatchEvent(new Event("change"));
   document.querySelector('input[name="owner_type"]:checked')?.dispatchEvent(new Event("change"));
+  document.getElementById("total_area_manual")?.dispatchEvent(new Event("change"));
   document.getElementById("area_length")?.dispatchEvent(new Event("input"));
 }
 

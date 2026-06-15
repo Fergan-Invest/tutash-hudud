@@ -51,6 +51,7 @@ class RegistryRequestFormRequest extends FormRequest
             'area_width' => ['required', 'numeric', 'min:0.01'],
             'calculated_land_area' => ['required', 'numeric', 'min:0.01'],
             'total_area' => ['required', 'numeric', 'min:0.01'],
+            'total_area_manual' => ['required', 'boolean'],
             'building_facade_length' => ['nullable', 'numeric', 'min:0'],
             'summer_terrace_sides' => ['nullable', 'numeric', 'min:0'],
             'distance_to_roadway' => ['required', 'numeric', 'min:0'],
@@ -165,6 +166,7 @@ class RegistryRequestFormRequest extends FormRequest
             'area_width' => 'Kenglik',
             'calculated_land_area' => 'Hisoblangan maydon',
             'total_area' => 'Umumiy maydon',
+            'total_area_manual' => "Umumiy maydonni qo'lda kiritish",
             'building_facade_length' => 'Fasad uzunligi',
             'summer_terrace_sides' => 'Yozgi terassa tomonlari',
             'distance_to_roadway' => 'Yo‘lgacha masofa',
@@ -190,19 +192,25 @@ class RegistryRequestFormRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $totalArea = null;
+        $calculatedArea = null;
         if (is_numeric($this->input('area_length')) && is_numeric($this->input('area_width'))) {
-            $totalArea = round((float) $this->input('area_length') * (float) $this->input('area_width'), 2);
+            $calculatedArea = round((float) $this->input('area_length') * (float) $this->input('area_width'), 2);
         }
+
+        $manualTotalArea = $this->boolean('total_area_manual');
+        $totalArea = $manualTotalArea
+            ? $this->input('total_area')
+            : ($calculatedArea ?? $this->input('total_area'));
 
         $this->merge([
             'has_tenant' => $this->boolean('has_tenant'),
             'terrace_buildings_available' => $this->boolean('terrace_buildings_available'),
             'terrace_buildings_permanent' => $this->boolean('terrace_buildings_permanent'),
             'has_permit' => $this->boolean('has_permit'),
-            'total_area' => $totalArea ?? $this->input('total_area'),
-            'calculated_land_area' => $totalArea ?? $this->input('total_area'),
-            'adjacent_activity_land' => $totalArea ?? $this->input('adjacent_activity_land', 0),
+            'total_area_manual' => $manualTotalArea,
+            'total_area' => $totalArea,
+            'calculated_land_area' => $calculatedArea ?? $this->input('calculated_land_area', $totalArea),
+            'adjacent_activity_land' => $calculatedArea ?? $this->input('adjacent_activity_land', 0),
         ]);
     }
 }

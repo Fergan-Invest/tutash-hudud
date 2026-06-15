@@ -5,6 +5,7 @@
     $field = fn($name, $default = null) => old($name, $requestItem?->{$name} ?? $default);
     $polygon = old('polygon_coordinates', $requestItem?->polygon_coordinates ? json_encode($requestItem->polygon_coordinates) : '');
     $ownerType = $field('owner_type', 'yuridik');
+    $totalAreaManual = (bool) $field('total_area_manual', false);
 @endphp
 
 @section('title', $editing ? 'Arizani tahrirlash' : 'Yangi ariza')
@@ -132,7 +133,8 @@
                 <label>Uzunlik (m)<input id="area_length" name="area_length" type="number" step="0.01" value="{{ $field('area_length') }}" required>@error('area_length')<span>{{ $message }}</span>@enderror</label>
                 <label>Kenglik (m)<input id="area_width" name="area_width" type="number" step="0.01" value="{{ $field('area_width') }}" required>@error('area_width')<span>{{ $message }}</span>@enderror</label>
                 <input id="calculated_land_area" name="calculated_land_area" type="hidden" value="{{ $field('calculated_land_area') }}">
-                <label>Umumiy maydon (m²)<input id="total_area" name="total_area" type="number" step="0.01" value="{{ $field('total_area') }}" readonly required>@error('total_area')<span>{{ $message }}</span>@enderror @error('calculated_land_area')<span>{{ $message }}</span>@enderror</label>
+                <label class="total-area-manual"><input type="hidden" name="total_area_manual" value="0"><input id="total_area_manual" name="total_area_manual" type="checkbox" value="1" @checked($totalAreaManual)> Qo'lda kiritish</label>
+                <label>Umumiy maydon (m²)<input id="total_area" name="total_area" type="number" step="0.01" value="{{ $field('total_area') }}" @readonly(! $totalAreaManual) required>@error('total_area')<span>{{ $message }}</span>@enderror @error('calculated_land_area')<span>{{ $message }}</span>@enderror @error('total_area_manual')<span>{{ $message }}</span>@enderror</label>
                 <label>Fasad uzunligi (m)<input name="building_facade_length" type="number" step="0.01" value="{{ $field('building_facade_length') }}">@error('building_facade_length')<span>{{ $message }}</span>@enderror</label>
                 <label>Yozgi terassa tomonlari (m)<input name="summer_terrace_sides" type="number" step="0.01" value="{{ $field('summer_terrace_sides') }}">@error('summer_terrace_sides')<span>{{ $message }}</span>@enderror</label>
                 <label>Yo‘lgacha masofa (m)<input name="distance_to_roadway" type="number" step="0.01" value="{{ $field('distance_to_roadway') }}" required>@error('distance_to_roadway')<span>{{ $message }}</span>@enderror</label>

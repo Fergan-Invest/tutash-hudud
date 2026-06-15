@@ -168,7 +168,7 @@ class RequestValidationTest extends TestCase
         $this->assertStringNotContainsString('Other District Owner', $content);
     }
 
-    public function test_hokimiyat_cadastre_is_optional_and_area_uses_total_area(): void
+    public function test_hokimiyat_cadastre_is_optional_and_area_defaults_to_calculated_total(): void
     {
         Storage::fake('public');
         [$user, $district, $mahalla, $street] = $this->setupActor();
@@ -186,6 +186,29 @@ class RequestValidationTest extends TestCase
             'hokimyatga_biriktirilgan_kadastr_raqami' => null,
             'calculated_land_area' => 800,
             'total_area' => 800,
+            'total_area_manual' => false,
+        ]);
+    }
+
+    public function test_total_area_can_be_entered_manually_when_checkbox_is_checked(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['area_length'] = 40;
+        $payload['area_width'] = 20;
+        $payload['calculated_land_area'] = 800;
+        $payload['total_area'] = 750;
+        $payload['total_area_manual'] = 1;
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('registry_requests', [
+            'calculated_land_area' => 800,
+            'total_area' => 750,
+            'total_area_manual' => true,
         ]);
     }
 

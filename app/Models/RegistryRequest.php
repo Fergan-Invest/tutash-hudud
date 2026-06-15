@@ -22,6 +22,7 @@ class RegistryRequest extends Model
         'hokimyatga_biriktirilgan_kadastr_raqami', 'owner_type', 'owner_stir_pinfl', 'owner_name',
         'district_id', 'mahalla_id', 'street_id', 'house_number', 'street_type', 'director_name',
         'phone_number', 'area_length', 'area_width', 'calculated_land_area', 'total_area',
+        'total_area_manual',
         'building_facade_length', 'summer_terrace_sides', 'distance_to_roadway',
         'distance_to_sidewalk', 'usage_purpose', 'activity_type', 'terrace_buildings_available',
         'terrace_buildings_permanent', 'has_permit', 'has_tenant', 'tenant_stir_pinfl',
@@ -34,6 +35,7 @@ class RegistryRequest extends Model
         'terrace_buildings_permanent' => 'boolean',
         'has_permit' => 'boolean',
         'has_tenant' => 'boolean',
+        'total_area_manual' => 'boolean',
         'adjacent_facilities' => 'array',
         'polygon_coordinates' => 'array',
     ];

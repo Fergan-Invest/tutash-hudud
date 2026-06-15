@@ -126,6 +126,8 @@ label small { color: var(--muted); }
 .check-grid { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 14px; }
 .check-grid label, .check-row { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 .check-grid input, .check-row input { width: auto; min-height: auto; }
+.total-area-manual { align-self: end; display: flex; align-items: center; gap: 8px; min-height: 44px; padding-bottom: 2px; color: #4a5261; }
+.total-area-manual input { width: auto; min-height: auto; }
 .map-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr); gap: 16px; }
 .map-shell { position: relative; min-width: 0; }
 .map-toolbar { position: absolute; z-index: 500; top: 12px; left: 12px; display: flex; flex-wrap: wrap; gap: 8px; max-width: calc(100% - 24px); }
