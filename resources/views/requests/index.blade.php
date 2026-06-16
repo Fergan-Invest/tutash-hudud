@@ -46,7 +46,7 @@
             <option value="{{ $district->id }}" @selected((string) request('district_id') === (string) $district->id)>{{ $district->name }}</option>
         @endforeach
     </select>
-    <select name="mahalla_id">
+    <select name="mahalla_id" class="searchable-select">
         <option value="">Barcha MFYlar</option>
         @foreach($mahallas as $mahalla)
             <option value="{{ $mahalla->id }}" @selected((string) request('mahalla_id') === (string) $mahalla->id)>{{ $mahalla->name }}</option>

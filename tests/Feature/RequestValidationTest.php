@@ -218,6 +218,7 @@ class RequestValidationTest extends TestCase
         $this->actingAs($user)
             ->get(route('requests.index', ['mahalla_id' => $otherMahalla->id]))
             ->assertOk()
+            ->assertSee('name="mahalla_id" class="searchable-select"', false)
             ->assertSee('Barcha MFYlar')
             ->assertSee('Yangi Owner')
             ->assertDontSee('Oybek Owner');
