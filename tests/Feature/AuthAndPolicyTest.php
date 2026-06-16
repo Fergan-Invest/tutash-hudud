@@ -66,6 +66,28 @@ class AuthAndPolicyTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_requests_index_shows_pagination_controls_after_first_page(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'A']);
+        $user = User::create(['name' => 'Invest', 'email' => 'pagination@example.com', 'password' => 'secret', 'role' => 'invest']);
+
+        foreach (range(1, 31) as $index) {
+            $this->registryRequest($district, $user)->update([
+                'owner_name' => "Owner {$index}",
+                'building_cadastr_number' => sprintf('31:23:12:31:23:%04d/12:01', $index),
+            ]);
+        }
+
+        $this->actingAs($user)
+            ->get(route('requests.index', ['page' => 2]))
+            ->assertOk()
+            ->assertSee('16-30')
+            ->assertSee('/ 31 ta yozuv')
+            ->assertSee('Oldingi')
+            ->assertSee('Keyingi')
+            ->assertSee('25 qator');
+    }
+
     public function test_invest_create_form_renders(): void
     {
         District::create(['external_id' => 1, 'name' => 'Farg‘ona shahar']);
@@ -129,8 +151,8 @@ class AuthAndPolicyTest extends TestCase
 
     private function registryRequest(District $district, User $user): RegistryRequest
     {
-        $mahalla = Mahalla::create(['district_id' => $district->id, 'name' => 'Markaz']);
-        $street = Street::create(['district_id' => $district->id, 'mahalla_id' => $mahalla->id, 'name' => 'Navoiy', 'type' => 'kocha']);
+        $mahalla = Mahalla::firstOrCreate(['district_id' => $district->id, 'name' => 'Markaz']);
+        $street = Street::firstOrCreate(['district_id' => $district->id, 'mahalla_id' => $mahalla->id, 'name' => 'Navoiy'], ['type' => 'kocha']);
 
         return RegistryRequest::create([
             'request_number' => uniqid('THR-'),

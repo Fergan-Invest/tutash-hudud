@@ -22,9 +22,12 @@ class RequestController extends Controller
         $this->authorize('viewAny', RegistryRequest::class);
 
         $query = $this->filteredRequestsQuery($request);
+        $perPage = $this->requestsPerPage($request);
 
         return view('requests.index', [
-            'requests' => $query->paginate(15)->withQueryString(),
+            'requests' => $query->paginate($perPage)->withQueryString(),
+            'perPage' => $perPage,
+            'perPageOptions' => [15, 25, 50, 100],
             'districts' => $this->availableDistricts($request),
             'mahallas' => Mahalla::orderBy('name')->get(),
             'statuses' => RegistryRequest::STATUSES,
@@ -259,6 +262,13 @@ class RequestController extends Controller
         });
 
         return $query;
+    }
+
+    private function requestsPerPage(Request $request): int
+    {
+        $perPage = (int) $request->input('per_page', 15);
+
+        return in_array($perPage, [15, 25, 50, 100], true) ? $perPage : 15;
     }
 
     private function availableDistricts(Request $request)

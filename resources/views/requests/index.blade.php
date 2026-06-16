@@ -48,6 +48,11 @@
     </select>
     <input name="date_from" type="date" value="{{ request('date_from') }}">
     <input name="date_to" type="date" value="{{ request('date_to') }}">
+    <select name="per_page" aria-label="Sahifadagi qatorlar">
+        @foreach($perPageOptions as $option)
+            <option value="{{ $option }}" @selected($perPage === $option)>{{ $option }} qator</option>
+        @endforeach
+    </select>
     <button class="secondary-button" type="submit">Filtrlash</button>
 </form>
 
@@ -88,7 +93,50 @@
                 </tbody>
             </table>
         </div>
-        {{ $requests->links() }}
+        <div class="pagination-bar">
+            <p>
+                {{ $requests->firstItem() }}-{{ $requests->lastItem() }}
+                / {{ $requests->total() }} ta yozuv
+            </p>
+
+            @if($requests->hasPages())
+                @php
+                    $paginationPages = collect([1, $requests->currentPage() - 2, $requests->currentPage() - 1, $requests->currentPage(), $requests->currentPage() + 1, $requests->currentPage() + 2, $requests->lastPage()])
+                        ->filter(fn ($page) => $page >= 1 && $page <= $requests->lastPage())
+                        ->unique()
+                        ->sort()
+                        ->values();
+                    $previousRenderedPage = null;
+                @endphp
+                <nav class="pagination-links" aria-label="Sahifalash">
+                    @if($requests->onFirstPage())
+                        <span class="pagination-link disabled" aria-disabled="true">Oldingi</span>
+                    @else
+                        <a class="pagination-link" href="{{ $requests->previousPageUrl() }}" rel="prev">Oldingi</a>
+                    @endif
+
+                    @foreach($paginationPages as $page)
+                        @if($previousRenderedPage !== null && $page > $previousRenderedPage + 1)
+                            <span class="pagination-gap" aria-hidden="true">...</span>
+                        @endif
+
+                        @if($page === $requests->currentPage())
+                            <span class="pagination-link active" aria-current="page">{{ $page }}</span>
+                        @else
+                            <a class="pagination-link" href="{{ $requests->url($page) }}">{{ $page }}</a>
+                        @endif
+
+                        @php($previousRenderedPage = $page)
+                    @endforeach
+
+                    @if($requests->hasMorePages())
+                        <a class="pagination-link" href="{{ $requests->nextPageUrl() }}" rel="next">Keyingi</a>
+                    @else
+                        <span class="pagination-link disabled" aria-disabled="true">Keyingi</span>
+                    @endif
+                </nav>
+            @endif
+        </div>
     </section>
 @endif
 @endsection

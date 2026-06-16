@@ -299,6 +299,64 @@ th { color: #8b92a1; }
 .registry-table tbody tr:hover td {
   background: #fbfdfd;
 }
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--cabinet-line);
+}
+.pagination-bar p {
+  margin: 0;
+  color: #687085;
+  font-weight: 800;
+  font-size: 13px;
+}
+.pagination-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.pagination-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  min-height: 38px;
+  border: 1px solid #d6dbe4;
+  border-radius: 7px;
+  background: #fff;
+  color: #30394d;
+  padding: 8px 11px;
+  font-weight: 800;
+  font-size: 13px;
+}
+.pagination-link:hover {
+  border-color: #9ccfc8;
+  color: var(--cabinet-teal);
+}
+.pagination-link.active {
+  border-color: var(--cabinet-teal);
+  background: var(--cabinet-teal);
+  color: #fff;
+}
+.pagination-link.disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.pagination-gap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  min-height: 38px;
+  color: #8b92a1;
+  font-weight: 900;
+}
 .row-number {
   display: inline-grid;
   place-items: center;
@@ -841,6 +899,15 @@ body.sidebar-open .menu-button span:nth-child(3) {
 
   .empty-state-card {
     margin-top: 24px;
+  }
+
+  .pagination-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pagination-links {
+    justify-content: flex-start;
   }
 }
 
