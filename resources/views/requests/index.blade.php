@@ -46,6 +46,12 @@
             <option value="{{ $district->id }}" @selected((string) request('district_id') === (string) $district->id)>{{ $district->name }}</option>
         @endforeach
     </select>
+    <select name="mahalla_id">
+        <option value="">Barcha MFYlar</option>
+        @foreach($mahallas as $mahalla)
+            <option value="{{ $mahalla->id }}" @selected((string) request('mahalla_id') === (string) $mahalla->id)>{{ $mahalla->name }}</option>
+        @endforeach
+    </select>
     <input name="date_from" type="date" value="{{ request('date_from') }}">
     <input name="date_to" type="date" value="{{ request('date_to') }}">
     <select name="per_page" aria-label="Sahifadagi qatorlar">

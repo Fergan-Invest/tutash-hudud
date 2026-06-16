@@ -199,6 +199,30 @@ class RequestValidationTest extends TestCase
             ->assertDontSee('Kōcha Owner');
     }
 
+    public function test_requests_index_can_filter_by_mahalla(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $otherMahalla = Mahalla::create(['district_id' => $district->id, 'name' => 'Yangi MFY']);
+        $otherStreet = Street::create(['district_id' => $district->id, 'mahalla_id' => $otherMahalla->id, 'name' => 'Bobur', 'type' => 'kocha']);
+
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['owner_name'] = 'Oybek Owner';
+        $this->actingAs($user)->post(route('requests.store'), $payload)->assertRedirect();
+
+        $payload = $this->payload($district, $otherMahalla, $otherStreet);
+        $payload['building_cadastr_number'] = '31:23:12:31:23:1232/12:02';
+        $payload['owner_name'] = 'Yangi Owner';
+        $this->actingAs($user)->post(route('requests.store'), $payload)->assertRedirect();
+
+        $this->actingAs($user)
+            ->get(route('requests.index', ['mahalla_id' => $otherMahalla->id]))
+            ->assertOk()
+            ->assertSee('Barcha MFYlar')
+            ->assertSee('Yangi Owner')
+            ->assertDontSee('Oybek Owner');
+    }
+
     public function test_act_file_is_optional(): void
     {
         Storage::fake('public');

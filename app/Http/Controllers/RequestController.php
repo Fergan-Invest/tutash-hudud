@@ -29,7 +29,7 @@ class RequestController extends Controller
             'perPage' => $perPage,
             'perPageOptions' => [15, 25, 50, 100],
             'districts' => $this->availableDistricts($request),
-            'mahallas' => Mahalla::orderBy('name')->get(),
+            'mahallas' => $this->availableMahallas($request),
             'statuses' => RegistryRequest::STATUSES,
             'streetTypes' => RegistryRequest::STREET_TYPES,
         ]);
@@ -277,6 +277,19 @@ class RequestController extends Controller
 
         if ($request->user()->isTuman()) {
             $query->where('id', $request->user()->district_id);
+        }
+
+        return $query->get();
+    }
+
+    private function availableMahallas(Request $request)
+    {
+        $query = Mahalla::orderBy('name');
+
+        if ($request->user()->isTuman()) {
+            $query->where('district_id', $request->user()->district_id);
+        } elseif ($request->filled('district_id')) {
+            $query->where('district_id', $request->district_id);
         }
 
         return $query->get();
