@@ -78,8 +78,10 @@
                 <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Hokimiyatga biriktirilgan kadastr raqami</th><th>Fayllar</th><th>Sana</th></tr></thead>
                 <tbody>
                 @foreach($requests as $item)
-                    @php($uploadedFileTypes = $item->files->pluck('type')->flip())
-                    <tr class="clickable-row" onclick="window.location='{{ route('requests.show', $item) }}'">
+                    @php
+                        $uploadedFileTypes = $item->files->pluck('type')->flip();
+                    @endphp
+                    <tr class="clickable-row" data-href="{{ route('requests.show', $item) }}" onclick="window.location=this.dataset.href">
                         <td><span class="row-number">{{ $requests->firstItem() + $loop->index }}</span></td>
                         <td>{{ $item->owner_name }}<small>{{ $item->owner_stir_pinfl }}</small></td>
                         <td>{{ $item->district->name }}<small>{{ $item->mahalla->name }}, {{ $item->street->name }}</small></td>
