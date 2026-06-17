@@ -23,6 +23,10 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
                 <span>Bosh sahifa</span>
             </a>
+            <a class="nav-link {{ request()->routeIs('requests.monitoring') ? 'active' : '' }}" href="{{ route('requests.monitoring') }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16V9"/><path d="M12 16V7"/><path d="M16 16v-4"/></svg>
+                <span>Monitoring</span>
+            </a>
             @can('create', App\Models\RegistryRequest::class)
                 <a class="nav-link {{ request()->routeIs('requests.create') ? 'active' : '' }}" href="{{ route('requests.create') }}">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/><path d="M8 9.5h8M8 13h5"/></svg>

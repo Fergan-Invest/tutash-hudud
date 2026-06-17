@@ -144,56 +144,56 @@ class RequestController extends Controller
             echo '<html><head><meta charset="UTF-8"></head><body><table border="1"><tr>';
 
             foreach ($this->exportHeadings() as $heading) {
-                echo '<th>'.$this->excelCell($heading).'</th>';
+                echo $this->excelCell($heading, 'text', 'th');
             }
 
             echo '</tr>';
 
             foreach ($requests as $item) {
                 $row = [
-                    $item->request_number,
-                    $statusLabels[$item->status] ?? $item->status,
-                    $item->created_at?->format('d.m.Y H:i'),
-                    $item->district?->name,
-                    $item->mahalla?->name,
-                    $item->street?->name,
-                    $item->house_number,
-                    $streetTypes[$item->street_type] ?? $item->street_type,
-                    $item->building_cadastr_number,
-                    $item->hokimyatga_biriktirilgan_kadastr_raqami,
-                    $ownerTypeLabels[$item->owner_type] ?? $item->owner_type,
-                    $item->owner_stir_pinfl,
-                    $item->owner_name,
-                    $item->director_name,
-                    $item->phone_number,
-                    $item->area_length,
-                    $item->area_width,
-                    $item->total_area,
-                    $item->building_facade_length,
-                    $item->summer_terrace_sides,
-                    $item->distance_to_roadway,
-                    $item->distance_to_sidewalk,
-                    $usagePurposeLabels[$item->usage_purpose] ?? $item->usage_purpose,
-                    $item->activity_type,
-                    $yesNo($item->terrace_buildings_available),
-                    $yesNo($item->terrace_buildings_permanent),
-                    $yesNo($item->has_permit),
-                    $yesNo($item->has_tenant),
-                    $item->tenant_stir_pinfl,
-                    $item->tenant_name,
-                    $item->tenant_activity_type,
-                    $item->adjacent_activity_type,
-                    $item->adjacent_activity_land,
-                    collect($item->adjacent_facilities ?? [])->implode(', '),
-                    $item->additional_info,
-                    $item->latitude,
-                    $item->longitude,
-                    $item->creator?->name,
+                    ['value' => $item->request_number, 'format' => 'text'],
+                    ['value' => $statusLabels[$item->status] ?? $item->status, 'format' => 'text'],
+                    ['value' => $item->created_at?->format('d.m.Y H:i'), 'format' => 'text'],
+                    ['value' => $item->district?->name, 'format' => 'text'],
+                    ['value' => $item->mahalla?->name, 'format' => 'text'],
+                    ['value' => $item->street?->name, 'format' => 'text'],
+                    ['value' => $item->house_number, 'format' => 'text'],
+                    ['value' => $streetTypes[$item->street_type] ?? $item->street_type, 'format' => 'text'],
+                    ['value' => $item->building_cadastr_number, 'format' => 'text'],
+                    ['value' => $item->hokimyatga_biriktirilgan_kadastr_raqami, 'format' => 'text'],
+                    ['value' => $ownerTypeLabels[$item->owner_type] ?? $item->owner_type, 'format' => 'text'],
+                    ['value' => $item->owner_stir_pinfl, 'format' => 'text'],
+                    ['value' => $item->owner_name, 'format' => 'text'],
+                    ['value' => $item->director_name, 'format' => 'text'],
+                    ['value' => $item->phone_number, 'format' => 'text'],
+                    ['value' => $item->area_length, 'format' => 'number'],
+                    ['value' => $item->area_width, 'format' => 'number'],
+                    ['value' => $item->total_area, 'format' => 'number'],
+                    ['value' => $item->building_facade_length, 'format' => 'number'],
+                    ['value' => $item->summer_terrace_sides, 'format' => 'number'],
+                    ['value' => $item->distance_to_roadway, 'format' => 'number'],
+                    ['value' => $item->distance_to_sidewalk, 'format' => 'number'],
+                    ['value' => $usagePurposeLabels[$item->usage_purpose] ?? $item->usage_purpose, 'format' => 'text'],
+                    ['value' => $item->activity_type, 'format' => 'text'],
+                    ['value' => $yesNo($item->terrace_buildings_available), 'format' => 'text'],
+                    ['value' => $yesNo($item->terrace_buildings_permanent), 'format' => 'text'],
+                    ['value' => $yesNo($item->has_permit), 'format' => 'text'],
+                    ['value' => $yesNo($item->has_tenant), 'format' => 'text'],
+                    ['value' => $item->tenant_stir_pinfl, 'format' => 'text'],
+                    ['value' => $item->tenant_name, 'format' => 'text'],
+                    ['value' => $item->tenant_activity_type, 'format' => 'text'],
+                    ['value' => $item->adjacent_activity_type, 'format' => 'text'],
+                    ['value' => $item->adjacent_activity_land, 'format' => 'number'],
+                    ['value' => collect($item->adjacent_facilities ?? [])->implode(', '), 'format' => 'text'],
+                    ['value' => $item->additional_info, 'format' => 'text'],
+                    ['value' => $item->latitude, 'format' => 'number'],
+                    ['value' => $item->longitude, 'format' => 'number'],
+                    ['value' => $item->creator?->name, 'format' => 'text'],
                 ];
 
                 echo '<tr>';
-                foreach ($row as $value) {
-                    echo '<td>'.$this->excelCell($value).'</td>';
+                foreach ($row as $cell) {
+                    echo $this->excelCell($cell['value'], $cell['format']);
                 }
                 echo '</tr>';
             }
@@ -201,6 +201,50 @@ class RequestController extends Controller
             echo '</table></body></html>';
         }, $filename, [
             'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+        ]);
+    }
+
+    public function monitoring(Request $request)
+    {
+        $this->authorize('viewAny', RegistryRequest::class);
+
+        $requests = $this->filteredRequestsQuery($request)->get();
+        $districts = $this->availableDistricts($request);
+        $groupedByDistrict = $requests->groupBy('district_id');
+        $statusLabels = $this->statusLabels();
+        $streetTypes = RegistryRequest::STREET_TYPES;
+
+        $rows = $districts->map(function (District $district) use ($groupedByDistrict, $request, $statusLabels, $streetTypes) {
+            $items = $groupedByDistrict->get($district->id, collect());
+            $query = $request->query();
+            $query['district_id'] = $district->id;
+
+            return [
+                'district' => $district,
+                'count' => $items->count(),
+                'total_area' => $items->sum(fn ($item) => (float) $item->total_area),
+                'street_types' => collect($streetTypes)->mapWithKeys(fn ($label, $key) => [
+                    $key => $items->where('street_type', $key)->count(),
+                ]),
+                'statuses' => collect($statusLabels)->mapWithKeys(fn ($label, $key) => [
+                    $key => $items->where('status', $key)->count(),
+                ]),
+                'url' => route('requests.index', $query),
+            ];
+        });
+
+        return view('requests.monitoring', [
+            'rows' => $rows,
+            'totals' => [
+                'count' => $requests->count(),
+                'total_area' => $requests->sum(fn ($item) => (float) $item->total_area),
+                'districts' => $rows->where('count', '>', 0)->count(),
+            ],
+            'districts' => $districts,
+            'mahallas' => $this->availableMahallas($request),
+            'statuses' => RegistryRequest::STATUSES,
+            'statusLabels' => $statusLabels,
+            'streetTypes' => $streetTypes,
         ]);
     }
 
@@ -339,9 +383,16 @@ class RequestController extends Controller
         ];
     }
 
-    private function excelCell($value): string
+    private function excelCell($value, string $format = 'text', string $tag = 'td'): string
     {
-        return e((string) ($value ?? ''));
+        if ($format === 'number' && $value !== null && $value !== '') {
+            $value = number_format((float) $value, 2, '.', '');
+            $style = 'mso-number-format:"0.00";';
+        } else {
+            $style = 'mso-number-format:"\@";';
+        }
+
+        return '<'.$tag." style='".$style."'>".e((string) ($value ?? '')).'</'.$tag.'>';
     }
 
     private function formData(Request $request, ?RegistryRequest $registryRequest = null): array

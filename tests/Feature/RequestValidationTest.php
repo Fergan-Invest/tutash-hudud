@@ -261,6 +261,8 @@ class RequestValidationTest extends TestCase
         $content = $response->streamedContent();
         $this->assertStringContainsString('Export Turizm Owner', $content);
         $this->assertStringNotContainsString('Export Kocha Owner', $content);
+        $this->assertStringContainsString('mso-number-format:"0.00";', $content);
+        $this->assertStringContainsString('mso-number-format:"\@";', $content);
     }
 
     public function test_tuman_export_only_contains_own_district_data(): void

@@ -368,6 +368,24 @@ th { color: #8b92a1; }
   font-weight: 900;
 }
 .row-link { color: var(--cabinet-teal); }
+.monitoring-metrics .metric-card strong {
+  overflow-wrap: anywhere;
+}
+.monitoring-table td,
+.monitoring-table th {
+  white-space: nowrap;
+}
+.monitoring-table td:first-child,
+.monitoring-table th:first-child {
+  white-space: normal;
+  min-width: 190px;
+}
+.clickable-row {
+  cursor: pointer;
+}
+.clickable-row:hover td {
+  background: #f3fbfa;
+}
 
 .empty-state-card { width: min(560px, 100%); margin: 145px auto 0; border-radius: 12px; padding: 38px 42px 32px; background: #fff; text-align: center; }
 .empty-illustration { display: grid; place-items: center; width: 104px; height: 92px; margin: 0 auto 10px; }

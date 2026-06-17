@@ -3,6 +3,7 @@
 @section('title', 'Reestr')
 @section('breadcrumb', 'Kadastr uchastkalari')
 @section('topbar-actions')
+    <a class="secondary-button topbar-export-button" href="{{ route('requests.monitoring', request()->query()) }}">Monitoring</a>
     <a class="secondary-button topbar-export-button" href="{{ route('requests.export', request()->query()) }}">Excel</a>
 @endsection
 

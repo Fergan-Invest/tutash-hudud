@@ -43,6 +43,27 @@ class AuthAndPolicyTest extends TestCase
         $this->actingAs($user)->get(route('requests.show', $requestB))->assertForbidden();
     }
 
+    public function test_tuman_monitoring_only_shows_own_district(): void
+    {
+        [$districtA, $districtB] = [
+            District::create(['external_id' => 1, 'name' => 'Alpha tuman']),
+            District::create(['external_id' => 2, 'name' => 'Beta tuman']),
+        ];
+        $user = User::create(['name' => 'Alpha operator', 'email' => 'monitoring-a@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $districtA->id]);
+        $invest = User::create(['name' => 'Invest', 'email' => 'monitoring-invest@example.com', 'password' => 'secret', 'role' => 'invest']);
+
+        $this->registryRequest($districtA, $user)->update(['total_area' => 125.5]);
+        $this->registryRequest($districtB, $invest)->update(['owner_name' => 'Beta Owner', 'total_area' => 999]);
+
+        $this->actingAs($user)
+            ->get(route('requests.monitoring', ['district_id' => $districtB->id]))
+            ->assertOk()
+            ->assertSee('Alpha tuman')
+            ->assertSee('125.50')
+            ->assertDontSee('Beta tuman')
+            ->assertDontSee('999.00');
+    }
+
     public function test_viloyat_hokimi_cannot_create(): void
     {
         $user = User::create(['name' => 'Hokim', 'email' => 'h@example.com', 'password' => 'secret', 'role' => 'viloyat_hokimi']);
