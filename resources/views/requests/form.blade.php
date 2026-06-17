@@ -6,6 +6,12 @@
     $polygon = old('polygon_coordinates', $requestItem?->polygon_coordinates ? json_encode($requestItem->polygon_coordinates) : '');
     $ownerType = $field('owner_type', 'yuridik');
     $totalAreaManual = (bool) $field('total_area_manual', false);
+    $fileTypeLabels = [
+        'act_file' => 'Akt fayli',
+        'design_code_file' => 'Loyiha kodi fayli',
+        'qayta_organish_akti_file' => 'Qayta o‘rganish akti',
+    ];
+    $existingFiles = $editing ? $requestItem->files->keyBy('type') : collect();
 @endphp
 
 @section('title', $editing ? 'Arizani tahrirlash' : 'Yangi ariza')
@@ -225,6 +231,23 @@
                     @error('images')<p class="field-error">{{ $message }}</p>@enderror
                     @error('images.*')<p class="field-error">{{ $message }}</p>@enderror
                 </div>
+
+                @if($editing)
+                    <div class="wide existing-file-grid">
+                        @foreach($fileTypeLabels as $type => $label)
+                            @php($existingFile = $existingFiles->get($type))
+                            <div class="existing-file-item {{ $existingFile ? 'uploaded' : 'missing' }}">
+                                <span>{{ $label }}</span>
+                                @if($existingFile)
+                                    <a href="{{ Storage::url($existingFile->path) }}" target="_blank" rel="noopener">{{ $existingFile->original_name }}</a>
+                                    <small>Yangi fayl tanlansa, mavjud fayl almashtiriladi.</small>
+                                @else
+                                    <strong>Yuklanmagan</strong>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
 
                 <label>Akt fayli<input name="act_file" type="file" accept=".pdf,image/*">@error('act_file')<span>{{ $message }}</span>@enderror</label>
                 <label>Loyiha kodi fayli<input name="design_code_file" type="file" accept=".pdf,image/*">@error('design_code_file')<span>{{ $message }}</span>@enderror</label>

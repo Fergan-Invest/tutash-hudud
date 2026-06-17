@@ -8,12 +8,10 @@
 @endsection
 
 @php
-    $statusLabels = [
-        'draft' => 'Qoralama',
-        'submitted' => 'Yuborilgan',
-        'in_review' => 'Ko‘rib chiqilmoqda',
-        'approved' => 'Tasdiqlangan',
-        'rejected' => 'Rad etilgan',
+    $fileTypeLabels = [
+        'act_file' => 'Akt',
+        'design_code_file' => 'Loyiha',
+        'qayta_organish_akti_file' => 'Qayta',
     ];
 @endphp
 
@@ -29,12 +27,6 @@
 
 <form class="panel filters soft-panel" method="GET">
     <input name="q" value="{{ request('q') }}" placeholder="Kadastr, STIR/PINFL yoki egasi bo'yicha qidirish">
-    <select name="status">
-        <option value="">Barcha statuslar</option>
-        @foreach($statuses as $status)
-            <option value="{{ $status }}" @selected(request('status') === $status)>{{ $statusLabels[$status] ?? $status }}</option>
-        @endforeach
-    </select>
     <select name="street_type">
         <option value="">Barcha ko‘cha turlari</option>
         @foreach($streetTypes as $key => $label)
@@ -83,16 +75,26 @@
     <section class="panel table-panel registry-card">
         <div class="table-wrap">
             <table class="registry-table">
-                <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Hokimiyatga biriktirilgan kadastr raqami</th><th>Sana</th></tr></thead>
+                <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Hokimiyatga biriktirilgan kadastr raqami</th><th>Fayllar</th><th>Sana</th></tr></thead>
                 <tbody>
                 @foreach($requests as $item)
+                    @php($uploadedFileTypes = $item->files->pluck('type')->flip())
                     <tr class="clickable-row" onclick="window.location='{{ route('requests.show', $item) }}'">
                         <td><span class="row-number">{{ $requests->firstItem() + $loop->index }}</span></td>
                         <td>{{ $item->owner_name }}<small>{{ $item->owner_stir_pinfl }}</small></td>
                         <td>{{ $item->district->name }}<small>{{ $item->mahalla->name }}, {{ $item->street->name }}</small></td>
                         <td>{{ $streetTypes[$item->street_type] ?? $item->street_type }}</td>
                         <td>{{ $item->building_cadastr_number }}</td>
-                        <td>{{ $item->hokimyatga_biriktirilgan_kadastr_raqami ?: '—' }}</td>
+                        <td>{{ $item->hokimyatga_biriktirilgan_kadastr_raqami ?: '-' }}</td>
+                        <td>
+                            <div class="file-status-list">
+                                @foreach($fileTypeLabels as $type => $label)
+                                    <span class="file-status-chip {{ $uploadedFileTypes->has($type) ? 'uploaded' : 'missing' }}">
+                                        {{ $label }} <b>{{ $uploadedFileTypes->has($type) ? '✓' : '-' }}</b>
+                                    </span>
+                                @endforeach
+                            </div>
+                        </td>
                         <td>{{ $item->created_at->format('d.m.Y H:i') }}</td>
                     </tr>
                 @endforeach

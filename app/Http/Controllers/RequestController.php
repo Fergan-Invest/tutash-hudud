@@ -282,7 +282,7 @@ class RequestController extends Controller
 
     private function filteredRequestsQuery(Request $request)
     {
-        $query = RegistryRequest::with(['district', 'mahalla', 'street', 'creator'])
+        $query = RegistryRequest::with(['district', 'mahalla', 'street', 'creator', 'files'])
             ->latest();
 
         if ($request->user()->isTuman()) {
@@ -446,6 +446,15 @@ class RequestController extends Controller
             if (! $request->hasFile($type)) {
                 continue;
             }
+
+            $registryRequest->files()
+                ->where('type', $type)
+                ->get()
+                ->each(function (RequestFile $existingFile) {
+                    Storage::disk('public')->delete($existingFile->path);
+                    $existingFile->delete();
+                });
+
             $file = $request->file($type);
             $path = $file->store("requests/{$registryRequest->id}/files", 'public');
             RequestFile::create([
