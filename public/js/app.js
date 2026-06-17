@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSessionKeepAlive();
   initPolygonMap();
   initShowMap();
+  initMonitoringMap();
 });
 
 function safeStorage(storage) {
@@ -1264,3 +1265,116 @@ window.checkCadastreRestriction = async function (cadastreNumber) {
     }
   }
 };
+
+async function initMonitoringMap() {
+  const root = document.querySelector("[data-monitoring-map]");
+  if (!root) return;
+
+  const dataNode = root.querySelector("[data-monitoring-districts]");
+  const panel = root.querySelector("[data-monitoring-panel]");
+  const canvas = root.querySelector(".fergana-map-canvas");
+  if (!dataNode || !panel || !canvas) return;
+
+  if (!canvas.querySelector("svg") && canvas.dataset.mapSrc) {
+    try {
+      const response = await fetch(canvas.dataset.mapSrc, { cache: "force-cache" });
+      if (response.ok) {
+        canvas.insertAdjacentHTML("beforeend", await response.text());
+      }
+    } catch {
+      canvas.insertAdjacentHTML("beforeend", "<p>Xaritani yuklab bo'lmadi.</p>");
+    }
+  }
+
+  const svg = canvas.querySelector("svg");
+  if (!svg) return;
+
+  const normalize = (value) => String(value || "")
+    .toLowerCase()
+    .replace(/[ʻ’‘`´]/g, "'")
+    .replace(/qo'/g, "qo")
+    .replace(/g'/g, "g")
+    .replace(/o'/g, "o")
+    .replace(/[^a-z0-9\u0400-\u04ff]+/g, "")
+    .trim();
+
+  let rows = [];
+  try {
+    rows = JSON.parse(dataNode.textContent || "[]");
+  } catch {
+    rows = [];
+  }
+
+  const dataByName = new Map(rows.map((row) => [normalize(row.name), row]));
+  const paths = [...svg.querySelectorAll("path[aria-label]")];
+
+  const fields = {
+    name: panel.querySelector("[data-panel-name]"),
+    summary: panel.querySelector("[data-panel-summary]"),
+    count: panel.querySelector("[data-panel-count]"),
+    area: panel.querySelector("[data-panel-area]"),
+    approved: panel.querySelector("[data-panel-approved]"),
+    types: panel.querySelector("[data-panel-types]"),
+    link: panel.querySelector("[data-panel-link]"),
+    mapLabel: root.querySelector("[data-map-selected-label]"),
+  };
+
+  const number = (value, decimals = 0) => Number(value || 0).toLocaleString("uz-UZ", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+
+  const rowForPath = (path) => {
+    const label = path.getAttribute("aria-label") || "";
+    return dataByName.get(normalize(label)) || {
+      name: label || "Hudud",
+      count: 0,
+      total_area: 0,
+      approved: 0,
+      street_types: {},
+      url: "/requests",
+    };
+  };
+
+  const renderPanel = (row) => {
+    fields.name.textContent = row.name;
+    if (fields.mapLabel) fields.mapLabel.textContent = row.name;
+    const areaLabel = row.total_area_label || number(row.total_area, 2);
+    fields.summary.textContent = `${number(row.count)} ta xatlov, ${areaLabel} kv/m maydon.`;
+    fields.count.textContent = number(row.count);
+    fields.area.textContent = areaLabel;
+    fields.approved.textContent = number(row.approved);
+    fields.link.href = row.url || "/requests";
+
+    fields.types.innerHTML = "";
+    Object.entries(row.street_types || {}).forEach(([label, value]) => {
+      const item = document.createElement("div");
+      item.innerHTML = `<span>${escapeHtml(label)}</span><strong>${number(value)}</strong>`;
+      fields.types.appendChild(item);
+    });
+  };
+
+  const selectPath = (path) => {
+    paths.forEach((item) => item.classList.remove("selected"));
+    path.classList.add("selected");
+    renderPanel(rowForPath(path));
+  };
+
+  paths.forEach((path) => {
+    const row = rowForPath(path);
+    path.dataset.count = String(row.count || 0);
+    path.classList.toggle("has-data", Number(row.count || 0) > 0);
+    path.setAttribute("tabindex", "0");
+    path.setAttribute("role", "button");
+    path.addEventListener("click", () => selectPath(path));
+    path.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        selectPath(path);
+      }
+    });
+  });
+
+  const firstWithData = paths.find((path) => Number(path.dataset.count || 0) > 0);
+  if (firstWithData) selectPath(firstWithData);
+}
