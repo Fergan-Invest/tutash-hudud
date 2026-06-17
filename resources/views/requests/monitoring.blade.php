@@ -33,38 +33,11 @@
     </article>
 </section>
 
-<form class="panel filters soft-panel" method="GET">
-    <input name="q" value="{{ request('q') }}" placeholder="Kadastr, STIR/PINFL yoki egasi bo'yicha qidirish">
-    <select name="status">
-        <option value="">Barcha statuslar</option>
-        @foreach($statuses as $status)
-            <option value="{{ $status }}" @selected(request('status') === $status)>{{ $statusLabels[$status] ?? $status }}</option>
-        @endforeach
-    </select>
-    <select name="street_type">
-        <option value="">Barcha ko'cha turlari</option>
-        @foreach($streetTypes as $key => $label)
-            <option value="{{ $key }}" @selected(request('street_type') === $key)>{{ $label }}</option>
-        @endforeach
-    </select>
-    <select name="district_id">
-        <option value="">Barcha tumanlar</option>
-        @foreach($districts as $district)
-            <option value="{{ $district->id }}" @selected((string) request('district_id') === (string) $district->id)>{{ $district->name }}</option>
-        @endforeach
-    </select>
-    <select name="mahalla_id" class="searchable-select">
-        <option value="">Barcha MFYlar</option>
-        @foreach($mahallas as $mahalla)
-            <option value="{{ $mahalla->id }}" @selected((string) request('mahalla_id') === (string) $mahalla->id)>{{ $mahalla->name }}</option>
-        @endforeach
-    </select>
-    <input name="date_from" type="date" value="{{ request('date_from') }}">
-    <input name="date_to" type="date" value="{{ request('date_to') }}">
-    <button class="secondary-button" type="submit">Filtrlash</button>
-</form>
-
-<section class="panel table-panel registry-card">
+<section class="panel table-panel registry-card monitoring-table-card">
+    <div class="table-card-heading">
+        <h2>Tumanlar kesimida</h2>
+        <span>{{ number_format($rows->count(), 0, '.', ' ') }} ta hudud</span>
+    </div>
     <div class="table-wrap">
         <table class="registry-table monitoring-table">
             <thead>
