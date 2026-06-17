@@ -83,18 +83,17 @@
     <section class="panel table-panel registry-card">
         <div class="table-wrap">
             <table class="registry-table">
-                <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Holati</th><th>Sana</th><th></th></tr></thead>
+                <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Hokimiyatga biriktirilgan kadastr raqami</th><th>Sana</th></tr></thead>
                 <tbody>
                 @foreach($requests as $item)
-                    <tr>
+                    <tr class="clickable-row" onclick="window.location='{{ route('requests.show', $item) }}'">
                         <td><span class="row-number">{{ $requests->firstItem() + $loop->index }}</span></td>
                         <td>{{ $item->owner_name }}<small>{{ $item->owner_stir_pinfl }}</small></td>
                         <td>{{ $item->district->name }}<small>{{ $item->mahalla->name }}, {{ $item->street->name }}</small></td>
                         <td>{{ $streetTypes[$item->street_type] ?? $item->street_type }}</td>
                         <td>{{ $item->building_cadastr_number }}</td>
-                        <td><span class="status {{ $item->status }}">{{ $statusLabels[$item->status] ?? $item->status }}</span></td>
+                        <td>{{ $item->hokimyatga_biriktirilgan_kadastr_raqami ?: '—' }}</td>
                         <td>{{ $item->created_at->format('d.m.Y H:i') }}</td>
-                        <td><a class="row-link" href="{{ route('requests.show', $item) }}">Ko'rish</a></td>
                     </tr>
                 @endforeach
                 </tbody>

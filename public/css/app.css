@@ -282,17 +282,17 @@ th { color: #8b92a1; }
 .registry-table {
   border-collapse: separate;
   border-spacing: 0;
-  min-width: 900px;
+  min-width: 820px;
 }
 .registry-table th {
   color: #8b92a1;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: .02em;
-  padding: 13px 14px;
+  padding: 11px 12px;
   background: #fbfcfd;
 }
 .registry-table td {
-  padding: 15px 14px;
+  padding: 13px 12px;
   background: #fff;
   vertical-align: middle;
 }
@@ -360,14 +360,23 @@ th { color: #8b92a1; }
 .row-number {
   display: inline-grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
   background: #eef7f6;
   color: var(--cabinet-teal);
   font-weight: 900;
 }
 .row-link { color: var(--cabinet-teal); }
+.registry-table th:nth-child(6),
+.registry-table td:nth-child(6) {
+  max-width: 260px;
+  white-space: normal;
+}
+.registry-table th:nth-child(7),
+.registry-table td:nth-child(7) {
+  width: 120px;
+}
 .monitoring-metrics .metric-card strong {
   overflow-wrap: anywhere;
 }
