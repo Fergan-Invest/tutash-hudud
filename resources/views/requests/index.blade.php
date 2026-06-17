@@ -75,7 +75,7 @@
     <section class="panel table-panel registry-card">
         <div class="table-wrap">
             <table class="registry-table">
-                <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Hokimiyatga biriktirilgan kadastr raqami</th><th>Fayllar</th><th>Sana</th></tr></thead>
+                <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Hokimiyatga biriktirilgan kadastr raqami</th><th>Fayllar</th><th>Sana</th><th></th></tr></thead>
                 <tbody>
                 @foreach($requests as $item)
                     @php
@@ -98,6 +98,7 @@
                             </div>
                         </td>
                         <td>{{ $item->created_at->format('d.m.Y H:i') }}</td>
+                        <td><a class="row-link row-action-button" href="{{ route('requests.show', $item) }}" onclick="event.stopPropagation()">Kirish</a></td>
                     </tr>
                 @endforeach
                 </tbody>

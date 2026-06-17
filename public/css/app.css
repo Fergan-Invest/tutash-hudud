@@ -381,6 +381,25 @@ th { color: #8b92a1; }
 .registry-table td:nth-child(8) {
   width: 120px;
 }
+.registry-table th:nth-child(9),
+.registry-table td:nth-child(9) {
+  width: 92px;
+  text-align: right;
+}
+.row-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  border-radius: 7px;
+  background: var(--cabinet-teal-soft);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.row-action-button:hover {
+  background: var(--cabinet-teal);
+  color: #fff;
+}
 .file-status-list {
   display: flex;
   align-items: center;

@@ -15,7 +15,7 @@
     <aside class="sidebar" id="app-sidebar">
         <a class="brand" href="{{ route('requests.index') }}">
             <span class="brand-mark">T</span>
-            <span><strong>Tutash hududlar reestri</strong><small>Tadbirkor kabineti</small></span>
+            <span><strong>Tutash hududlar reestri</strong><small>Farg'ona invest kompaniya</small></span>
         </a>
 
         <nav class="nav-list" aria-label="Asosiy menyu">
