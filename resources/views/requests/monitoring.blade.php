@@ -54,8 +54,7 @@
 
             <div class="panel-metrics">
                 <div><span>Xatlov soni</span><strong data-panel-count>0</strong></div>
-                <div><span>Maydon</span><strong data-panel-area>0.00</strong><small>kv/m</small></div>
-                <div><span>Tasdiqlangan</span><strong data-panel-approved>0</strong></div>
+                <div><span>Maydon <small>kv/m</small></span><strong data-panel-area>0.00</strong></div>
             </div>
 
             <div class="panel-type-list" data-panel-types></div>

@@ -932,14 +932,14 @@ th { color: #8b92a1; }
 
 .map-monitoring-header h1 {
   margin: 0;
-  color: #102246;
+  color: var(--text);
   font-size: clamp(1.5rem, 3vw, 1.9rem);
   line-height: 1.05;
 }
 
 .map-monitoring-header p {
   margin: 6px 0 0;
-  color: #13284f;
+  color: var(--text);
   font-size: 13px;
   font-weight: 750;
 }
@@ -957,17 +957,17 @@ th { color: #8b92a1; }
   align-items: baseline;
   gap: 5px;
   min-height: 30px;
-  border: 1px solid #d9e4f1;
+  border: 1px solid var(--line);
   border-radius: 999px;
   background: #fff;
-  color: #375071;
+  color: var(--muted);
   padding: 5px 10px;
   font-size: 12px;
   font-weight: 800;
 }
 
 .map-monitoring-totals b {
-  color: #0b8e86;
+  color: var(--teal);
   font-size: 14px;
 }
 
@@ -995,28 +995,32 @@ th { color: #8b92a1; }
 }
 
 .fergana-map-canvas path {
-  fill: #c8c8c8;
+  fill: #d9dee4;
   stroke: none;
   cursor: pointer;
   outline: none;
   transition: fill .16s ease, filter .16s ease, opacity .16s ease;
 }
 
+.fergana-map-canvas path.has-data {
+  fill: #d9dee4;
+}
+
 .fergana-map-canvas path:not(.has-data) {
-  fill: #c8c8c8;
+  fill: #d9dee4;
   opacity: 1;
 }
 
 .fergana-map-canvas path:hover {
-  fill: #1b5aaa;
+  fill: var(--teal);
   opacity: 1;
-  filter: drop-shadow(0 8px 10px rgba(16, 65, 132, .22));
+  filter: drop-shadow(0 8px 10px rgba(21, 154, 130, .22));
 }
 
 .fergana-map-canvas path.selected {
-  fill: #0b4e9b !important;
+  fill: var(--teal) !important;
   opacity: 1;
-  filter: drop-shadow(0 10px 14px rgba(16, 65, 132, .32));
+  filter: drop-shadow(0 10px 14px rgba(21, 154, 130, .3));
 }
 
 .map-selected-label {
@@ -1024,7 +1028,7 @@ th { color: #8b92a1; }
   z-index: 2;
   top: 70px;
   right: 4%;
-  color: #0b4e9b;
+  color: var(--teal);
   font-size: 15px;
   font-weight: 900;
   text-transform: uppercase;
@@ -1033,9 +1037,9 @@ th { color: #8b92a1; }
 .map-district-panel {
   position: relative;
   align-self: stretch;
-  border-top: 1px solid #0b4e9b;
-  border-bottom: 1px solid #0b4e9b;
-  background: #fbfbfc;
+  border-top: 1px solid var(--teal);
+  border-bottom: 1px solid var(--line);
+  background: #fff;
   box-shadow: none;
   padding: 56px 46px;
   overflow: hidden;
@@ -1043,7 +1047,7 @@ th { color: #8b92a1; }
 
 .panel-eyebrow {
   display: inline-flex;
-  color: #0b4e9b;
+  color: var(--text);
   font-size: 26px;
   font-weight: 900;
   text-transform: uppercase;
@@ -1052,14 +1056,14 @@ th { color: #8b92a1; }
 
 .map-district-panel h2 {
   margin: 20px 0 12px;
-  color: #0b4e9b;
+  color: var(--text);
   font-size: 30px;
   line-height: 1.15;
 }
 
 .map-district-panel p {
   margin: 0;
-  color: #111827;
+  color: var(--text);
   font-size: 19px;
   line-height: 1.45;
 }
@@ -1084,14 +1088,14 @@ th { color: #8b92a1; }
 .panel-metrics span,
 .panel-type-list span {
   flex: 0 0 150px;
-  color: #0b4e9b;
+  color: var(--text);
   font-size: 20px;
   font-weight: 500;
 }
 
 .panel-metrics strong,
 .panel-type-list strong {
-  color: #111827;
+  color: var(--text);
   font-size: 20px;
   font-weight: 500;
 }
@@ -1116,7 +1120,7 @@ th { color: #8b92a1; }
 .panel-link {
   justify-self: start;
   min-width: 210px;
-  background: #0b4e9b;
+  background: var(--teal);
 }
 
 .empty-state-card { width: min(560px, 100%); margin: 145px auto 0; border-radius: 12px; padding: 38px 42px 32px; background: #fff; text-align: center; }

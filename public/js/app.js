@@ -1313,7 +1313,6 @@ async function initMonitoringMap() {
     summary: panel.querySelector("[data-panel-summary]"),
     count: panel.querySelector("[data-panel-count]"),
     area: panel.querySelector("[data-panel-area]"),
-    approved: panel.querySelector("[data-panel-approved]"),
     types: panel.querySelector("[data-panel-types]"),
     link: panel.querySelector("[data-panel-link]"),
     mapLabel: root.querySelector("[data-map-selected-label]"),
@@ -1343,7 +1342,6 @@ async function initMonitoringMap() {
     fields.summary.textContent = `${number(row.count)} ta xatlov, ${areaLabel} kv/m maydon.`;
     fields.count.textContent = number(row.count);
     fields.area.textContent = areaLabel;
-    fields.approved.textContent = number(row.approved);
     fields.link.href = row.url || "/requests";
 
     fields.types.innerHTML = "";
