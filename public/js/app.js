@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSessionKeepAlive();
   initPolygonMap();
   initShowMap();
-  initMonitoringMap();
+  // initMonitoringMap(); // Map monitoring is preserved but disabled; the old table design is active.
 });
 
 function safeStorage(storage) {
@@ -1266,6 +1266,7 @@ window.checkCadastreRestriction = async function (cadastreNumber) {
   }
 };
 
+/*
 async function initMonitoringMap() {
   const root = document.querySelector("[data-monitoring-map]");
   if (!root) return;
@@ -1376,3 +1377,4 @@ async function initMonitoringMap() {
   const firstWithData = paths.find((path) => Number(path.dataset.count || 0) > 0);
   if (firstWithData) selectPath(firstWithData);
 }
+*/
