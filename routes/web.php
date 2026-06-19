@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\RequestController;
+use App\Http\Controllers\RequestFileController;
 use App\Http\Controllers\RequestImageController;
 use App\Http\Controllers\StreetController;
 use App\Http\Controllers\UserActivityController;
@@ -35,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/requests/export', [RequestController::class, 'export'])->name('requests.export');
     Route::resource('requests', RequestController::class)->parameters(['requests' => 'registryRequest']);
     Route::post('/api/check-cadastre-restriction', [RequestController::class, 'checkCadastreRestriction'])->name('cadastre.check');
+    Route::delete('/request-files/{file}', [RequestFileController::class, 'destroy'])->name('request-files.destroy');
     Route::delete('/request-images/{image}', [RequestImageController::class, 'destroy'])->name('request-images.destroy');
     Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
     Route::get('/addresses/{district}', [AddressController::class, 'show'])->name('addresses.show');

@@ -239,7 +239,10 @@
                             <div class="existing-file-item {{ $existingFile ? 'uploaded' : 'missing' }}">
                                 <span>{{ $label }}</span>
                                 @if($existingFile)
-                                    <a href="{{ Storage::url($existingFile->path) }}" target="_blank" rel="noopener">{{ $existingFile->original_name }}</a>
+                                    <div class="existing-file-actions">
+                                        <a href="{{ Storage::url($existingFile->path) }}" target="_blank" rel="noopener">{{ $existingFile->original_name }}</a>
+                                        <button type="button" class="secondary-button delete-existing-file" data-delete-url="{{ route('request-files.destroy', $existingFile) }}">O‘chirish</button>
+                                    </div>
                                     <small>Yangi fayl tanlansa, mavjud fayl almashtiriladi.</small>
                                 @else
                                     <strong>Yuklanmagan</strong>

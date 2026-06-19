@@ -188,6 +188,9 @@ class RequestController extends Controller
                     ['value' => $item->additional_info, 'format' => 'text'],
                     ['value' => $item->latitude, 'format' => 'number'],
                     ['value' => $item->longitude, 'format' => 'number'],
+                    ['value' => $item->files->contains('type', 'act_file') ? 'Mavjud' : 'Mavjud emas', 'format' => 'text'],
+                    ['value' => $item->files->contains('type', 'design_code_file') ? 'Mavjud' : 'Mavjud emas', 'format' => 'text'],
+                    ['value' => $item->files->contains('type', 'qayta_organish_akti_file') ? 'Mavjud' : 'Mavjud emas', 'format' => 'text'],
                     ['value' => $item->creator?->name, 'format' => 'text'],
                 ];
 
@@ -379,6 +382,9 @@ class RequestController extends Controller
             'Qo‘shimcha ma’lumot',
             'Xarita kengligi',
             'Xarita uzunligi',
+            'Akt fayli',
+            'Loyiha kodi fayli',
+            'Qayta o‘rganish akti',
             'Yaratuvchi',
         ];
     }

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\District;
 use App\Models\Mahalla;
 use App\Models\RegistryRequest;
+use App\Models\RequestFile;
 use App\Models\Street;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -263,6 +264,61 @@ class RequestValidationTest extends TestCase
         $this->assertStringNotContainsString('Export Kocha Owner', $content);
         $this->assertStringContainsString('mso-number-format:"0.00";', $content);
         $this->assertStringContainsString('mso-number-format:"\@";', $content);
+        $this->assertStringContainsString('Akt fayli', $content);
+        $this->assertStringContainsString('Loyiha kodi fayli', $content);
+        $this->assertStringContainsString('Qayta o‘rganish akti', $content);
+        $this->assertSame(1, substr_count($content, '>Mavjud<'));
+        $this->assertSame(2, substr_count($content, '>Mavjud emas<'));
+    }
+
+    public function test_invest_can_delete_an_uploaded_request_file(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $file = RequestFile::firstOrFail();
+        Storage::disk('public')->assertExists($file->path);
+
+        $this->actingAs($user)
+            ->get(route('requests.edit', $file->registry_request_id))
+            ->assertOk()
+            ->assertSee(route('request-files.destroy', $file), false)
+            ->assertSee('delete-existing-file', false);
+
+        $this->actingAs($user)
+            ->deleteJson(route('request-files.destroy', $file))
+            ->assertOk()
+            ->assertJson(['deleted' => true]);
+
+        Storage::disk('public')->assertMissing($file->path);
+        $this->assertDatabaseMissing('request_files', ['id' => $file->id]);
+        $this->assertDatabaseHas('audit_logs', [
+            'auditable_id' => $file->registry_request_id,
+            'event' => 'file_deleted',
+        ]);
+    }
+
+    public function test_tuman_cannot_delete_an_uploaded_request_file(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor('tuman');
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $file = RequestFile::firstOrFail();
+
+        $this->actingAs($user)
+            ->deleteJson(route('request-files.destroy', $file))
+            ->assertForbidden();
+
+        Storage::disk('public')->assertExists($file->path);
+        $this->assertDatabaseHas('request_files', ['id' => $file->id]);
     }
 
     public function test_tuman_export_only_contains_own_district_data(): void

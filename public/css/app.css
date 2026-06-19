@@ -451,6 +451,20 @@ th { color: #8b92a1; }
   font-weight: 800;
   overflow-wrap: anywhere;
 }
+.existing-file-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.existing-file-actions a {
+  min-width: 0;
+}
+.existing-file-actions .secondary-button {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 5px 9px;
+}
 .existing-file-item strong,
 .existing-file-item small {
   color: var(--cabinet-muted);

@@ -821,6 +821,38 @@ function initImageSlots() {
       button.closest(".existing-image")?.remove();
     });
   });
+
+  document.querySelectorAll(".delete-existing-file").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!confirm("Fayl o‘chirilsinmi?")) return;
+      button.disabled = true;
+
+      const response = await fetch(button.dataset.deleteUrl, {
+        method: "DELETE",
+        headers: {
+          "Accept": "application/json",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+        },
+      });
+
+      if (!response.ok) {
+        button.disabled = false;
+        showToast("Faylni o‘chirishda xatolik yuz berdi.", "error");
+        return;
+      }
+
+      const item = button.closest(".existing-file-item");
+      item?.classList.remove("uploaded");
+      item?.classList.add("missing");
+      item?.querySelector(".existing-file-actions")?.remove();
+      const status = document.createElement("strong");
+      status.textContent = "Yuklanmagan";
+      item?.querySelector("span")?.after(status);
+      const hint = item?.querySelector("small");
+      if (hint) hint.textContent = "Yangi fayl yuklashingiz mumkin.";
+      showToast("Fayl o‘chirildi.", "success");
+    });
+  });
 }
 
 function initDraftPersistence() {
