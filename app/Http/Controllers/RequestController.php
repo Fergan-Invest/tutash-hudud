@@ -300,11 +300,20 @@ class RequestController extends Controller
         $query->when($request->filled('date_to'), fn ($q) => $q->whereDate('created_at', '<=', $request->date_to));
         $query->when($request->filled('q'), function ($q) use ($request) {
             $term = '%'.$request->q.'%';
-            $q->where(function ($inner) use ($term) {
+            $phoneDigits = preg_replace('/\D/', '', (string) $request->q);
+            $q->where(function ($inner) use ($term, $phoneDigits) {
                 $inner->where('request_number', 'like', $term)
                     ->orWhere('building_cadastr_number', 'like', $term)
                     ->orWhere('owner_stir_pinfl', 'like', $term)
-                    ->orWhere('owner_name', 'like', $term);
+                    ->orWhere('owner_name', 'like', $term)
+                    ->orWhere('phone_number', 'like', $term);
+
+                if ($phoneDigits !== '') {
+                    $inner->orWhereRaw(
+                        "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(phone_number, '+', ''), ' ', ''), '(', ''), ')', ''), '-', '') LIKE ?",
+                        ['%'.$phoneDigits.'%']
+                    );
+                }
             });
         });
 

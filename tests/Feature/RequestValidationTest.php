@@ -225,6 +225,39 @@ class RequestValidationTest extends TestCase
             ->assertDontSee('Oybek Owner');
     }
 
+    public function test_requests_index_can_search_by_phone_digits(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+
+        $this->actingAs($user)
+            ->post(route('requests.store'), $this->payload($district, $mahalla, $street))
+            ->assertRedirect();
+
+        $this->actingAs($user)
+            ->get(route('requests.index', ['q' => '901234567']))
+            ->assertOk()
+            ->assertSee('Owner MCHJ');
+    }
+
+    public function test_stir_and_pinfl_require_exact_lengths(): void
+    {
+        Storage::fake('public');
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        $payload['owner_stir_pinfl'] = '1234567890';
+        $payload['has_tenant'] = 1;
+        $payload['tenant_stir_pinfl'] = '1234567890';
+        $payload['tenant_name'] = 'Ijarachi';
+        $payload['tenant_activity_type'] = 'Savdo';
+
+        $this->actingAs($user)
+            ->from(route('requests.create'))
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect(route('requests.create'))
+            ->assertSessionHasErrors(['owner_stir_pinfl', 'tenant_stir_pinfl']);
+    }
+
     public function test_act_file_is_optional(): void
     {
         Storage::fake('public');

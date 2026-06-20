@@ -26,7 +26,7 @@
 </section>
 
 <form class="panel filters soft-panel" method="GET">
-    <input name="q" value="{{ request('q') }}" placeholder="Kadastr, STIR/PINFL yoki egasi bo'yicha qidirish">
+    <input name="q" value="{{ request('q') }}" placeholder="Kadastr, STIR/PINFL, telefon yoki egasi bo'yicha qidirish">
     <select name="street_type">
         <option value="">Barcha ko‘cha turlari</option>
         @foreach($streetTypes as $key => $label)

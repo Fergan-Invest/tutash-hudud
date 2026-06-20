@@ -675,6 +675,7 @@ function initOwnerType() {
 function initMasks() {
   const phone = document.getElementById("phone_number");
   const ownerId = document.getElementById("owner_stir_pinfl");
+  const tenantId = document.getElementById("tenant_stir_pinfl");
   const cadastre = document.getElementById("building_cadastr_number");
   const hokimiyatCadastre = document.getElementById("hokimyatga_biriktirilgan_kadastr_raqami");
 
@@ -692,6 +693,10 @@ function initMasks() {
   ownerId?.addEventListener("input", () => {
     const type = document.querySelector('input[name="owner_type"]:checked')?.value || "yuridik";
     ownerId.value = ownerId.value.replace(/\D/g, "").slice(0, type === "jismoniy" ? 14 : 9);
+  });
+
+  tenantId?.addEventListener("input", () => {
+    tenantId.value = tenantId.value.replace(/\D/g, "").slice(0, 14);
   });
 
   cadastre?.addEventListener("input", () => {

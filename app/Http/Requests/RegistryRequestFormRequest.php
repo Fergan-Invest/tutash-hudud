@@ -28,7 +28,7 @@ class RegistryRequestFormRequest extends FormRequest
             'building_cadastr_number' => ['required', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([\/:].+)?$/'],
             'hokimyatga_biriktirilgan_kadastr_raqami' => ['nullable', 'string', 'max:100', 'regex:/^\d{2}:\d{2}:\d{2}:\d{2}:\d{2}:\d{4}([\/:].+)?$/'],
             'owner_type' => ['required', Rule::in(['jismoniy', 'yuridik'])],
-            'owner_stir_pinfl' => ['required', 'digits_between:9,14'],
+            'owner_stir_pinfl' => ['required', $this->input('owner_type') === 'jismoniy' ? 'digits:14' : 'digits:9'],
             'owner_name' => ['required', 'string', 'max:255'],
             'district_id' => ['required', 'integer', 'exists:districts,id'],
             'mahalla_id' => [
@@ -62,7 +62,7 @@ class RegistryRequestFormRequest extends FormRequest
             'terrace_buildings_permanent' => ['required', 'boolean'],
             'has_permit' => ['required', 'boolean'],
             'has_tenant' => ['nullable', 'boolean'],
-            'tenant_stir_pinfl' => ['nullable', 'required_if:has_tenant,1', 'string', 'max:32'],
+            'tenant_stir_pinfl' => ['nullable', 'required_if:has_tenant,1', 'regex:/^(?:\d{9}|\d{14})$/'],
             'tenant_name' => ['nullable', 'required_if:has_tenant,1', 'string', 'max:255'],
             'tenant_activity_type' => ['nullable', 'required_if:has_tenant,1', 'string', 'max:255'],
             'adjacent_activity_type' => ['nullable', 'string', 'max:255'],

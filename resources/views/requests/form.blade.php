@@ -163,7 +163,7 @@
         <div class="form-section">
             <h2>Ijarachi va izoh</h2>
             <div class="form-grid two">
-                <label>Ijarachi STIR/PINFL<input name="tenant_stir_pinfl" value="{{ $field('tenant_stir_pinfl') }}">@error('tenant_stir_pinfl')<span>{{ $message }}</span>@enderror</label>
+                <label>Ijarachi STIR/PINFL<input id="tenant_stir_pinfl" name="tenant_stir_pinfl" value="{{ $field('tenant_stir_pinfl') }}" inputmode="numeric" maxlength="14" pattern="(?:\d{9}|\d{14})" placeholder="9 xonali STIR yoki 14 xonali PINFL">@error('tenant_stir_pinfl')<span>{{ $message }}</span>@enderror</label>
                 <label>Ijarachi nomi / F.I.SH<input name="tenant_name" value="{{ $field('tenant_name') }}">@error('tenant_name')<span>{{ $message }}</span>@enderror</label>
                 <label>Ijarachi faoliyat turi<input name="tenant_activity_type" value="{{ $field('tenant_activity_type') }}">@error('tenant_activity_type')<span>{{ $message }}</span>@enderror</label>
                 <label class="wide">Qo‘shimcha ma’lumot<textarea name="additional_info">{{ $field('additional_info') }}</textarea>@error('additional_info')<span>{{ $message }}</span>@enderror</label>
