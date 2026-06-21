@@ -33,10 +33,12 @@
                     <span>Yangi ariza</span>
                 </a>
             @endcan
-            <a class="nav-link {{ request()->routeIs('addresses.*') ? 'active' : '' }}" href="{{ route('addresses.index') }}">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>
-                <span>Manzillar</span>
-            </a>
+            @if(auth()->user()->isInvest())
+                <a class="nav-link {{ request()->routeIs('addresses.*', 'mahallas.*', 'streets.update') ? 'active' : '' }}" href="{{ route('addresses.index') }}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>
+                    <span>Manzillar</span>
+                </a>
+            @endif
             <a class="nav-link {{ request()->routeIs('users.online') ? 'active' : '' }}" href="{{ route('users.online') }}">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 10 18H2z"/><path d="M12 9v5M12 17h.01"/></svg>
                 <span>Online foydalanuvchilar</span>

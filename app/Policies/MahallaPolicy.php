@@ -2,17 +2,17 @@
 
 namespace App\Policies;
 
-use App\Models\Street;
+use App\Models\Mahalla;
 use App\Models\User;
 
-class StreetPolicy
+class MahallaPolicy
 {
     public function create(User $user): bool
     {
         return $user->isInvest();
     }
 
-    public function update(User $user, Street $street): bool
+    public function update(User $user, Mahalla $mahalla): bool
     {
         return $user->isInvest();
     }

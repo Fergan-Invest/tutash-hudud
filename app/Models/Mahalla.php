@@ -17,4 +17,9 @@ class Mahalla extends Model
     {
         return $this->hasMany(Street::class);
     }
+
+    public function audits()
+    {
+        return $this->morphMany(AuditLog::class, 'auditable')->latest();
+    }
 }

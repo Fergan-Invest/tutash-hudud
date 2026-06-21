@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\MahallaController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RequestFileController;
 use App\Http\Controllers\RequestImageController;
@@ -40,6 +41,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/request-images/{image}', [RequestImageController::class, 'destroy'])->name('request-images.destroy');
     Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
     Route::get('/addresses/{district}', [AddressController::class, 'show'])->name('addresses.show');
+    Route::post('/mahallas', [MahallaController::class, 'store'])->name('mahallas.store');
+    Route::put('/mahallas/{mahalla}', [MahallaController::class, 'update'])->name('mahallas.update');
     Route::post('/streets/store', [StreetController::class, 'store'])->name('streets.store');
+    Route::put('/streets/{street}', [StreetController::class, 'update'])->name('streets.update');
     Route::get('/users/online', [UserActivityController::class, 'online'])->name('users.online');
 });

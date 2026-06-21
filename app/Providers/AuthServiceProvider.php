@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Models\AuditLog;
+use App\Models\Mahalla;
 use App\Models\RegistryRequest;
 use App\Models\Street;
 use App\Policies\AuditPolicy;
+use App\Policies\MahallaPolicy;
 use App\Policies\RegistryRequestPolicy;
 use App\Policies\StreetPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -20,6 +22,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         RegistryRequest::class => RegistryRequestPolicy::class,
         Street::class => StreetPolicy::class,
+        Mahalla::class => MahallaPolicy::class,
         AuditLog::class => AuditPolicy::class,
     ];
 

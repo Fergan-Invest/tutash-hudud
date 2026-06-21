@@ -170,6 +170,78 @@ class AuthAndPolicyTest extends TestCase
             ->assertSee('Oybek');
     }
 
+    public function test_only_invest_can_open_address_management(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona shahar']);
+        $tuman = User::create([
+            'name' => 'Tuman operatori',
+            'email' => 'district-address@example.com',
+            'password' => 'secret',
+            'role' => 'tuman',
+            'district_id' => $district->id,
+        ]);
+        $hokim = User::create([
+            'name' => 'Hokim',
+            'email' => 'hokim-address@example.com',
+            'password' => 'secret',
+            'role' => 'viloyat_hokimi',
+        ]);
+
+        $this->actingAs($tuman)->get(route('addresses.index'))->assertForbidden();
+        $this->actingAs($hokim)->get(route('addresses.show', $district))->assertForbidden();
+        $this->actingAs($tuman)
+            ->post(route('mahallas.store'), ['district_id' => $district->id, 'name' => 'Ruxsatsiz MFY'])
+            ->assertForbidden();
+    }
+
+    public function test_invest_can_create_and_update_mahalla_and_street(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona shahar']);
+        $invest = User::create([
+            'name' => 'Invest',
+            'email' => 'address-manager@example.com',
+            'password' => 'secret',
+            'role' => 'invest',
+        ]);
+
+        $this->actingAs($invest)
+            ->post(route('mahallas.store'), [
+                'district_id' => $district->id,
+                'name' => 'Yangi MFY',
+            ])
+            ->assertRedirect();
+
+        $mahalla = Mahalla::where('name', 'Yangi MFY')->firstOrFail();
+
+        $this->actingAs($invest)
+            ->put(route('mahallas.update', $mahalla), ['name' => 'Yangilangan MFY'])
+            ->assertRedirect();
+
+        $this->actingAs($invest)
+            ->post(route('streets.store'), [
+                'district_id' => $district->id,
+                'mahalla_id' => $mahalla->id,
+                'name' => 'Navoiy',
+                'type' => 'kocha',
+            ])
+            ->assertRedirect();
+
+        $street = Street::where('name', 'Navoiy')->firstOrFail();
+
+        $this->actingAs($invest)
+            ->put(route('streets.update', $street), [
+                'mahalla_id' => $mahalla->id,
+                'name' => 'Mustaqillik',
+                'type' => 'kocha',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('mahallas', ['id' => $mahalla->id, 'name' => 'Yangilangan MFY']);
+        $this->assertDatabaseHas('streets', ['id' => $street->id, 'name' => 'Mustaqillik']);
+        $this->assertDatabaseHas('audit_logs', ['event' => 'mahalla_created']);
+        $this->assertDatabaseHas('audit_logs', ['event' => 'street_updated']);
+    }
+
     private function registryRequest(District $district, User $user): RegistryRequest
     {
         $mahalla = Mahalla::firstOrCreate(['district_id' => $district->id, 'name' => 'Markaz']);

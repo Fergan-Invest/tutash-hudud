@@ -102,6 +102,23 @@ td small { display: block; color: var(--muted); margin-top: 4px; }
 .form-grid { display: grid; gap: 14px; margin-top: 14px; }
 .form-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .form-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.address-editor { margin-bottom: 18px; }
+.address-editor summary { cursor: pointer; color: #26364f; font-weight: 800; }
+.address-form-action { display: flex; align-items: end; }
+.address-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.inline-editor { position: relative; }
+.inline-editor > summary { list-style: none; }
+.inline-editor > summary::-webkit-details-marker { display: none; }
+.inline-editor form { display: flex; gap: 8px; align-items: center; min-width: 420px; margin-top: 8px; }
+.inline-editor input, .inline-editor select { min-width: 130px; }
+.selected-address-row { background: #eefafa; }
+.street-management { margin-top: 18px; }
+.empty-address-selection { margin-top: 18px; text-align: center; }
+.empty-address-selection p { margin-top: 6px; }
+@media (max-width: 760px) {
+  .inline-editor form { min-width: 0; flex-direction: column; align-items: stretch; }
+  .address-form-action .primary-button { width: 100%; }
+}
 .wide { grid-column: 1 / -1; }
 label { display: grid; gap: 6px; color: #26364f; font-weight: 650; }
 label span, .field-error, label small { color: var(--danger); font-size: 12px; font-weight: 600; }

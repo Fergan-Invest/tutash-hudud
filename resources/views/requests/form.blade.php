@@ -116,7 +116,9 @@
                             <option value="">Tanlang</option>
                             @foreach($streets as $street)<option value="{{ $street->id }}" data-district="{{ $street->district_id }}" data-mahalla="{{ $street->mahalla_id }}" @selected((string) $field('street_id') === (string) $street->id)>{{ $street->name }}</option>@endforeach
                         </select>
-                        <button class="icon-button" type="button" id="add-street">+</button>
+                        @can('create', App\Models\Street::class)
+                            <button class="icon-button" type="button" id="add-street">+</button>
+                        @endcan
                     </div>
                     @error('street_id')<span>{{ $message }}</span>@enderror
                 </label>
@@ -124,10 +126,12 @@
                     <input name="house_number" value="{{ $field('house_number') }}" required>
                     @error('house_number')<span>{{ $message }}</span>@enderror
                 </label>
-                <label class="wide hidden" id="new-street-wrap">Yangi ko‘cha nomi
-                    <input id="new_street_name">
-                    <small>Nomni yozib, + tugmasini yana bosing.</small>
-                </label>
+                @can('create', App\Models\Street::class)
+                    <label class="wide hidden" id="new-street-wrap">Yangi ko‘cha nomi
+                        <input id="new_street_name">
+                        <small>Nomni yozib, + tugmasini yana bosing.</small>
+                    </label>
+                @endcan
             </div>
         </div>
     </section>

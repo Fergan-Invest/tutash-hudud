@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Street extends Model
 {
     public const TYPES = [
-        'kocha' => 'Kōcha',
+        'kocha' => 'Ko‘cha',
         'gostronomik' => 'Gostronomik',
         'turizm' => 'Turizm',
     ];
