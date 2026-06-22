@@ -242,6 +242,65 @@ class AuthAndPolicyTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['event' => 'street_updated']);
     }
 
+    public function test_tuman_can_add_street_to_own_district_from_request_form(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona tumani']);
+        $mahalla = Mahalla::create(['district_id' => $district->id, 'name' => 'Oybek']);
+        $tuman = User::create([
+            'name' => 'Tuman operatori',
+            'email' => 'street-tuman@example.com',
+            'password' => 'secret',
+            'role' => 'tuman',
+            'district_id' => $district->id,
+        ]);
+
+        $this->actingAs($tuman)
+            ->get(route('requests.create'))
+            ->assertOk()
+            ->assertSee('id="add-street"', false);
+
+        $this->actingAs($tuman)
+            ->postJson(route('streets.store'), [
+                'district_id' => $district->id,
+                'mahalla_id' => $mahalla->id,
+                'name' => 'Mustaqillik',
+                'type' => 'kocha',
+            ])
+            ->assertOk()
+            ->assertJsonFragment(['name' => 'Mustaqillik']);
+
+        $this->assertDatabaseHas('streets', [
+            'district_id' => $district->id,
+            'mahalla_id' => $mahalla->id,
+            'name' => 'Mustaqillik',
+        ]);
+    }
+
+    public function test_tuman_cannot_add_street_to_another_district(): void
+    {
+        $ownDistrict = District::create(['external_id' => 1, 'name' => 'Own']);
+        $otherDistrict = District::create(['external_id' => 2, 'name' => 'Other']);
+        $otherMahalla = Mahalla::create(['district_id' => $otherDistrict->id, 'name' => 'Other MFY']);
+        $tuman = User::create([
+            'name' => 'Tuman operatori',
+            'email' => 'street-scope@example.com',
+            'password' => 'secret',
+            'role' => 'tuman',
+            'district_id' => $ownDistrict->id,
+        ]);
+
+        $this->actingAs($tuman)
+            ->postJson(route('streets.store'), [
+                'district_id' => $otherDistrict->id,
+                'mahalla_id' => $otherMahalla->id,
+                'name' => 'Ruxsatsiz',
+                'type' => 'kocha',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('streets', ['name' => 'Ruxsatsiz']);
+    }
+
     private function registryRequest(District $district, User $user): RegistryRequest
     {
         $mahalla = Mahalla::firstOrCreate(['district_id' => $district->id, 'name' => 'Markaz']);

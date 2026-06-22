@@ -9,7 +9,7 @@ class StreetPolicy
 {
     public function create(User $user): bool
     {
-        return $user->isInvest();
+        return $user->isInvest() || $user->isTuman();
     }
 
     public function update(User $user, Street $street): bool

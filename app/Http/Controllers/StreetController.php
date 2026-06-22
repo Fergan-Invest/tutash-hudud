@@ -28,6 +28,10 @@ class StreetController extends Controller
             'type' => ['required', Rule::in(array_keys(Street::TYPES))],
         ]);
 
+        if ($request->user()->isTuman() && (int) $data['district_id'] !== (int) $request->user()->district_id) {
+            abort(403, 'Tuman foydalanuvchisi faqat o‘z hududiga ko‘cha qo‘sha oladi.');
+        }
+
         $mahalla = Mahalla::where('id', $data['mahalla_id'])
             ->where('district_id', $data['district_id'])
             ->firstOrFail();
