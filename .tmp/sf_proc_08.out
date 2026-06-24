@@ -1,0 +1,19 @@
+
+7-Zip 23.01 (x64) : Copyright (c) 1999-2023 Igor Pavlov : 2023-06-20
+
+Scanning the drive for archives:
+1 file, 83360 bytes (82 KiB)
+
+Extracting archive: C:\Users\I\Desktop\ftutash-hudud\vendor\composer\tmp-fd6819d5299bac08633b9da88185193b.zip
+--
+Path = C:\Users\I\Desktop\ftutash-hudud\vendor\composer\tmp-fd6819d5299bac08633b9da88185193b.zip
+Type = zip
+Physical Size = 83360
+Comment = e495d7178ca524f2dd0fe6a1d99a1e608e1c9936
+
+Everything is Ok
+
+Folders: 24
+Files: 123
+Size:       128200
+Compressed: 83360

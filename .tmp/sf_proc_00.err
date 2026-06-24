@@ -1,0 +1,52 @@
+[Thu Jun 25 00:08:04 2026] PHP 8.1.9 Development Server (http://127.0.0.1:8000) started
+[Thu Jun 25 00:08:47 2026] 127.0.0.1:58564 Accepted
+[Thu Jun 25 00:08:48 2026] 127.0.0.1:58564 Closing
+[Thu Jun 25 00:08:48 2026] 127.0.0.1:52495 Accepted
+[Thu Jun 25 00:08:48 2026] 127.0.0.1:52495 Closing
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:56690 Accepted
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:59614 Accepted
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:56690 Closing
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:59614 [200]: GET /vendor/leaflet/leaflet.css
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:49666 Accepted
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:54042 Accepted
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:49666 [200]: GET /css/app.css?v=1782324745
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:54042 [200]: GET /js/app.js?v=1782324745
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:59614 Closing
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:49666 Closing
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:54042 Closing
+[Thu Jun 25 00:08:49 2026] 127.0.0.1:61941 Accepted
+[Thu Jun 25 00:08:50 2026] 127.0.0.1:61941 Closing
+[Thu Jun 25 00:08:50 2026] 127.0.0.1:55592 Accepted
+[Thu Jun 25 00:08:50 2026] 127.0.0.1:55592 [200]: GET /favicon.ico
+[Thu Jun 25 00:08:50 2026] 127.0.0.1:55592 Closing
+[Thu Jun 25 00:08:52 2026] 127.0.0.1:64886 Accepted
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:64886 Closing
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:49666 Accepted
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:49666 [200]: GET /vendor/leaflet/leaflet.css
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:49666 Closing
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:53935 Accepted
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:60261 Accepted
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:56317 Accepted
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:60261 [200]: GET /css/app.css?v=1782324745
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:54920 Accepted
+[Thu Jun 25 00:08:53 2026] 127.0.0.1:53935 Closing
+[Thu Jun 25 00:08:54 2026] 127.0.0.1:56317 Closing
+[Thu Jun 25 00:08:54 2026] 127.0.0.1:64204 Accepted
+[Thu Jun 25 00:08:54 2026] 127.0.0.1:54920 Closing
+[Thu Jun 25 00:08:54 2026] 127.0.0.1:54613 Accepted
+[Thu Jun 25 00:08:54 2026] 127.0.0.1:64204 Closing
+[Thu Jun 25 00:08:54 2026] 127.0.0.1:60261 Closing
+[Thu Jun 25 00:08:54 2026] 127.0.0.1:54613 [200]: GET /js/app.js?v=1782324745
+[Thu Jun 25 00:08:54 2026] 127.0.0.1:54613 Closing
+[Thu Jun 25 00:08:54 2026] 127.0.0.1:55533 Accepted
+[Thu Jun 25 00:08:55 2026] 127.0.0.1:55533 Closing
+[Thu Jun 25 00:08:55 2026] 127.0.0.1:64960 Accepted
+[Thu Jun 25 00:08:55 2026] 127.0.0.1:64960 [200]: GET /vendor/leaflet/leaflet.js
+[Thu Jun 25 00:08:55 2026] 127.0.0.1:64960 Closing
+[Thu Jun 25 00:08:56 2026] 127.0.0.1:65533 Accepted
+[Thu Jun 25 00:08:56 2026] 127.0.0.1:65533 [200]: GET /favicon.ico
+[Thu Jun 25 00:08:56 2026] 127.0.0.1:65533 Closing
+[Thu Jun 25 00:09:07 2026] 127.0.0.1:60305 Accepted
+[Thu Jun 25 00:09:07 2026] 127.0.0.1:60305 Closing
+[Thu Jun 25 00:09:07 2026] 127.0.0.1:63921 Accepted
+[Thu Jun 25 00:09:08 2026] 127.0.0.1:63921 Closing

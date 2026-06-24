@@ -10,10 +10,10 @@ use App\Models\RequestFile;
 use App\Models\RequestImage;
 use App\Models\Street;
 use App\Services\AuditLogger;
+use App\Services\RequestNumberGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class RequestController extends Controller
 {
@@ -42,11 +42,11 @@ class RequestController extends Controller
         return view('requests.form', $this->formData($request));
     }
 
-    public function store(RegistryRequestFormRequest $request, AuditLogger $auditLogger)
+    public function store(RegistryRequestFormRequest $request, AuditLogger $auditLogger, RequestNumberGenerator $requestNumberGenerator)
     {
-        $registryRequest = DB::transaction(function () use ($request, $auditLogger) {
+        $registryRequest = DB::transaction(function () use ($request, $auditLogger, $requestNumberGenerator) {
             $data = $this->validatedPayload($request);
-            $data['request_number'] = $this->nextRequestNumber();
+            $data['request_number'] = $requestNumberGenerator->next();
             $data['status'] = 'submitted';
             $data['created_by'] = $request->user()->id;
             $data['updated_by'] = $request->user()->id;
@@ -484,12 +484,4 @@ class RequestController extends Controller
         }
     }
 
-    private function nextRequestNumber(): string
-    {
-        do {
-            $number = 'THR-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
-        } while (RegistryRequest::where('request_number', $number)->exists());
-
-        return $number;
-    }
 }

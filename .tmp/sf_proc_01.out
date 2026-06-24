@@ -1,0 +1,221 @@
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true                                                                                            0.01s  
+
+   PASS  Tests\Feature\AuthAndPolicyTest
+  ✓ login works with seeded style user                                                                           0.44s  
+  ✓ tuman user only sees own district request                                                                    0.09s  
+  ✓ tuman monitoring only shows own district                                                                     0.07s  
+  ✓ viloyat hokimi cannot create                                                                                 0.06s  
+  ✓ tuman user cannot edit even own district request                                                             0.06s  
+  ✓ requests index shows pagination controls after first page                                                    0.13s  
+  ✓ invest create form renders                                                                                   0.07s  
+  ✓ authenticated user can keep session alive                                                                    0.06s  
+  ✓ session clear invalidates session and redirects to login                                                     0.05s  
+  ✓ addresses page renders counts                                                                                0.07s  
+  ✓ only invest can open address management                                                                      0.08s  
+  ✓ invest can create and update mahalla and street                                                              0.07s  
+  ✓ tuman can add street to own district from request form                                                       0.05s  
+  ✓ tuman cannot add street to another district                                                                  0.05s  
+
+   FAIL  Tests\Feature\RequestValidationTest
+  ✓ invest can create request with four unique images                                                            0.14s  
+  ✓ cadastre number accepts colon suffix                                                                         0.09s  
+  ✓ duplicate building cadastre is rejected on create                                                            0.11s  
+  ✓ building cadastre can stay the same on edit                                                                  0.12s  
+  ✓ duplicate building cadastre is rejected on edit                                                              0.13s  
+  ✓ ajax cadastre check reports duplicates and ignores current request                                           0.11s  
+  ✓ request accepts new street type options                                                                      0.11s  
+  ✓ request rejects old street type options                                                                      0.10s  
+  ⨯ requests index can filter by street type                                                                     0.15s  
+  ✓ requests index can filter by mahalla                                                                         0.15s  
+  ✓ requests index can search by phone digits                                                                    0.10s  
+  ✓ stir and pinfl require exact lengths                                                                         0.08s  
+  ✓ act file is optional                                                                                         0.09s  
+  ✓ requests export uses current filters                                                                         0.13s  
+  ✓ invest can delete an uploaded request file                                                                   0.12s  
+  ✓ tuman cannot delete an uploaded request file                                                                 0.10s  
+  ✓ tuman export only contains own district data                                                                 0.13s  
+  ✓ hokimiyat cadastre is optional and area defaults to calculated total                                         0.10s  
+  ✓ total area can be entered manually when checkbox is checked                                                  0.09s  
+  ✓ adjacent facilities are optional                                                                             0.09s  
+  ✓ image validation messages are uzbek                                                                          0.09s  
+  ✓ ajax validate checks payload without storing                                                                 0.08s  
+  ✓ ajax validate returns uzbek errors                                                                           0.09s  
+  ✓ ajax validate works for update without requiring new images                                                  0.10s  
+  ✓ show page renders readonly steps and image previews                                                          0.10s  
+  ✓ create form does not render adjacent activity land field                                                     0.07s  
+  ✓ duplicate images are rejected and old input returns                                                          0.10s  
+  ✓ request can be updated and soft deleted without media cleanup                                                0.12s  
+  ✓ tuman cannot submit another district                                                                         0.08s  
+
+   PASS  Tests\Feature\SeederTest
+  ✓ database seeder imports addresses and users idempotently                                                     1.25s  
+  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\RequestValidationTest > requests index can filter by street type                               
+  Failed asserting that '<!doctype html>\n
+<html lang="uz">\n
+<head>\n
+    <meta charset="utf-8">\n
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n
+    <meta name="csrf-token" content="HDZzgnYD39pqVcbSeffpByBhP34MBzNi0KxgrDq2">\n
+    <title>Reestr</title>\n
+    <link rel="stylesheet" href="http://localhost/vendor/leaflet/leaflet.css">\n
+    <link rel="stylesheet" href="http://localhost/css/app.css?v=1782324745">\n
+    <script src="http://localhost/js/app.js?v=1782324745" defer></script>\n
+</head>\n
+<body>\n
+<div class="app-shell">\n
+    <div class="sidebar-backdrop" data-sidebar-close hidden></div>\n
+    <aside class="sidebar" id="app-sidebar">\n
+        <a class="brand" href="http://localhost/requests">\n
+            <span class="brand-mark">T</span>\n
+            <span><strong>Tutash hududlar reestri</strong><small>Farg'ona invest kompaniya</small></span>\n
+        </a>\n
+\n
+        <nav class="nav-list" aria-label="Asosiy menyu">\n
+            <a class="nav-link active" href="http://localhost/requests">\n
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>\n
+                <span>Bosh sahifa</span>\n
+            </a>\n
+            <a class="nav-link " href="http://localhost/requests/monitoring">\n
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16V9"/><path d="M12 16V7"/><path d="M16 16v-4"/></svg>\n
+                <span>Monitoring</span>\n
+            </a>\n
+                            <a class="nav-link " href="http://localhost/requests/create">\n
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/><path d="M8 9.5h8M8 13h5"/></svg>\n
+                    <span>Yangi ariza</span>\n
+                </a>\n
+                                        <a class="nav-link " href="http://localhost/addresses">\n
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>\n
+                    <span>Manzillar</span>\n
+                </a>\n
+                        <a class="nav-link " href="http://localhost/users/online">\n
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 10 18H2z"/><path d="M12 9v5M12 17h.01"/></svg>\n
+                <span>Online foydalanuvchilar</span>\n
+            </a>\n
+        </nav>\n
+    </aside>\n
+\n
+    <div class="content">\n
+        <header class="topbar">\n
+            <div class="topbar-title">\n
+                <button class="menu-button" type="button" aria-label="Menyuni ochish" aria-controls="app-sidebar" aria-expanded="false"><span></span><span></span><span></span></button>\n
+                <span class="breadcrumb">Kadastr uchastkalari</span>\n
+            </div>\n
+\n
+            <div class="topbar-actions">\n
+                    <a class="secondary-button topbar-export-button" href="http://localhost/requests/monitoring?street_type=turizm">Monitoring</a>\n
+    <a class="secondary-button topbar-export-button" href="http://localhost/requests/export?street_type=turizm">Excel</a>\n
+                <a class="report-link" href="mailto:invest.abdusattorov@gmail.com">\n
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8M8 13h5"/></svg>\n
+                    <span>Xatolik haqida xabar berish</span>\n
+                </a>\n
+                <button class="bell-button" type="button" aria-label="Bildirishnomalar">\n
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>\n
+                </button>\n
+                <div class="user-card">\n
+                    <span class="user-avatar">U</span>\n
+                    <span>User</span>\n
+                    <form method="POST" action="http://localhost/logout"><input type="hidden" name="_token" value="HDZzgnYD39pqVcbSeffpByBhP34MBzNi0KxgrDq2" autocomplete="off"><button class="link-button" type="submit">Chiqish</button></form>\n
+                </div>\n
+            </div>\n
+        </header>\n
+\n
+                    <div class="alert success">Ariza saqlandi.</div>\n
+                \n
+        <main><section class="page-title compact-title">\n
+    <div>\n
+        <h1>Kadastr uchastkalari</h1>\n
+    </div>\n
+            <a class="primary-button" href="http://localhost/requests/create">Ariza berish</a>\n
+    </section>\n
+\n
+<form class="panel filters soft-panel" method="GET">\n
+    <input name="q" value="" placeholder="Kadastr, STIR/PINFL, telefon yoki egasi bo'yicha qidirish">\n
+    <select name="street_type">\n
+        <option value="">Barcha ko‘cha turlari</option>\n
+                    <option value="kocha" >Ko‘cha</option>\n
+                    <option value="gostronomik" >Gostronomik</option>\n
+                    <option value="turizm" selected>Turizm</option>\n
+            </select>\n
+    <select name="district_id">\n
+        <option value="">Barcha tumanlar</option>\n
+                    <option value="1" >Farg‘ona shahar</option>\n
+            </select>\n
+    <select name="mahalla_id" class="searchable-select">\n
+        <option value="">Barcha MFYlar</option>\n
+                    <option value="1" >Oybek</option>\n
+            </select>\n
+    <input name="date_from" type="date" value="">\n
+    <input name="date_to" type="date" value="">\n
+    <select name="per_page" aria-label="Sahifadagi qatorlar">\n
+                    <option value="15" selected>15 qator</option>\n
+                    <option value="25" >25 qator</option>\n
+                    <option value="50" >50 qator</option>\n
+                    <option value="100" >100 qator</option>\n
+            </select>\n
+    <button class="secondary-button" type="submit">Filtrlash</button>\n
+</form>\n
+\n
+    <section class="panel table-panel registry-card">\n
+        <div class="table-wrap">\n
+            <table class="registry-table">\n
+                <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Hokimiyatga biriktirilgan kadastr raqami</th><th>Fayllar</th><th>Sana</th><th></th></tr></thead>\n
+                <tbody>\n
+                                                        <tr class="clickable-row" data-href="http://localhost/requests/2" onclick="window.location=this.dataset.href">\n
+                        <td><span class="row-number">1</span></td>\n
+                        <td>Turizm Owner<small>123456789</small></td>\n
+                        <td>Farg‘ona shahar<small>Oybek, Navoiy</small></td>\n
+                        <td>Turizm</td>\n
+                        <td>31:23:12:31:23:1232/12:02</td>\n
+                        <td>10:08:04:01:02:5006/0001:035</td>\n
+                        <td>\n
+                            <div class="file-status-list">\n
+                                                                    <span class="file-status-chip uploaded">\n
+                                        Akt <b>✓</b>\n
+                                    </span>\n
+                                                                    <span class="file-status-chip missing">\n
+                                        Loyiha <b>-</b>\n
+                                    </span>\n
+                                                                    <span class="file-status-chip missing">\n
+                                        Qayta <b>-</b>\n
+                                    </span>\n
+                                                            </div>\n
+                        </td>\n
+                        <td>25.06.2026 00:13</td>\n
+                        <td><a class="row-link row-action-button" href="http://localhost/requests/2" onclick="event.stopPropagation()">Kirish</a></td>\n
+                    </tr>\n
+                                </tbody>\n
+            </table>\n
+        </div>\n
+        <div class="pagination-bar">\n
+            <p>\n
+                1-1\n
+                / 1 ta yozuv\n
+            </p>\n
+\n
+                    </div>\n
+    </section>\n
+</main>\n
+    </div>\n
+</div>\n
+</body>\n
+</html>\n
+' [UTF-8](length: 7958) contains "Yuborilgan" [ASCII](length: 10).
+
+  at tests\Feature\RequestValidationTest.php:196
+    192▕         $this->actingAs($user)
+    193▕             ->get(route('requests.index', ['street_type' => 'turizm']))
+    194▕             ->assertOk()
+    195▕             ->assertSee('T/r')
+  ➜ 196▕             ->assertSee('Yuborilgan')
+    197▕             ->assertSee('Filtrlash')
+    198▕             ->assertDontSee('THR-')
+    199▕             ->assertSee('Turizm Owner')
+    200▕             ->assertDontSee('Kōcha Owner');
+
+
+  Tests:    1 failed, 44 passed (213 assertions)
+  Duration: 5.89s
+
