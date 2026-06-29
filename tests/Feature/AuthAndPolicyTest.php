@@ -170,6 +170,33 @@ class AuthAndPolicyTest extends TestCase
             ->assertSee('Oybek');
     }
 
+    public function test_address_district_page_shows_and_navigates_mahalla_pagination(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'Fargona shahar']);
+        foreach (range(1, 51) as $number) {
+            Mahalla::create([
+                'district_id' => $district->id,
+                'name' => sprintf('MFY %02d', $number),
+            ]);
+        }
+        $user = User::create(['name' => 'Invest', 'email' => 'address-pagination@example.com', 'password' => 'secret', 'role' => 'invest']);
+
+        $this->actingAs($user)
+            ->get(route('addresses.show', $district))
+            ->assertOk()
+            ->assertSee('1-50')
+            ->assertSee('/ 51 ta MFY')
+            ->assertSee('pagination-links', false)
+            ->assertSee('Keyingi')
+            ->assertDontSee('MFY 51');
+
+        $this->actingAs($user)
+            ->get(route('addresses.show', ['district' => $district, 'page' => 2]))
+            ->assertOk()
+            ->assertSee('51-51')
+            ->assertSee('MFY 51');
+    }
+
     public function test_only_invest_can_open_address_management(): void
     {
         $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona shahar']);

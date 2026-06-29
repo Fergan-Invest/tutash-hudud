@@ -43,7 +43,8 @@ class AddressController extends Controller
             'mahallas' => $district->mahallas()
                 ->withCount('streets')
                 ->orderBy('name')
-                ->paginate(50),
+                ->paginate(50)
+                ->withQueryString(),
             'selectedMahalla' => $selectedMahalla,
             'streetTypes' => Street::TYPES,
         ]);

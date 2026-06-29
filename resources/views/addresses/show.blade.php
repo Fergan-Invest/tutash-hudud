@@ -64,7 +64,50 @@
             </tbody>
         </table>
     </div>
-    {{ $mahallas->links() }}
+    <div class="pagination-bar">
+        <p>
+            {{ $mahallas->firstItem() }}-{{ $mahallas->lastItem() }}
+            / {{ $mahallas->total() }} ta MFY
+        </p>
+
+        @if($mahallas->hasPages())
+            @php
+                $paginationPages = collect([1, $mahallas->currentPage() - 2, $mahallas->currentPage() - 1, $mahallas->currentPage(), $mahallas->currentPage() + 1, $mahallas->currentPage() + 2, $mahallas->lastPage()])
+                    ->filter(fn ($page) => $page >= 1 && $page <= $mahallas->lastPage())
+                    ->unique()
+                    ->sort()
+                    ->values();
+                $previousRenderedPage = null;
+            @endphp
+            <nav class="pagination-links" aria-label="MFY sahifalari">
+                @if($mahallas->onFirstPage())
+                    <span class="pagination-link disabled" aria-disabled="true">Oldingi</span>
+                @else
+                    <a class="pagination-link" href="{{ $mahallas->previousPageUrl() }}" rel="prev">Oldingi</a>
+                @endif
+
+                @foreach($paginationPages as $page)
+                    @if($previousRenderedPage !== null && $page > $previousRenderedPage + 1)
+                        <span class="pagination-gap" aria-hidden="true">...</span>
+                    @endif
+
+                    @if($page === $mahallas->currentPage())
+                        <span class="pagination-link active" aria-current="page">{{ $page }}</span>
+                    @else
+                        <a class="pagination-link" href="{{ $mahallas->url($page) }}">{{ $page }}</a>
+                    @endif
+
+                    @php($previousRenderedPage = $page)
+                @endforeach
+
+                @if($mahallas->hasMorePages())
+                    <a class="pagination-link" href="{{ $mahallas->nextPageUrl() }}" rel="next">Keyingi</a>
+                @else
+                    <span class="pagination-link disabled" aria-disabled="true">Keyingi</span>
+                @endif
+            </nav>
+        @endif
+    </div>
 </section>
 
 @if($selectedMahalla)
