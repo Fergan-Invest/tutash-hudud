@@ -13,6 +13,105 @@
     <a class="secondary-button" href="{{ route('addresses.index') }}">Tumanlarga qaytish</a>
 </section>
 
+<section class="district-statistics" aria-labelledby="statistics-title">
+    <div class="statistics-heading">
+        <div>
+            <p class="eyebrow">Hudud statistikasi</p>
+            <h2 id="statistics-title">{{ $statistics['period_label'] }}gi xatlovlar</h2>
+        </div>
+        <nav class="period-tabs" aria-label="Statistika davri">
+            <a href="{{ route('addresses.show', ['district' => $district, 'period' => 'today']) }}" class="{{ $statistics['period'] === 'today' ? 'active' : '' }}">Bugun</a>
+            <a href="{{ route('addresses.show', ['district' => $district, 'period' => 'week']) }}" class="{{ $statistics['period'] === 'week' ? 'active' : '' }}">Bu hafta</a>
+            <a href="{{ route('addresses.show', ['district' => $district, 'period' => 'month']) }}" class="{{ $statistics['period'] === 'month' ? 'active' : '' }}">Bu oy</a>
+        </nav>
+    </div>
+
+    <form class="statistics-date-filter" method="GET" action="{{ route('addresses.show', $district) }}">
+        <input type="hidden" name="period" value="custom">
+        <label>Boshlanish sanasi
+            <input type="date" name="date_from" value="{{ $statistics['date_from'] }}" required>
+        </label>
+        <label>Tugash sanasi
+            <input type="date" name="date_to" value="{{ $statistics['date_to'] }}" required>
+        </label>
+        <button class="primary-button" type="submit">Ko‘rsatish</button>
+    </form>
+
+    <div class="statistics-summary-grid">
+        <article class="statistics-card accent-card">
+            <span>Xatlovlar soni</span>
+            <strong>{{ number_format($statistics['count'], 0, '.', ' ') }}</strong>
+            <small>{{ $statistics['period_label'] }} qo‘shilgan</small>
+        </article>
+        <article class="statistics-card">
+            <span>Jami maydon</span>
+            <strong>{{ number_format($statistics['area'], 2, '.', ' ') }}</strong>
+            <small>kv/m hisobida</small>
+        </article>
+        <article class="statistics-card">
+            <span>Faol MFYlar</span>
+            <strong>{{ number_format($statistics['active_mahallas'], 0, '.', ' ') }}</strong>
+            <small>{{ $district->mahallas_count }} ta MFYdan</small>
+        </article>
+    </div>
+
+    <div class="statistics-visual-grid">
+        <article class="panel statistics-chart-card">
+            <div class="panel-heading">
+                <div><h3>Qo‘shilish dinamikasi</h3><p>{{ $statistics['period'] === 'today' ? 'Soatlar' : 'Kunlar' }} kesimida</p></div>
+                <span class="chart-legend"><i></i> Xatlovlar</span>
+            </div>
+            <div class="timeline-chart" aria-label="Qo‘shilish vaqti diagrammasi">
+                @foreach($statistics['timeline'] as $point)
+                    @php
+                        $height = $point['count']
+                            ? max(10, round($point['count'] / $statistics['max_timeline_count'] * 100))
+                            : 3;
+                    @endphp
+                    <div class="timeline-column" title="{{ $point['label'] }} — {{ $point['count'] }} ta, {{ number_format($point['area'], 2, '.', ' ') }} kv/m">
+                        <span class="timeline-value">{{ $point['count'] ?: '' }}</span>
+                        <i style="height: {{ $height }}%"></i>
+                        <small>{{ $point['label'] }}</small>
+                    </div>
+                @endforeach
+            </div>
+        </article>
+
+        <article class="panel statistics-chart-card">
+            <div class="panel-heading">
+                <div><h3>MFYlar kesimida</h3><p>Eng ko‘p xatlov kiritilgan hududlar</p></div>
+            </div>
+            <div class="mahalla-bars">
+                @forelse($statistics['mahallas']->take(8) as $row)
+                    <a class="mahalla-bar-row" href="{{ route('requests.index', ['district_id' => $district->id, 'mahalla_id' => $row['id']]) }}">
+                        <div><strong>{{ $row['name'] }}</strong><span>{{ number_format($row['area'], 2, '.', ' ') }} kv/m</span></div>
+                        <div class="mahalla-bar-track"><i style="width: {{ max(4, round($row['count'] / $statistics['max_mahalla_count'] * 100)) }}%"></i></div>
+                        <b>{{ $row['count'] }}</b>
+                    </a>
+                @empty
+                    <div class="statistics-empty">Tanlangan davrda xatlov qo‘shilmagan.</div>
+                @endforelse
+            </div>
+        </article>
+    </div>
+
+    @if($statistics['recent']->isNotEmpty())
+        <details class="panel recent-statistics">
+            <summary>Oxirgi qo‘shilganlar <span>{{ $statistics['recent']->count() }} ta</span></summary>
+            <div class="recent-registry-list">
+                @foreach($statistics['recent'] as $item)
+                    <a href="{{ route('requests.show', $item) }}">
+                        <span class="recent-time">{{ $item->created_at->format('H:i') }}</span>
+                        <strong>{{ $statistics['mahalla_names'][$item->mahalla_id] ?? 'MFY ko‘rsatilmagan' }}</strong>
+                        <span>{{ $item->request_number }}</span>
+                        <b>{{ number_format((float) $item->total_area, 2, '.', ' ') }} kv/m</b>
+                    </a>
+                @endforeach
+            </div>
+        </details>
+    @endif
+</section>
+
 <section class="metrics address-summary">
     <article class="metric-card"><span>MFYlar</span><strong>{{ $district->mahallas_count }}</strong><small>{{ $district->name }} bo‘yicha</small></article>
     <article class="metric-card"><span>Ko‘chalar</span><strong>{{ $district->streets_count }}</strong><small>Tizimga qo‘shilgan</small></article>
