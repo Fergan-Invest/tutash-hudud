@@ -27,6 +27,10 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16V9"/><path d="M12 16V7"/><path d="M16 16v-4"/></svg>
                 <span>Monitoring</span>
             </a>
+            <a class="nav-link {{ request()->routeIs('requests.map') ? 'active' : '' }}" href="{{ route('requests.map') }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg>
+                <span>Xaritada</span>
+            </a>
             @can('create', App\Models\RegistryRequest::class)
                 <a class="nav-link {{ request()->routeIs('requests.create') ? 'active' : '' }}" href="{{ route('requests.create') }}">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/><path d="M8 9.5h8M8 13h5"/></svg>

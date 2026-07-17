@@ -188,10 +188,11 @@
                         <button type="button" class="map-tool" id="fit-polygon">Ko‘rsatish</button>
                         <button type="button" class="map-tool danger" id="reset-polygon">Tozalash</button>
                     </div>
-                    <div id="polygon-map" class="leaflet-map" data-polygon='@json($polygon)'></div>
+                    <div id="polygon-map" class="leaflet-map" data-polygon='@json($polygon)' data-existing-url="{{ $mapDataUrl }}" data-exclude="{{ $requestItem?->id }}"></div>
                 </div>
                 <div class="measure-panel">
                     <div class="map-help">Xaritani bosing: nuqta qo‘shiladi. Nuqtani sudrab tahrirlang. Marker ustida o‘ng tugma: nuqtani o‘chirish.</div>
+                    <div class="map-help existing-map-help"><strong>Mavjud obyektlar</strong><br>Qizil poligon yoki markerlar avval yaratilgan arizalardir. Ustiga bosib ma'lumotni ko'ring.</div>
                     <input type="hidden" id="latitude" name="latitude" value="{{ $field('latitude') }}" required>
                     <input type="hidden" id="longitude" name="longitude" value="{{ $field('longitude') }}" required>
                     <input type="hidden" id="polygon_coordinates" name="polygon_coordinates" value="{{ $polygon }}" required>

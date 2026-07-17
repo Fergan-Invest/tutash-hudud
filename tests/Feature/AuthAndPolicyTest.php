@@ -64,6 +64,36 @@ class AuthAndPolicyTest extends TestCase
             ->assertDontSee('999.00');
     }
 
+    public function test_tuman_map_data_never_exposes_another_district(): void
+    {
+        $districtA = District::create(['external_id' => 1, 'name' => 'Alpha']);
+        $districtB = District::create(['external_id' => 2, 'name' => 'Beta']);
+        $user = User::create(['name' => 'Alpha operator', 'email' => 'map-a@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $districtA->id]);
+        $own = $this->registryRequest($districtA, $user);
+        $other = $this->registryRequest($districtB, $user);
+
+        $this->actingAs($user)
+            ->getJson(route('requests.map-data', ['district_id' => $districtB->id]))
+            ->assertOk()
+            ->assertJsonCount(1, 'items')
+            ->assertJsonPath('items.0.id', $own->id)
+            ->assertJsonMissing(['id' => $other->id]);
+    }
+
+    public function test_map_data_can_exclude_current_request_when_editing(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'Alpha']);
+        $invest = User::create(['name' => 'Invest', 'email' => 'map-invest@example.com', 'password' => 'secret', 'role' => 'invest']);
+        $excluded = $this->registryRequest($district, $invest);
+        $visible = $this->registryRequest($district, $invest);
+
+        $this->actingAs($invest)
+            ->getJson(route('requests.map-data', ['exclude' => $excluded->id]))
+            ->assertOk()
+            ->assertJsonCount(1, 'items')
+            ->assertJsonPath('items.0.id', $visible->id);
+    }
+
     public function test_viloyat_hokimi_cannot_create(): void
     {
         $user = User::create(['name' => 'Hokim', 'email' => 'h@example.com', 'password' => 'secret', 'role' => 'viloyat_hokimi']);

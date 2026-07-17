@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/session/keep-alive', [RequestController::class, 'keepAlive'])->name('session.keep-alive');
     Route::match(['post', 'put', 'patch'], '/requests/validate/{registryRequest?}', [RequestController::class, 'validateForm'])->name('requests.validate');
     Route::get('/requests/monitoring', [RequestController::class, 'monitoring'])->name('requests.monitoring');
+    Route::get('/requests/map', [RequestController::class, 'map'])->name('requests.map');
+    Route::get('/requests/map-data', [RequestController::class, 'mapData'])->name('requests.map-data');
     Route::get('/requests/export', [RequestController::class, 'export'])->name('requests.export');
     Route::resource('requests', RequestController::class)->parameters(['requests' => 'registryRequest']);
     Route::post('/api/check-cadastre-restriction', [RequestController::class, 'checkCadastreRestriction'])->name('cadastre.check');

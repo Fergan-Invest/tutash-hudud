@@ -42,6 +42,51 @@ class RequestController extends Controller
         return view('requests.form', $this->formData($request));
     }
 
+    public function map(Request $request)
+    {
+        $this->authorize('viewAny', RegistryRequest::class);
+
+        return view('requests.map', [
+            'districts' => $this->availableDistricts($request),
+            'statuses' => RegistryRequest::STATUSES,
+        ]);
+    }
+
+    public function mapData(Request $request)
+    {
+        $this->authorize('viewAny', RegistryRequest::class);
+        $validated = $request->validate([
+            'district_id' => ['nullable', 'integer', 'exists:districts,id'],
+            'exclude' => ['nullable', 'integer'],
+            'status' => ['nullable', 'in:'.implode(',', RegistryRequest::STATUSES)],
+        ]);
+
+        $query = RegistryRequest::query()
+            ->with(['district:id,name', 'mahalla:id,name', 'street:id,name'])
+            ->whereNotNull('latitude')->whereNotNull('longitude');
+
+        if ($request->user()->isTuman()) {
+            $query->where('district_id', $request->user()->district_id);
+        } elseif (! empty($validated['district_id'])) {
+            $query->where('district_id', $validated['district_id']);
+        }
+
+        $query->when(! empty($validated['exclude']), fn ($q) => $q->whereKeyNot($validated['exclude']));
+        $query->when(! empty($validated['status']), fn ($q) => $q->where('status', $validated['status']));
+
+        return response()->json(['items' => $query->latest()->get()->map(fn (RegistryRequest $item) => [
+            'id' => $item->id,
+            'request_number' => $item->request_number,
+            'status' => $item->status,
+            'owner_name' => $item->owner_name,
+            'address' => collect([$item->district?->name, $item->mahalla?->name, $item->street?->name, $item->house_number])->filter()->implode(', '),
+            'latitude' => (float) $item->latitude,
+            'longitude' => (float) $item->longitude,
+            'polygon' => $item->polygon_coordinates,
+            'url' => route('requests.show', $item),
+        ])])->header('Cache-Control', 'private, no-store');
+    }
+
     public function store(RegistryRequestFormRequest $request, AuditLogger $auditLogger, RequestNumberGenerator $requestNumberGenerator)
     {
         $registryRequest = DB::transaction(function () use ($request, $auditLogger, $requestNumberGenerator) {
@@ -430,6 +475,7 @@ class RequestController extends Controller
             'streetTypes' => RegistryRequest::STREET_TYPES,
             'usagePurposes' => ['savdo' => 'Savdo', 'xizmat' => 'Xizmat', 'umumiy_ovqatlanish' => 'Umumiy ovqatlanish', 'boshqa' => 'Boshqa'],
             'facilities' => ['soyabon', 'stol_stul', 'vitrina', 'yengil_konstruksiya', 'reklama'],
+            'mapDataUrl' => route('requests.map-data'),
         ];
     }
 

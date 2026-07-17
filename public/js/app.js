@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSessionKeepAlive();
   initPolygonMap();
   initShowMap();
+  initRequestsMap();
   // initMonitoringMap(); // Map monitoring is preserved but disabled; the old table design is active.
 });
 
@@ -961,6 +962,18 @@ function initPolygonMap() {
   const locate = document.getElementById("locate-position");
   const map = L.map(container).setView([40.3777, 71.7978], 13);
   addTiles(map);
+  const existingLayer = L.featureGroup().addTo(map);
+  const districtSelect = document.getElementById("district_id");
+
+  const loadExisting = async () => {
+    if (!container.dataset.existingUrl) return;
+    const url = new URL(container.dataset.existingUrl, window.location.origin);
+    if (districtSelect?.value) url.searchParams.set("district_id", districtSelect.value);
+    if (container.dataset.exclude) url.searchParams.set("exclude", container.dataset.exclude);
+    await loadMapObjects(url, existingLayer, false);
+  };
+  loadExisting().catch(() => {});
+  districtSelect?.addEventListener("change", () => loadExisting().catch(() => {}));
 
   const points = [];
   const markers = [];
@@ -1176,6 +1189,62 @@ function initShowMap() {
   const latlngs = coords.map(([lng, lat]) => [lat, lng]);
   const polygon = L.polygon(latlngs, { color: "#159a82", fillColor: "#159a82", fillOpacity: .24 }).addTo(map);
   map.fitBounds(polygon.getBounds(), { padding: [30, 30] });
+}
+
+function initRequestsMap() {
+  const root = document.querySelector("[data-requests-map]");
+  const container = document.getElementById("requests-map");
+  if (!root || !container || container.dataset.mapReady === "1") return;
+  if (typeof L === "undefined") {
+    loadLeaflet().then(initRequestsMap).catch(() => { container.textContent = "Xaritani yuklab bo'lmadi."; });
+    return;
+  }
+
+  container.dataset.mapReady = "1";
+  const map = L.map(container).setView([40.3777, 71.7978], 10);
+  addTiles(map);
+  const layer = L.featureGroup().addTo(map);
+  const district = root.querySelector("[data-map-district]");
+  const status = root.querySelector("[data-map-status]");
+  const count = root.querySelector("[data-map-count]");
+
+  const refresh = async () => {
+    const url = new URL(root.dataset.url, window.location.origin);
+    if (district?.value) url.searchParams.set("district_id", district.value);
+    if (status?.value) url.searchParams.set("status", status.value);
+    const total = await loadMapObjects(url, layer, true, map);
+    if (count) count.textContent = `${total} ta obyekt`;
+  };
+
+  district?.addEventListener("change", refresh);
+  status?.addEventListener("change", refresh);
+  refresh().catch(() => { if (count) count.textContent = "Ma'lumotni yuklab bo'lmadi"; });
+}
+
+async function loadMapObjects(url, layer, fit = false, map = null) {
+  const response = await fetch(url, { headers: { Accept: "application/json" }, cache: "no-store" });
+  if (!response.ok) throw new Error("Map data request failed");
+  const data = await response.json();
+  layer.clearLayers();
+
+  (data.items || []).forEach((item) => {
+    const coords = parseGeoJson(item.polygon);
+    const popup = `<div class="map-object-popup"><strong>${escapeHtml(item.request_number || "Ariza")}</strong><span>${escapeHtml(item.status || "")}</span><p>${escapeHtml(item.owner_name || "")}</p><p>${escapeHtml(item.address || "")}</p><a href="${escapeHtml(item.url)}">Batafsil ko'rish</a></div>`;
+    let object;
+    if (coords.length >= 3) {
+      object = L.polygon(coords.map(([lng, lat]) => [lat, lng]), {
+        color: "#d34747", fillColor: "#ef6b62", fillOpacity: .28, weight: 2,
+      });
+    } else {
+      object = L.circleMarker([item.latitude, item.longitude], {
+        radius: 8, color: "#a92828", fillColor: "#ef6b62", fillOpacity: .85,
+      });
+    }
+    object.bindPopup(popup).addTo(layer);
+  });
+
+  if (fit && map && layer.getLayers().length) map.fitBounds(layer.getBounds(), { padding: [24, 24], maxZoom: 17 });
+  return (data.items || []).length;
 }
 
 function loadLeaflet() {
