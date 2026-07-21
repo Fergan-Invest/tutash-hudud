@@ -222,7 +222,7 @@
             <h2>Xarita va poligon</h2>
             <div class="map-layout">
                 <div class="map-shell">
-                    <div id="show-map" class="leaflet-map" data-polygon='@json($requestItem->polygon_coordinates)'></div>
+                    <div id="show-map" class="leaflet-map" data-map-type="hybrid" data-polygon='@json($requestItem->polygon_coordinates)'></div>
                 </div>
                 <div class="measure-panel">
                     <div class="readonly-field"><span>Xarita kengligi</span><strong>{{ $requestItem->latitude }}</strong></div>

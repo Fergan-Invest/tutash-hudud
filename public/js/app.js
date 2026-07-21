@@ -961,7 +961,7 @@ function initPolygonMap() {
   const finish = document.getElementById("finish-polygon");
   const locate = document.getElementById("locate-position");
   const map = L.map(container).setView([40.3777, 71.7978], 13);
-  addTiles(map);
+  addTiles(map, container.dataset.mapType || "hybrid");
   const existingLayer = L.featureGroup().addTo(map);
   const districtSelect = document.getElementById("district_id");
 
@@ -1183,7 +1183,7 @@ function initShowMap() {
   }
   container.dataset.mapReady = "1";
   const map = L.map(container).setView([40.3777, 71.7978], 13);
-  addTiles(map);
+  addTiles(map, container.dataset.mapType || "hybrid");
   const coords = parseGeoJson(container.dataset.polygon);
   if (!coords.length) return;
   const latlngs = coords.map(([lng, lat]) => [lat, lng]);
@@ -1202,10 +1202,11 @@ function initRequestsMap() {
 
   container.dataset.mapReady = "1";
   const map = L.map(container).setView([40.3777, 71.7978], 10);
-  addTiles(map);
+  const tileController = addTiles(map, container.dataset.mapType || "hybrid");
   const layer = L.featureGroup().addTo(map);
   const district = root.querySelector("[data-map-district]");
   const status = root.querySelector("[data-map-status]");
+  const mapType = root.querySelector("[data-map-type-select]");
   const count = root.querySelector("[data-map-count]");
 
   const refresh = async () => {
@@ -1218,6 +1219,7 @@ function initRequestsMap() {
 
   district?.addEventListener("change", refresh);
   status?.addEventListener("change", refresh);
+  mapType?.addEventListener("change", () => tileController.setType(mapType.value));
   refresh().catch(() => { if (count) count.textContent = "Ma'lumotni yuklab bo'lmadi"; });
 }
 
@@ -1263,13 +1265,44 @@ function loadLeaflet() {
   return window.leafletLoadingPromise;
 }
 
-function addTiles(map) {
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    updateWhenIdle: true,
-    keepBuffer: 1,
+function addTiles(map, initialType = "hybrid") {
+  const commonOptions = { maxZoom: 19, updateWhenIdle: true, keepBuffer: 1 };
+  if (!map.getPane("hybridLabelsPane")) {
+    const labelsPane = map.createPane("hybridLabelsPane");
+    labelsPane.style.zIndex = "350";
+    labelsPane.style.pointerEvents = "none";
+  }
+  const street = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    ...commonOptions,
     attribution: "&copy; OpenStreetMap contributors",
-  }).addTo(map);
+  });
+  const satellite = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    { ...commonOptions, attribution: "Tiles &copy; Esri" },
+  );
+  const labels = L.tileLayer(
+    "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+    { ...commonOptions, pane: "hybridLabelsPane", attribution: "Labels &copy; Esri" },
+  );
+  let activeType;
+
+  const setType = (requestedType) => {
+    const type = ["hybrid", "satellite", "street"].includes(requestedType) ? requestedType : "hybrid";
+    [street, satellite, labels].forEach((layer) => {
+      if (map.hasLayer(layer)) map.removeLayer(layer);
+    });
+
+    if (type === "street") {
+      street.addTo(map);
+    } else {
+      satellite.addTo(map);
+      if (type === "hybrid") labels.addTo(map);
+    }
+    activeType = type;
+  };
+
+  setType(initialType);
+  return { setType, getType: () => activeType };
 }
 
 function parseGeoJson(value) {

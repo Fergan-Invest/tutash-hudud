@@ -188,7 +188,7 @@
                         <button type="button" class="map-tool" id="fit-polygon">Ko‘rsatish</button>
                         <button type="button" class="map-tool danger" id="reset-polygon">Tozalash</button>
                     </div>
-                    <div id="polygon-map" class="leaflet-map" data-polygon='@json($polygon)' data-existing-url="{{ $mapDataUrl }}" data-exclude="{{ $requestItem?->id }}"></div>
+                    <div id="polygon-map" class="leaflet-map" data-map-type="hybrid" data-polygon='@json($polygon)' data-existing-url="{{ $mapDataUrl }}" data-exclude="{{ $requestItem?->id }}"></div>
                 </div>
                 <div class="measure-panel">
                     <div class="map-help">Xaritani bosing: nuqta qo‘shiladi. Nuqtani sudrab tahrirlang. Marker ustida o‘ng tugma: nuqtani o‘chirish.</div>

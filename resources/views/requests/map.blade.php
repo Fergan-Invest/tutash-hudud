@@ -18,8 +18,15 @@
         <label>Holati
             <select data-map-status><option value="">Barcha holatlar</option>@foreach($statuses as $status)<option value="{{ $status }}">{{ $status }}</option>@endforeach</select>
         </label>
+        <label>Xarita turi
+            <select data-map-type-select>
+                <option value="hybrid" selected>Hybrid</option>
+                <option value="satellite">Sun’iy yo‘ldosh</option>
+                <option value="street">Oddiy xarita</option>
+            </select>
+        </label>
         <div class="map-object-count" data-map-count>Yuklanmoqda...</div>
     </div>
-    <div id="requests-map" class="leaflet-map requests-overview-map"></div>
+    <div id="requests-map" class="leaflet-map requests-overview-map" data-map-type="hybrid"></div>
 </section>
 @endsection
