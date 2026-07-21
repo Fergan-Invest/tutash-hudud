@@ -1266,7 +1266,7 @@ function loadLeaflet() {
 }
 
 function addTiles(map, initialType = "hybrid") {
-  const commonOptions = { maxZoom: 19, updateWhenIdle: true, keepBuffer: 1 };
+  const commonOptions = { maxZoom: 22, updateWhenIdle: true, keepBuffer: 1 };
   if (!map.getPane("hybridLabelsPane")) {
     const labelsPane = map.createPane("hybridLabelsPane");
     labelsPane.style.zIndex = "350";
@@ -1274,15 +1274,27 @@ function addTiles(map, initialType = "hybrid") {
   }
   const street = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     ...commonOptions,
+    maxNativeZoom: 19,
     attribution: "&copy; OpenStreetMap contributors",
   });
   const satellite = L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    { ...commonOptions, attribution: "Tiles &copy; Esri" },
+    {
+      ...commonOptions,
+      // Esri returns placeholder tiles above the reliable imagery level in
+      // some parts of Uzbekistan. Reuse and upscale level 18 instead.
+      maxNativeZoom: 18,
+      attribution: "Tiles &copy; Esri",
+    },
   );
   const labels = L.tileLayer(
     "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
-    { ...commonOptions, pane: "hybridLabelsPane", attribution: "Labels &copy; Esri" },
+    {
+      ...commonOptions,
+      maxNativeZoom: 18,
+      pane: "hybridLabelsPane",
+      attribution: "Labels &copy; Esri",
+    },
   );
   let activeType;
 
