@@ -52,7 +52,12 @@ class AuthAndPolicyTest extends TestCase
         $user = User::create(['name' => 'Alpha operator', 'email' => 'monitoring-a@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $districtA->id]);
         $invest = User::create(['name' => 'Invest', 'email' => 'monitoring-invest@example.com', 'password' => 'secret', 'role' => 'invest']);
 
-        $this->registryRequest($districtA, $user)->update(['total_area' => 125.5]);
+        $this->registryRequest($districtA, $user)->update([
+            'total_area' => 125.5,
+            'contract_concluded' => true,
+            'customer_signed' => true,
+            'payment_paid' => true,
+        ]);
         $this->registryRequest($districtB, $invest)->update(['owner_name' => 'Beta Owner', 'total_area' => 999]);
 
         $this->actingAs($user)
@@ -60,6 +65,9 @@ class AuthAndPolicyTest extends TestCase
             ->assertOk()
             ->assertSee('Alpha tuman')
             ->assertSee('125.50')
+            ->assertSee('Shartnoma tuzilgan')
+            ->assertSee('Buyurtmachi imzolagan')
+            ->assertSee('To‘lov to‘langan')
             ->assertDontSee('Beta tuman')
             ->assertDontSee('999.00');
     }

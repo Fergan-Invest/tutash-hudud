@@ -222,6 +222,9 @@ class RequestController extends Controller
                 $row = [
                     ['value' => $item->request_number, 'format' => 'text'],
                     ['value' => $statusLabels[$item->status] ?? $item->status, 'format' => 'text'],
+                    ['value' => $yesNo($item->contract_concluded), 'format' => 'text'],
+                    ['value' => $yesNo($item->customer_signed), 'format' => 'text'],
+                    ['value' => $yesNo($item->payment_paid), 'format' => 'text'],
                     ['value' => $item->created_at?->format('d.m.Y H:i'), 'format' => 'text'],
                     ['value' => $item->district?->name, 'format' => 'text'],
                     ['value' => $item->mahalla?->name, 'format' => 'text'],
@@ -301,6 +304,11 @@ class RequestController extends Controller
                 'statuses' => collect($statusLabels)->mapWithKeys(fn ($label, $key) => [
                     $key => $items->where('status', $key)->count(),
                 ]),
+                'process_statuses' => [
+                    'contract_concluded' => $items->where('contract_concluded', true)->count(),
+                    'customer_signed' => $items->where('customer_signed', true)->count(),
+                    'payment_paid' => $items->where('payment_paid', true)->count(),
+                ],
                 'url' => route('requests.index', $query),
             ];
         });
@@ -425,6 +433,9 @@ class RequestController extends Controller
         return [
             'Ariza raqami',
             'Holati',
+            'Shartnoma tuzilgan',
+            'Buyurtmachi imzolagan',
+            'To‘lov to‘langan',
             'Sana',
             'Tuman',
             'Mahalla',

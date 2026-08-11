@@ -287,6 +287,11 @@ class RequestValidationTest extends TestCase
         $payload['owner_name'] = 'Export Turizm Owner';
         $payload['street_type'] = 'turizm';
         $this->actingAs($user)->post(route('requests.store'), $payload)->assertRedirect();
+        RegistryRequest::latest('id')->first()->update([
+            'contract_concluded' => true,
+            'customer_signed' => true,
+            'payment_paid' => true,
+        ]);
 
         $response = $this->actingAs($user)->get(route('requests.export', ['street_type' => 'turizm']));
 
@@ -300,6 +305,10 @@ class RequestValidationTest extends TestCase
         $this->assertStringContainsString('Akt fayli', $content);
         $this->assertStringContainsString('Loyiha kodi fayli', $content);
         $this->assertStringContainsString('Qayta o‘rganish akti', $content);
+        $this->assertStringContainsString('Shartnoma tuzilgan', $content);
+        $this->assertStringContainsString('Buyurtmachi imzolagan', $content);
+        $this->assertStringContainsString('To‘lov to‘langan', $content);
+        $this->assertGreaterThanOrEqual(3, substr_count($content, '>Ha<'));
         $this->assertSame(1, substr_count($content, '>Mavjud<'));
         $this->assertSame(2, substr_count($content, '>Mavjud emas<'));
     }

@@ -49,6 +49,9 @@
                         <th>{{ $label }}</th>
                     @endforeach
                     <th>Tasdiqlangan</th>
+                    <th>Shartnoma tuzilgan</th>
+                    <th>Buyurtmachi imzolagan</th>
+                    <th>To‘lov to‘langan</th>
                     <th>Ko'rish</th>
                 </tr>
             </thead>
@@ -62,11 +65,14 @@
                             <td>{{ number_format($row['street_types'][$key] ?? 0, 0, '.', ' ') }}</td>
                         @endforeach
                         <td>{{ number_format($row['statuses']['approved'] ?? 0, 0, '.', ' ') }}</td>
+                        <td>{{ number_format($row['process_statuses']['contract_concluded'] ?? 0, 0, '.', ' ') }}</td>
+                        <td>{{ number_format($row['process_statuses']['customer_signed'] ?? 0, 0, '.', ' ') }}</td>
+                        <td>{{ number_format($row['process_statuses']['payment_paid'] ?? 0, 0, '.', ' ') }}</td>
                         <td><a class="row-link" href="{{ $row['url'] }}">Ro'yxat</a></td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ 6 + count($streetTypes) }}" class="empty">Ma'lumot topilmadi.</td>
+                        <td colspan="{{ 9 + count($streetTypes) }}" class="empty">Ma'lumot topilmadi.</td>
                     </tr>
                 @endforelse
             </tbody>
