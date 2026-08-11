@@ -172,6 +172,30 @@ class RequestController extends Controller
         return redirect()->route('requests.index')->with('success', 'Ariza o‘chirildi.');
     }
 
+    public function updateProcessStatuses(Request $request, RegistryRequest $registryRequest, AuditLogger $auditLogger)
+    {
+        $this->authorize('updateProcessStatuses', $registryRequest);
+
+        $request->validate([
+            'contract_concluded' => ['sometimes', 'boolean'],
+            'customer_signed' => ['sometimes', 'boolean'],
+            'payment_paid' => ['sometimes', 'boolean'],
+        ]);
+
+        $fields = ['contract_concluded', 'customer_signed', 'payment_paid'];
+        $newValues = collect($fields)->mapWithKeys(fn ($field) => [$field => $request->boolean($field)])->all();
+        $oldValues = $registryRequest->only($fields);
+
+        if ($oldValues !== $newValues) {
+            DB::transaction(function () use ($request, $registryRequest, $auditLogger, $oldValues, $newValues) {
+                $registryRequest->update($newValues + ['updated_by' => $request->user()->id]);
+                $auditLogger->log($registryRequest, 'process_statuses_updated', $oldValues, $newValues, $request);
+            });
+        }
+
+        return redirect()->route('requests.show', $registryRequest)->with('success', 'Jarayon holatlari saqlandi.');
+    }
+
     public function export(Request $request)
     {
         $this->authorize('viewAny', RegistryRequest::class);

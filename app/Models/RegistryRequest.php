@@ -28,6 +28,7 @@ class RegistryRequest extends Model
         'terrace_buildings_permanent', 'has_permit', 'has_tenant', 'tenant_stir_pinfl',
         'tenant_name', 'tenant_activity_type', 'adjacent_activity_type', 'adjacent_activity_land',
         'adjacent_facilities', 'additional_info', 'latitude', 'longitude', 'polygon_coordinates',
+        'contract_concluded', 'customer_signed', 'payment_paid',
     ];
 
     protected $casts = [
@@ -38,6 +39,9 @@ class RegistryRequest extends Model
         'total_area_manual' => 'boolean',
         'adjacent_facilities' => 'array',
         'polygon_coordinates' => 'array',
+        'contract_concluded' => 'boolean',
+        'customer_signed' => 'boolean',
+        'payment_paid' => 'boolean',
     ];
 
     protected static function booted(): void

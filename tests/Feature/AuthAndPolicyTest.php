@@ -117,6 +117,53 @@ class AuthAndPolicyTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_invest_can_update_process_statuses_and_change_is_audited(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'A']);
+        $user = User::create(['name' => 'Status xodimi', 'email' => 'status@example.com', 'password' => 'secret', 'role' => 'invest']);
+        $registryRequest = $this->registryRequest($district, $user);
+
+        $this->actingAs($user)
+            ->patch(route('requests.process-statuses.update', $registryRequest), [
+                'contract_concluded' => '1',
+                'payment_paid' => '1',
+            ])
+            ->assertRedirect(route('requests.show', $registryRequest));
+
+        $this->assertDatabaseHas('registry_requests', [
+            'id' => $registryRequest->id,
+            'contract_concluded' => true,
+            'customer_signed' => false,
+            'payment_paid' => true,
+            'updated_by' => $user->id,
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'auditable_id' => $registryRequest->id,
+            'user_id' => $user->id,
+            'event' => 'process_statuses_updated',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('requests.show', $registryRequest))
+            ->assertOk()
+            ->assertSee('Jarayon holatlari')
+            ->assertSee('Shartnoma tuzilgan')
+            ->assertSee('Status xodimi');
+    }
+
+    public function test_tuman_cannot_update_process_statuses(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'A']);
+        $user = User::create(['name' => 'Tuman', 'email' => 'status-tuman@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $district->id]);
+        $registryRequest = $this->registryRequest($district, $user);
+
+        $this->actingAs($user)
+            ->patch(route('requests.process-statuses.update', $registryRequest), ['contract_concluded' => '1'])
+            ->assertForbidden();
+
+        $this->assertFalse($registryRequest->fresh()->contract_concluded);
+    }
+
     public function test_requests_index_shows_pagination_controls_after_first_page(): void
     {
         $district = District::create(['external_id' => 1, 'name' => 'A']);

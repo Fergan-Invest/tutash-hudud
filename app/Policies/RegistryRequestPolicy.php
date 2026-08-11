@@ -37,4 +37,9 @@ class RegistryRequestPolicy
     {
         return $user->isInvest() && $request->status !== 'approved';
     }
+
+    public function updateProcessStatuses(User $user, RegistryRequest $request): bool
+    {
+        return $user->isInvest();
+    }
 }

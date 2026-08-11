@@ -1,0 +1,9 @@
+.process-status-panel { display: grid; gap: 18px; margin-bottom: 20px; }
+.process-status-panel h2 { margin: 0 0 6px; }
+.process-status-panel p { margin: 0; color: var(--muted); }
+.process-status-panel form { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.process-status-options { display: flex; gap: 12px; flex: 1; flex-wrap: wrap; }
+.process-status-options label, .process-status-options.readonly span { display: flex; align-items: center; gap: 9px; padding: 12px 14px; border: 1px solid #dbe3ec; border-radius: 10px; background: #f8fafc; }
+.process-status-options input { width: 18px; height: 18px; accent-color: #16835b; }
+.process-status-options.readonly .done { border-color: #93d5b8; background: #edf9f3; }
+@media (max-width: 700px) { .process-status-panel form, .process-status-options { align-items: stretch; flex-direction: column; } }

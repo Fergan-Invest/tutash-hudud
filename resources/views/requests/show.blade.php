@@ -23,6 +23,7 @@
         'image_deleted' => 'Rasm o‘chirildi',
         'street_created' => 'Ko‘cha yaratildi',
         'street_reused' => 'Mavjud ko‘cha ishlatildi',
+        'process_statuses_updated' => 'Jarayon holatlari yangilandi',
     ];
     $auditFieldLabels = [
         'status' => 'Holati',
@@ -66,6 +67,9 @@
         'mime' => 'Fayl turi',
         'size' => 'Fayl hajmi',
         'path' => 'Fayl manzili',
+        'contract_concluded' => 'Shartnoma tuzilgan',
+        'customer_signed' => 'Buyurtmachi imzolagan',
+        'payment_paid' => 'To‘lov to‘langan',
     ];
     $technicalAuditFields = ['id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'sha256', 'registry_request_id', 'uploaded_by'];
     $yesNo = fn($value) => $value ? 'Ha' : 'Yo‘q';
@@ -79,7 +83,7 @@
             return $yesNo($value);
         }
 
-        if (in_array($key, ['terrace_buildings_available', 'terrace_buildings_permanent', 'has_permit', 'has_tenant'], true)) {
+        if (in_array($key, ['terrace_buildings_available', 'terrace_buildings_permanent', 'has_permit', 'has_tenant', 'contract_concluded', 'customer_signed', 'payment_paid'], true)) {
             return $yesNo((bool) $value);
         }
 
@@ -133,6 +137,31 @@
             </form>
         @endcan
     </div>
+</section>
+
+<section class="panel process-status-panel">
+    <div>
+        <h2>Jarayon holatlari</h2>
+        <p>Amalga oshirilgan bosqichlarni belgilang. Har bir o‘zgarish va uni bajargan xodim tarixda saqlanadi.</p>
+    </div>
+    @can('updateProcessStatuses', $requestItem)
+        <form method="POST" action="{{ route('requests.process-statuses.update', $requestItem) }}">
+            @csrf
+            @method('PATCH')
+            <div class="process-status-options">
+                <label><input type="checkbox" name="contract_concluded" value="1" @checked($requestItem->contract_concluded)> <span>Shartnoma tuzilgan</span></label>
+                <label><input type="checkbox" name="customer_signed" value="1" @checked($requestItem->customer_signed)> <span>Buyurtmachi imzolagan</span></label>
+                <label><input type="checkbox" name="payment_paid" value="1" @checked($requestItem->payment_paid)> <span>To‘lov to‘langan</span></label>
+            </div>
+            <button class="primary-button" type="submit">Holatlarni saqlash</button>
+        </form>
+    @else
+        <div class="process-status-options readonly">
+            <span class="{{ $requestItem->contract_concluded ? 'done' : '' }}">Shartnoma tuzilgan: <strong>{{ $yesNo($requestItem->contract_concluded) }}</strong></span>
+            <span class="{{ $requestItem->customer_signed ? 'done' : '' }}">Buyurtmachi imzolagan: <strong>{{ $yesNo($requestItem->customer_signed) }}</strong></span>
+            <span class="{{ $requestItem->payment_paid ? 'done' : '' }}">To‘lov to‘langan: <strong>{{ $yesNo($requestItem->payment_paid) }}</strong></span>
+        </div>
+    @endcan
 </section>
 
 <section class="registry-card form-panel readonly-request">
