@@ -140,20 +140,41 @@
 </section>
 
 <section class="panel process-status-panel">
-    <div>
-        <h2>Jarayon holatlari</h2>
-        <p>Amalga oshirilgan bosqichlarni belgilang. Har bir o‘zgarish va uni bajargan xodim tarixda saqlanadi.</p>
+    <div class="process-status-heading">
+        <span class="process-status-heading-icon" aria-hidden="true">✓</span>
+        <div>
+            <h2>Jarayon holatlari</h2>
+            <p>Amalga oshirilgan bosqichlarni belgilang. Har bir o‘zgarish tarixda saqlanadi.</p>
+        </div>
     </div>
     @can('updateProcessStatuses', $requestItem)
         <form method="POST" action="{{ route('requests.process-statuses.update', $requestItem) }}">
             @csrf
             @method('PATCH')
             <div class="process-status-options">
-                <label><input type="checkbox" name="contract_concluded" value="1" @checked($requestItem->contract_concluded)> <span>Shartnoma tuzilgan</span></label>
-                <label><input type="checkbox" name="customer_signed" value="1" @checked($requestItem->customer_signed)> <span>Buyurtmachi imzolagan</span></label>
-                <label><input type="checkbox" name="payment_paid" value="1" @checked($requestItem->payment_paid)> <span>To‘lov to‘langan</span></label>
+                <label class="process-status-option">
+                    <input type="checkbox" name="contract_concluded" value="1" @checked($requestItem->contract_concluded)>
+                    <span class="process-status-number">1</span>
+                    <span class="process-status-copy"><strong>Shartnoma tuzilgan</strong><small>Shartnoma rasmiylashtirildi</small></span>
+                    <span class="process-status-switch" aria-hidden="true"></span>
+                </label>
+                <label class="process-status-option">
+                    <input type="checkbox" name="customer_signed" value="1" @checked($requestItem->customer_signed)>
+                    <span class="process-status-number">2</span>
+                    <span class="process-status-copy"><strong>Buyurtmachi imzolagan</strong><small>Imzo tasdiqlandi</small></span>
+                    <span class="process-status-switch" aria-hidden="true"></span>
+                </label>
+                <label class="process-status-option">
+                    <input type="checkbox" name="payment_paid" value="1" @checked($requestItem->payment_paid)>
+                    <span class="process-status-number">3</span>
+                    <span class="process-status-copy"><strong>To‘lov to‘langan</strong><small>To‘lov qabul qilindi</small></span>
+                    <span class="process-status-switch" aria-hidden="true"></span>
+                </label>
             </div>
-            <button class="primary-button" type="submit">Holatlarni saqlash</button>
+            <div class="process-status-footer">
+                <span>O‘zgarish vaqti va xodim avtomatik qayd etiladi</span>
+                <button class="primary-button" type="submit">Holatlarni saqlash</button>
+            </div>
         </form>
     @else
         <div class="process-status-options readonly">
