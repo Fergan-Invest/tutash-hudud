@@ -482,6 +482,37 @@ class RequestValidationTest extends TestCase
         $this->assertDatabaseCount('request_images', 0);
     }
 
+    public function test_browser_preflight_can_validate_without_uploading_files(): void
+    {
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        unset($payload['images'], $payload['act_file']);
+        $payload['_validation_only'] = '1';
+
+        $this->actingAs($user)
+            ->postJson(route('requests.validate'), $payload)
+            ->assertOk()
+            ->assertJson(['ok' => true]);
+
+        $this->assertDatabaseCount('registry_requests', 0);
+    }
+
+    public function test_validation_only_flag_cannot_bypass_images_on_store(): void
+    {
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        unset($payload['images'], $payload['act_file']);
+        $payload['_validation_only'] = '1';
+
+        $this->actingAs($user)
+            ->from(route('requests.create'))
+            ->post(route('requests.store'), $payload)
+            ->assertRedirect(route('requests.create'))
+            ->assertSessionHasErrors('images');
+
+        $this->assertDatabaseCount('registry_requests', 0);
+    }
+
     public function test_ajax_validate_returns_uzbek_errors(): void
     {
         Storage::fake('public');

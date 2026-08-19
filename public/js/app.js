@@ -188,7 +188,12 @@ function initSessionKeepAlive() {
 
 function saveCurrentFormDraft(form) {
   if (!form) return;
-  saveDraft(form, `request-form-draft:${location.pathname}`);
+  saveDraft(form, requestDraftKey());
+}
+
+function requestDraftKey() {
+  // Versioned so stale drafts created by the old form cannot populate a new request.
+  return `request-form-draft:v2:${location.pathname}`;
 }
 
 function clearStepStorageForCurrentPage() {
@@ -213,6 +218,12 @@ async function validateFormBeforeSubmit(form) {
   try {
     const payload = new FormData(form);
     payload.delete("_method");
+    payload.set("_validation_only", "1");
+    // Files are validated by the final store/update request. Sending them during
+    // preflight doubled uploads and could exceed the web server request limit.
+    for (const key of [...payload.keys()]) {
+      if (payload.get(key) instanceof File) payload.delete(key);
+    }
 
     const response = await fetch(url, {
       method: "POST",
@@ -865,7 +876,7 @@ function initDraftPersistence() {
   const form = document.querySelector(".stepped-form");
   if (!form) return;
 
-  const draftKey = `request-form-draft:${location.pathname}`;
+  const draftKey = requestDraftKey();
   const imageKey = `${draftKey}:images`;
   const draft = readJson(draftKey, {});
 
