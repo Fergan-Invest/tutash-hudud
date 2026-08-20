@@ -253,16 +253,40 @@ async function validateFormBeforeSubmit(form) {
       return false;
     }
 
+    let serverMessage = "";
+    try {
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        serverMessage = typeof data.message === "string" ? data.message.trim() : "";
+      }
+    } catch {
+      // The status code below is still useful when a proxy returns invalid JSON.
+    }
+
+    const safeClientMessage = response.status < 500 && serverMessage
+      ? serverMessage
+      : "Server qo'shimcha tekshiruvni bajara olmadi";
+    showToast(`${safeClientMessage} (HTTP ${response.status}). Ariza asosiy tekshiruvga yuboriladi.`, "error");
+    console.error("Request validation preflight failed", {
+      status: response.status,
+      statusText: response.statusText,
+      message: serverMessage,
+      url,
+    });
+
     // The preflight endpoint is only a convenience for showing validation
     // errors without leaving the page.  A missing/stale route cache or a
     // temporary server error here must not block the real form submission;
     // the store/update action still performs the same server-side validation.
     clearAjaxValidationSummary();
     return true;
-  } catch {
+  } catch (error) {
     // Let the browser perform the normal form POST. If connectivity is really
     // unavailable, the native request will show that failure; if only fetch
     // was blocked by a proxy/browser, the application can still be saved.
+    showToast("Qo'shimcha tekshiruv serveriga ulanib bo'lmadi. Ariza asosiy tekshiruvga yuboriladi.", "error");
+    console.error("Request validation preflight connection failed", error);
     clearAjaxValidationSummary();
     return true;
   }
