@@ -527,6 +527,23 @@ class RequestValidationTest extends TestCase
             ->assertJsonFragment(['Yuklangan fayllar rasm bo‘lishi kerak.']);
     }
 
+    public function test_ajax_validate_returns_validation_error_when_an_image_upload_is_invalid(): void
+    {
+        [$user, $district, $mahalla, $street] = $this->setupActor();
+        $payload = $this->payload($district, $mahalla, $street);
+        $path = tempnam(sys_get_temp_dir(), 'request-validation-');
+        $payload['images'][0] = new UploadedFile($path, 'invalid-upload.jpg', null, UPLOAD_ERR_PARTIAL, true);
+
+        try {
+            $this->actingAs($user)
+                ->postJson(route('requests.validate'), $payload)
+                ->assertStatus(422)
+                ->assertJsonValidationErrors('images.0');
+        } finally {
+            unlink($path);
+        }
+    }
+
     public function test_ajax_validate_works_for_update_without_requiring_new_images(): void
     {
         Storage::fake('public');

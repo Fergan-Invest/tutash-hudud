@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\RegistryRequest;
 use App\Models\RequestImage;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 
 class RegistryRequestFormRequest extends FormRequest
@@ -93,7 +94,16 @@ class RegistryRequestFormRequest extends FormRequest
 
             $hashes = [];
             foreach ($this->file('images', []) as $index => $image) {
-                $hash = hash_file('sha256', $image->getRealPath());
+                if (! $image instanceof UploadedFile || ! $image->isValid()) {
+                    continue;
+                }
+
+                $path = $image->getRealPath();
+                if (! is_string($path) || ! is_file($path)) {
+                    continue;
+                }
+
+                $hash = hash_file('sha256', $path);
                 if (in_array($hash, $hashes, true)) {
                     $validator->errors()->add("images.$index", 'Bir xil rasmni qayta yuklash mumkin emas.');
                 }
