@@ -253,11 +253,18 @@ async function validateFormBeforeSubmit(form) {
       return false;
     }
 
-    showToast("Ma'lumotlarni tekshirishda xatolik yuz berdi. Qayta urinib ko'ring.", "error");
-    return false;
+    // The preflight endpoint is only a convenience for showing validation
+    // errors without leaving the page.  A missing/stale route cache or a
+    // temporary server error here must not block the real form submission;
+    // the store/update action still performs the same server-side validation.
+    clearAjaxValidationSummary();
+    return true;
   } catch {
-    showToast("Internet yoki server bilan aloqa uzildi. Ma'lumotlar yuborilmadi.", "error");
-    return false;
+    // Let the browser perform the normal form POST. If connectivity is really
+    // unavailable, the native request will show that failure; if only fetch
+    // was blocked by a proxy/browser, the application can still be saved.
+    clearAjaxValidationSummary();
+    return true;
   }
 }
 
