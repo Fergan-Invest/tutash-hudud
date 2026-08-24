@@ -14,9 +14,7 @@ class UserPasswordSeeder extends Seeder
     public function run(): void
     {
         $accounts = [
-            'invest@tutash.local' => '@ew1411ADBiQ#@!a',
-            'viloyat.hokimi@tutash.local' => '@3224ew1411ADBiQ#@!a',
-            'district-1@tutash.local' => '@3456@#gfh#@!a',
+
         ];
 
         foreach ($accounts as $email => $password) {
