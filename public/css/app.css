@@ -1462,6 +1462,15 @@ label { color: #777e8d; font-weight: 650; }
 .compact-login-card .brand small { font-size: 10px; text-align: center; }
 .compact-login-card label { font-size: 13px; color: #555d6b; margin-bottom: 10px; }
 .compact-login-card input { min-height: 40px; }
+.compact-login-card .password-field { position: relative; display: block; color: inherit; font-size: inherit; font-weight: inherit; }
+.compact-login-card .password-field input { width: 100%; padding-right: 44px; }
+.password-toggle { position: absolute; top: 50%; right: 7px; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: #687085; cursor: pointer; transform: translateY(-50%); }
+.password-toggle:hover { background: #edf7f5; color: var(--teal); }
+.password-toggle:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+.password-toggle svg { width: 19px; height: 19px; }
+.password-toggle .eye-closed { display: none; }
+.password-toggle[aria-pressed="true"] .eye-open { display: none; }
+.password-toggle[aria-pressed="true"] .eye-closed { display: block; }
 .compact-login-card .primary-button { width: 100%; min-height: 40px; font-size: 13px; }
 .error-card { width: min(520px, 100%); text-align: center; border: 0; border-radius: 14px; padding: 28px; }
 .error-card .auth-brand { justify-content: center; padding: 0; border: 0; margin-bottom: 18px; }
