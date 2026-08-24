@@ -8,6 +8,7 @@ use App\Http\Controllers\RequestFileController;
 use App\Http\Controllers\RequestImageController;
 use App\Http\Controllers\StreetController;
 use App\Http\Controllers\UserActivityController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,7 +29,7 @@ Route::middleware('guest')->group(function () {
 
 Route::get('/session/clear', [AuthController::class, 'clearSession'])->name('session.clear');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::redirect('/', '/requests');
     Route::get('/session/keep-alive', [RequestController::class, 'keepAlive'])->name('session.keep-alive');
@@ -49,4 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/streets/store', [StreetController::class, 'store'])->name('streets.store');
     Route::put('/streets/{street}', [StreetController::class, 'update'])->name('streets.update');
     Route::get('/users/online', [UserActivityController::class, 'online'])->name('users.online');
+    Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+    Route::patch('/users/{user}/password', [UserManagementController::class, 'updatePassword'])->name('users.password.update');
+    Route::patch('/users/{user}/status', [UserManagementController::class, 'updateStatus'])->name('users.status.update');
 });

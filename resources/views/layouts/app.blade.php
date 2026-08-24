@@ -42,6 +42,12 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>
                     <span>Manzillar</span>
                 </a>
+                @if(auth()->user()->canManageUsers())
+                    <a class="nav-link {{ request()->routeIs('users.index', 'users.password.*', 'users.status.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></svg>
+                        <span>Foydalanuvchilar</span>
+                    </a>
+                @endif
             @endif
             <a class="nav-link {{ request()->routeIs('users.online') ? 'active' : '' }}" href="{{ route('users.online') }}">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 10 18H2z"/><path d="M12 9v5M12 17h.01"/></svg>

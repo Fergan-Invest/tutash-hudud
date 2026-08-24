@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'role',
         'district_id',
+        'is_active',
         'last_seen_at',
         'last_ip',
         'last_user_agent',
@@ -46,6 +47,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_active' => 'boolean',
         'last_seen_at' => 'datetime',
     ];
 
@@ -62,6 +64,11 @@ class User extends Authenticatable
     public function isInvest(): bool
     {
         return $this->role === 'invest';
+    }
+
+    public function canManageUsers(): bool
+    {
+        return $this->isInvest() && $this->email === 'invest@tutash.local';
     }
 
     public function isTuman(): bool

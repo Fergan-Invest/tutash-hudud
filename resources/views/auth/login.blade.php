@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kirish - Tutash hududlar reestri</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
+    <script src="{{ asset('js/login.js') }}?v={{ filemtime(public_path('js/login.js')) }}" defer></script>
 </head>
 <body class="auth-page">
     <form class="login-card compact-login-card" method="POST" action="{{ route('login.store') }}">
@@ -22,7 +23,7 @@
         <label>Parol
             <span class="password-field">
                 <input id="password" name="password" type="password" placeholder="Parolni kiriting" required>
-                <button class="password-toggle" type="button" aria-label="Parolni ko‘rsatish" aria-controls="password" aria-pressed="false">
+                <button class="password-toggle" type="button" data-password-toggle aria-label="Parolni ko‘rsatish" aria-controls="password" aria-pressed="false">
                     <svg class="eye-open" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/>
                         <circle cx="12" cy="12" r="3"/>
@@ -38,16 +39,5 @@
         <label class="check-row"><input name="remember" type="checkbox" value="1"> Eslab qolish</label>
         <button class="primary-button full-button" type="submit">Tizimga kirish</button>
     </form>
-    <script>
-        const passwordInput = document.getElementById('password');
-        const passwordToggle = document.querySelector('.password-toggle');
-
-        passwordToggle.addEventListener('click', () => {
-            const isVisible = passwordInput.type === 'text';
-            passwordInput.type = isVisible ? 'password' : 'text';
-            passwordToggle.setAttribute('aria-pressed', String(! isVisible));
-            passwordToggle.setAttribute('aria-label', isVisible ? 'Parolni ko‘rsatish' : 'Parolni yashirish');
-        });
-    </script>
 </body>
 </html>
