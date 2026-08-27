@@ -291,6 +291,9 @@ class RequestController extends Controller
 
         $rows = $districts->map(function (District $district) use ($groupedByDistrict, $request, $statusLabels, $streetTypes) {
             $items = $groupedByDistrict->get($district->id, collect());
+            $contractedItems = $items->where('contract_concluded', true);
+            $paidContracts = $contractedItems->where('payment_paid', true)->count();
+            $unpaidContracts = $contractedItems->where('payment_paid', false)->count();
             $query = $request->query();
             $query['district_id'] = $district->id;
 
@@ -305,13 +308,20 @@ class RequestController extends Controller
                     $key => $items->where('status', $key)->count(),
                 ]),
                 'process_statuses' => [
-                    'contract_concluded' => $items->where('contract_concluded', true)->count(),
+                    'contract_concluded' => $contractedItems->count(),
                     'customer_signed' => $items->where('customer_signed', true)->count(),
-                    'payment_paid' => $items->where('payment_paid', true)->count(),
+                    'payment_paid' => $paidContracts,
+                    'payment_unpaid' => $unpaidContracts,
+                    'payment_percent' => $contractedItems->isNotEmpty()
+                        ? round(($paidContracts / $contractedItems->count()) * 100)
+                        : 0,
                 ],
                 'url' => route('requests.index', $query),
             ];
         });
+
+        $contractedRequests = $requests->where('contract_concluded', true);
+        $paidContracts = $contractedRequests->where('payment_paid', true)->count();
 
         return view('requests.monitoring', [
             'rows' => $rows,
@@ -319,6 +329,12 @@ class RequestController extends Controller
                 'count' => $requests->count(),
                 'total_area' => $requests->sum(fn ($item) => (float) $item->total_area),
                 'districts' => $rows->where('count', '>', 0)->count(),
+                'contracts' => $contractedRequests->count(),
+                'paid' => $paidContracts,
+                'unpaid' => $contractedRequests->where('payment_paid', false)->count(),
+                'payment_percent' => $contractedRequests->isNotEmpty()
+                    ? round(($paidContracts / $contractedRequests->count()) * 100)
+                    : 0,
             ],
             'districts' => $districts,
             'mahallas' => $this->availableMahallas($request),

@@ -11,25 +11,35 @@
 <section class="page-title compact-title">
     <div>
         <h1>Monitoring</h1>
-        <p>{{ number_format($totals['count'], 0, '.', ' ') }} ta xatlovga {{ number_format($totals['total_area'], 2, '.', ' ') }} kv/m maydon xatlandi</p>
+        <p>{{ number_format($totals['contracts'], 0, '.', ' ') }} ta shartnomadan {{ number_format($totals['paid'], 0, '.', ' ') }} tasi to‘langan</p>
     </div>
 </section>
 
-<section class="metrics monitoring-metrics">
-    <article class="metric-card">
-        <span>Jami xatlov</span>
-        <strong>{{ number_format($totals['count'], 0, '.', ' ') }}</strong>
-        <small>Tanlangan filterlar bo'yicha</small>
+<section class="monitoring-contract-summary" aria-label="Shartnomalar bo‘yicha umumiy ko‘rsatkichlar">
+    <article class="contract-metric contract-metric-total">
+        <span>Jami shartnoma</span>
+        <strong>{{ number_format($totals['contracts'], 0, '.', ' ') }}</strong>
+        <small>Shartnoma tuzilganlar</small>
     </article>
-    <article class="metric-card">
-        <span>Jami maydon</span>
-        <strong>{{ number_format($totals['total_area'], 2, '.', ' ') }}</strong>
-        <small>kv/m</small>
+    <article class="contract-metric contract-metric-paid">
+        <span>To‘langan</span>
+        <strong>{{ number_format($totals['paid'], 0, '.', ' ') }}</strong>
+        <small>{{ $totals['payment_percent'] }}% shartnoma bo‘yicha</small>
     </article>
-    <article class="metric-card">
-        <span>Faol tumanlar</span>
-        <strong>{{ number_format($totals['districts'], 0, '.', ' ') }}</strong>
-        <small>Xatlov kiritilgan hududlar</small>
+    <article class="contract-metric contract-metric-unpaid">
+        <span>To‘lanmagan</span>
+        <strong>{{ number_format($totals['unpaid'], 0, '.', ' ') }}</strong>
+        <small>To‘lov kutilmoqda</small>
+    </article>
+    <article class="contract-payment-progress">
+        <div>
+            <span>To‘lov holati</span>
+            <strong>{{ $totals['payment_percent'] }}%</strong>
+        </div>
+        <div class="contract-progress-track" role="progressbar" aria-label="To‘langan shartnomalar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $totals['payment_percent'] }}">
+            <i style="width: {{ $totals['payment_percent'] }}%"></i>
+        </div>
+        <small>{{ number_format($totals['paid'], 0, '.', ' ') }} ta to‘langan · {{ number_format($totals['unpaid'], 0, '.', ' ') }} ta kutilmoqda</small>
     </article>
 </section>
 
@@ -49,10 +59,12 @@
                         <th>{{ $label }}</th>
                     @endforeach
                     <th>Tasdiqlangan</th>
-                    <th>Shartnoma tuzilgan</th>
+                    <th>Jami shartnoma <small>Shartnoma tuzilgan</small></th>
                     <th>Buyurtmachi imzolagan</th>
-                    <th>To‘lov to‘langan</th>
-                    <th>Ko'rish</th>
+                    <th>To‘langan <small>To‘lov to‘langan</small></th>
+                    <th>To‘lanmagan</th>
+                    <th>To‘lov holati</th>
+                    <th>Ko‘rish</th>
                 </tr>
             </thead>
             <tbody>
@@ -65,14 +77,21 @@
                             <td>{{ number_format($row['street_types'][$key] ?? 0, 0, '.', ' ') }}</td>
                         @endforeach
                         <td>{{ number_format($row['statuses']['approved'] ?? 0, 0, '.', ' ') }}</td>
-                        <td>{{ number_format($row['process_statuses']['contract_concluded'] ?? 0, 0, '.', ' ') }}</td>
+                        <td><strong>{{ number_format($row['process_statuses']['contract_concluded'] ?? 0, 0, '.', ' ') }}</strong></td>
                         <td>{{ number_format($row['process_statuses']['customer_signed'] ?? 0, 0, '.', ' ') }}</td>
-                        <td>{{ number_format($row['process_statuses']['payment_paid'] ?? 0, 0, '.', ' ') }}</td>
-                        <td><a class="row-link" href="{{ $row['url'] }}">Ro'yxat</a></td>
+                        <td><span class="payment-badge payment-badge-paid">{{ number_format($row['process_statuses']['payment_paid'] ?? 0, 0, '.', ' ') }}</span></td>
+                        <td><span class="payment-badge payment-badge-unpaid">{{ number_format($row['process_statuses']['payment_unpaid'] ?? 0, 0, '.', ' ') }}</span></td>
+                        <td>
+                            <div class="table-payment-progress">
+                                <span><i style="width: {{ $row['process_statuses']['payment_percent'] ?? 0 }}%"></i></span>
+                                <b>{{ $row['process_statuses']['payment_percent'] ?? 0 }}%</b>
+                            </div>
+                        </td>
+                        <td><a class="row-link" href="{{ $row['url'] }}">Ro‘yxat</a></td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ 9 + count($streetTypes) }}" class="empty">Ma'lumot topilmadi.</td>
+                        <td colspan="{{ 11 + count($streetTypes) }}" class="empty">Ma’lumot topilmadi.</td>
                     </tr>
                 @endforelse
             </tbody>
