@@ -11,35 +11,47 @@
 <section class="page-title compact-title">
     <div>
         <h1>Monitoring</h1>
-        <p>{{ number_format($totals['contracts'], 0, '.', ' ') }} ta shartnomadan {{ number_format($totals['paid'], 0, '.', ' ') }} tasi to‘langan</p>
+        <p>{{ number_format($totals['count'], 0, '.', ' ') }} ta xatlovga {{ number_format($totals['total_area'], 2, '.', ' ') }} kv/m maydon xatlandi</p>
     </div>
 </section>
 
-<section class="monitoring-contract-summary" aria-label="Shartnomalar bo‘yicha umumiy ko‘rsatkichlar">
-    <article class="contract-metric contract-metric-total">
+<section class="metrics monitoring-metrics" aria-label="Xatlov bo‘yicha umumiy ko‘rsatkichlar">
+    <article class="metric-card">
+        <span>Jami xatlov</span>
+        <strong>{{ number_format($totals['count'], 0, '.', ' ') }}</strong>
+        <small>Tanlangan filterlar bo‘yicha</small>
+    </article>
+    <article class="metric-card">
+        <span>Jami maydon</span>
+        <strong>{{ number_format($totals['total_area'], 2, '.', ' ') }}</strong>
+        <small>kv/m</small>
+    </article>
+    <article class="metric-card">
+        <span>Faol tumanlar</span>
+        <strong>{{ number_format($totals['districts'], 0, '.', ' ') }}</strong>
+        <small>Xatlov kiritilgan hududlar</small>
+    </article>
+</section>
+
+<section class="monitoring-section-heading">
+    <h2>Shartnomalar bo‘yicha</h2>
+    <span>{{ $totals['payment_percent'] }}% to‘langan</span>
+</section>
+<section class="metrics monitoring-metrics contract-metrics" aria-label="Shartnomalar bo‘yicha umumiy ko‘rsatkichlar">
+    <article class="metric-card">
         <span>Jami shartnoma</span>
         <strong>{{ number_format($totals['contracts'], 0, '.', ' ') }}</strong>
         <small>Shartnoma tuzilganlar</small>
     </article>
-    <article class="contract-metric contract-metric-paid">
+    <article class="metric-card">
         <span>To‘langan</span>
         <strong>{{ number_format($totals['paid'], 0, '.', ' ') }}</strong>
         <small>{{ $totals['payment_percent'] }}% shartnoma bo‘yicha</small>
     </article>
-    <article class="contract-metric contract-metric-unpaid">
+    <article class="metric-card">
         <span>To‘lanmagan</span>
         <strong>{{ number_format($totals['unpaid'], 0, '.', ' ') }}</strong>
         <small>To‘lov kutilmoqda</small>
-    </article>
-    <article class="contract-payment-progress">
-        <div>
-            <span>To‘lov holati</span>
-            <strong>{{ $totals['payment_percent'] }}%</strong>
-        </div>
-        <div class="contract-progress-track" role="progressbar" aria-label="To‘langan shartnomalar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $totals['payment_percent'] }}">
-            <i style="width: {{ $totals['payment_percent'] }}%"></i>
-        </div>
-        <small>{{ number_format($totals['paid'], 0, '.', ' ') }} ta to‘langan · {{ number_format($totals['unpaid'], 0, '.', ' ') }} ta kutilmoqda</small>
     </article>
 </section>
 

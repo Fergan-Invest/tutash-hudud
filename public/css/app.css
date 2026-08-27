@@ -652,43 +652,27 @@ th { color: #8b92a1; }
 .monitoring-metrics .metric-card strong {
   overflow-wrap: anywhere;
 }
-.monitoring-contract-summary {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(180px, 1fr)) minmax(260px, 1.35fr);
+.monitoring-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  margin: 4px 0 10px;
+}
+.monitoring-section-heading h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 15px;
+}
+.monitoring-section-heading span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+.contract-metrics {
   margin-bottom: 18px;
 }
-.contract-metric,
-.contract-payment-progress {
-  min-height: 118px;
-  padding: 18px;
-  border: 1px solid #dfe6ee;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(31, 47, 58, .05);
-}
-.contract-metric {
-  display: grid;
-  align-content: center;
-  gap: 5px;
-  border-top: 4px solid #2f6feb;
-}
-.contract-metric-paid { border-top-color: #179b72; background: #f7fcfa; }
-.contract-metric-unpaid { border-top-color: #e4a11b; background: #fffaf1; }
-.contract-metric span,
-.contract-payment-progress span { color: #667085; font-size: 13px; font-weight: 750; }
-.contract-metric strong { color: #172033; font-size: 30px; line-height: 1.1; }
-.contract-metric-paid strong { color: #087a55; }
-.contract-metric-unpaid strong { color: #b66e08; }
-.contract-metric small,
-.contract-payment-progress small { color: #7b8495; font-size: 12px; }
-.contract-payment-progress { display: grid; align-content: center; gap: 10px; }
-.contract-payment-progress > div:first-child { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.contract-payment-progress strong { color: #087a55; font-size: 25px; }
-.contract-progress-track,
 .table-payment-progress > span { display: block; overflow: hidden; border-radius: 999px; background: #e8edf2; }
-.contract-progress-track { height: 10px; }
-.contract-progress-track i,
 .table-payment-progress i { display: block; height: 100%; border-radius: inherit; background: #179b72; }
 .payment-badge { display: inline-flex; min-width: 40px; justify-content: center; padding: 5px 9px; border-radius: 999px; font-weight: 850; }
 .payment-badge-paid { color: #087a55; background: #e8f7f0; }
@@ -1799,10 +1783,6 @@ body.sidebar-open .menu-button span:nth-child(3) {
 }
 
 @media (max-width: 1180px) {
-  .monitoring-contract-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .map-monitoring-workspace {
     grid-template-columns: 1fr;
   }
@@ -1968,7 +1948,6 @@ body.sidebar-open .menu-button span:nth-child(3) {
   }
 
   .filters,
-  .monitoring-contract-summary,
   .monitoring-summary-grid,
   .monitoring-grid,
   .monitoring-analytics,
