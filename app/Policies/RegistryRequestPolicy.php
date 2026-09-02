@@ -14,12 +14,7 @@ class RegistryRequestPolicy
 
     public function view(User $user, RegistryRequest $request): bool
     {
-        if ($user->canManageUsers() || $user->isViloyatHokimi()) {
-            return true;
-        }
-
-        return (int) $request->created_by === (int) $user->id
-            && (! $user->isTuman() || (int) $user->district_id === (int) $request->district_id);
+        return $this->viewAny($user);
     }
 
     public function create(User $user): bool
@@ -33,20 +28,17 @@ class RegistryRequestPolicy
             return false;
         }
 
-        return $user->isInvest()
-            && (int) $request->created_by === (int) $user->id;
+        return $user->isInvest() || (int) $request->created_by === (int) $user->id;
     }
 
     public function delete(User $user, RegistryRequest $request): bool
     {
-        return $user->isInvest()
-            && (int) $request->created_by === (int) $user->id
+        return ($user->isInvest() || (int) $request->created_by === (int) $user->id)
             && $request->status !== 'approved';
     }
 
     public function updateProcessStatuses(User $user, RegistryRequest $request): bool
     {
-        return $user->isInvest()
-            && (int) $request->created_by === (int) $user->id;
+        return $user->isInvest() || (int) $request->created_by === (int) $user->id;
     }
 }

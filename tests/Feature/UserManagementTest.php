@@ -48,6 +48,16 @@ class UserManagementTest extends TestCase
         $this->assertDatabaseMissing('users', ['email' => 'tumansiz@example.com']);
     }
 
+    public function test_create_user_form_has_password_visibility_buttons(): void
+    {
+        $invest = User::factory()->create(['role' => 'invest', 'email' => 'invest@tutash.local']);
+
+        $this->actingAs($invest)->get(route('users.index'))
+            ->assertOk()
+            ->assertSee('aria-controls="new-user-password"', false)
+            ->assertSee('aria-controls="new-user-password-confirmation"', false);
+    }
+
     public function test_invest_can_change_another_users_password(): void
     {
         $invest = User::factory()->create(['role' => 'invest', 'email' => 'invest@tutash.local']);

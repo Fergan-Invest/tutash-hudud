@@ -67,12 +67,7 @@ class RequestController extends Controller
             ->with(['district:id,name', 'mahalla:id,name', 'street:id,name'])
             ->whereNotNull('latitude')->whereNotNull('longitude');
 
-        if (! $request->user()->canManageUsers() && ! $request->user()->isViloyatHokimi()) {
-            $query->where('created_by', $request->user()->id);
-            if ($request->user()->isTuman()) {
-                $query->where('district_id', $request->user()->district_id);
-            }
-        } elseif (! empty($validated['district_id'])) {
+        if (! empty($validated['district_id'])) {
             $query->where('district_id', $validated['district_id']);
         }
 
@@ -386,16 +381,9 @@ class RequestController extends Controller
         $query = RegistryRequest::with(['district', 'mahalla', 'street', 'creator', 'files'])
             ->latest();
 
-        if (! $request->user()->canManageUsers() && ! $request->user()->isViloyatHokimi()) {
-            $query->where('created_by', $request->user()->id);
-            if ($request->user()->isTuman()) {
-                $query->where('district_id', $request->user()->district_id);
-            }
-        }
-
         $query->when($request->filled('status'), fn ($q) => $q->where('status', $request->status));
         $query->when($request->filled('street_type'), fn ($q) => $q->where('street_type', $request->street_type));
-        $query->when($request->filled('district_id') && ! $request->user()->isTuman(), fn ($q) => $q->where('district_id', $request->district_id));
+        $query->when($request->filled('district_id'), fn ($q) => $q->where('district_id', $request->district_id));
         $query->when($request->filled('mahalla_id'), fn ($q) => $q->where('mahalla_id', $request->mahalla_id));
         $query->when($request->filled('created_by'), fn ($q) => $q->where('created_by', $request->created_by));
         $query->when($request->filled('date_from'), fn ($q) => $q->whereDate('created_at', '>=', $request->date_from));
@@ -433,10 +421,6 @@ class RequestController extends Controller
     {
         $query = District::orderBy('name');
 
-        if ($request->user()->isTuman()) {
-            $query->where('id', $request->user()->district_id);
-        }
-
         return $query->get();
     }
 
@@ -444,9 +428,7 @@ class RequestController extends Controller
     {
         $query = Mahalla::orderBy('name');
 
-        if ($request->user()->isTuman()) {
-            $query->where('district_id', $request->user()->district_id);
-        } elseif ($request->filled('district_id')) {
+        if ($request->filled('district_id')) {
             $query->where('district_id', $request->district_id);
         }
 
@@ -455,10 +437,6 @@ class RequestController extends Controller
 
     private function availableCreators(Request $request)
     {
-        if (! $request->user()->canManageUsers() && ! $request->user()->isViloyatHokimi()) {
-            return User::whereKey($request->user()->id)->get();
-        }
-
         return User::query()
             ->whereIn('id', RegistryRequest::query()->select('created_by')->distinct())
             ->orderBy('name')

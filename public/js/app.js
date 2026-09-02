@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   initMobileNavigation();
+  initPasswordToggles();
   initSteps();
   initDependentSelects();
   initSearchableSelects();
@@ -17,6 +18,21 @@ document.addEventListener("DOMContentLoaded", () => {
   initRequestsMap();
   // initMonitoringMap(); // Map monitoring is preserved but disabled; the old table design is active.
 });
+
+function initPasswordToggles() {
+  document.querySelectorAll("[data-password-toggle]").forEach((button) => {
+    const input = document.getElementById(button.getAttribute("aria-controls"));
+    if (!input) return;
+
+    button.addEventListener("click", () => {
+      const willShow = input.type === "password";
+      input.type = willShow ? "text" : "password";
+      button.setAttribute("aria-pressed", String(willShow));
+      button.setAttribute("aria-label", willShow ? "Parolni yashirish" : "Parolni ko‘rsatish");
+      input.focus();
+    });
+  });
+}
 
 function safeStorage(storage) {
   try {

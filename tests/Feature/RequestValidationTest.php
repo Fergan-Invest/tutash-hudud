@@ -344,7 +344,7 @@ class RequestValidationTest extends TestCase
         ]);
     }
 
-    public function test_tuman_cannot_delete_an_uploaded_request_file(): void
+    public function test_tuman_can_delete_a_file_from_own_request(): void
     {
         Storage::fake('public');
         [$user, $district, $mahalla, $street] = $this->setupActor('tuman');
@@ -357,13 +357,13 @@ class RequestValidationTest extends TestCase
 
         $this->actingAs($user)
             ->deleteJson(route('request-files.destroy', $file))
-            ->assertForbidden();
+            ->assertOk();
 
-        Storage::disk('public')->assertExists($file->path);
-        $this->assertDatabaseHas('request_files', ['id' => $file->id]);
+        Storage::disk('public')->assertMissing($file->path);
+        $this->assertDatabaseMissing('request_files', ['id' => $file->id]);
     }
 
-    public function test_tuman_export_only_contains_own_district_data(): void
+    public function test_tuman_can_export_another_district_data(): void
     {
         Storage::fake('public');
         [$user, $district, $mahalla, $street] = $this->setupActor('tuman');
@@ -385,8 +385,8 @@ class RequestValidationTest extends TestCase
             ->get(route('requests.export', ['district_id' => $otherDistrict->id]))
             ->streamedContent();
 
-        $this->assertStringContainsString('Owner MCHJ', $content);
-        $this->assertStringNotContainsString('Other District Owner', $content);
+        $this->assertStringNotContainsString('Owner MCHJ', $content);
+        $this->assertStringContainsString('Other District Owner', $content);
     }
 
     public function test_hokimiyat_cadastre_is_optional_and_area_defaults_to_calculated_total(): void

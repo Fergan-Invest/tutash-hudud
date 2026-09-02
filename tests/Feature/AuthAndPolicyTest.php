@@ -32,7 +32,7 @@ class AuthAndPolicyTest extends TestCase
         $this->assertAuthenticated();
     }
 
-    public function test_tuman_user_only_sees_own_district_request(): void
+    public function test_tuman_user_can_view_requests_created_by_others(): void
     {
         [$districtA, $districtB] = [District::create(['external_id' => 1, 'name' => 'A']), District::create(['external_id' => 2, 'name' => 'B'])];
         $user = User::create(['name' => 'A operator', 'email' => 'a@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $districtA->id]);
@@ -40,10 +40,10 @@ class AuthAndPolicyTest extends TestCase
         $requestB = $this->registryRequest($districtB, $user);
 
         $this->actingAs($user)->get(route('requests.show', $requestA))->assertOk();
-        $this->actingAs($user)->get(route('requests.show', $requestB))->assertForbidden();
+        $this->actingAs($user)->get(route('requests.show', $requestB))->assertOk();
     }
 
-    public function test_tuman_monitoring_only_shows_own_district(): void
+    public function test_tuman_monitoring_can_filter_other_districts(): void
     {
         [$districtA, $districtB] = [
             District::create(['external_id' => 1, 'name' => 'Alpha tuman']),
@@ -64,15 +64,12 @@ class AuthAndPolicyTest extends TestCase
             ->get(route('requests.monitoring', ['district_id' => $districtB->id]))
             ->assertOk()
             ->assertSee('Alpha tuman')
-            ->assertSee('125.50')
-            ->assertSee('Shartnoma tuzilgan')
-            ->assertSee('Buyurtmachi imzolagan')
-            ->assertSee('To‘lov to‘langan')
-            ->assertDontSee('Beta tuman')
-            ->assertDontSee('999.00');
+            ->assertSee('Beta tuman')
+            ->assertSee('999.00')
+            ->assertDontSee('125.50');
     }
 
-    public function test_tuman_map_data_never_exposes_another_district(): void
+    public function test_tuman_map_data_can_show_another_district(): void
     {
         $districtA = District::create(['external_id' => 1, 'name' => 'Alpha']);
         $districtB = District::create(['external_id' => 2, 'name' => 'Beta']);
@@ -84,8 +81,8 @@ class AuthAndPolicyTest extends TestCase
             ->getJson(route('requests.map-data', ['district_id' => $districtB->id]))
             ->assertOk()
             ->assertJsonCount(1, 'items')
-            ->assertJsonPath('items.0.id', $own->id)
-            ->assertJsonMissing(['id' => $other->id]);
+            ->assertJsonPath('items.0.id', $other->id)
+            ->assertJsonMissing(['id' => $own->id]);
     }
 
     public function test_map_data_can_exclude_current_request_when_editing(): void
@@ -109,7 +106,7 @@ class AuthAndPolicyTest extends TestCase
         $this->actingAs($user)->get(route('requests.create'))->assertForbidden();
     }
 
-    public function test_tuman_user_cannot_edit_even_own_district_request(): void
+    public function test_tuman_user_can_edit_own_request(): void
     {
         $district = District::create(['external_id' => 1, 'name' => 'A']);
         $user = User::create(['name' => 'A operator', 'email' => 'edit-a@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $district->id]);
@@ -118,11 +115,11 @@ class AuthAndPolicyTest extends TestCase
         $this->actingAs($user)
             ->get(route('requests.show', $request))
             ->assertOk()
-            ->assertDontSee('Tahrirlash');
+            ->assertSee('Tahrirlash');
 
         $this->actingAs($user)
             ->get(route('requests.edit', $request))
-            ->assertForbidden();
+            ->assertOk();
     }
 
     public function test_invest_can_update_process_statuses_and_change_is_audited(): void
@@ -159,7 +156,7 @@ class AuthAndPolicyTest extends TestCase
             ->assertSee('Status xodimi');
     }
 
-    public function test_tuman_cannot_update_process_statuses(): void
+    public function test_tuman_can_update_own_process_statuses(): void
     {
         $district = District::create(['external_id' => 1, 'name' => 'A']);
         $user = User::create(['name' => 'Tuman', 'email' => 'status-tuman@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $district->id]);
@@ -167,9 +164,9 @@ class AuthAndPolicyTest extends TestCase
 
         $this->actingAs($user)
             ->patch(route('requests.process-statuses.update', $registryRequest), ['contract_concluded' => '1'])
-            ->assertForbidden();
+            ->assertRedirect(route('requests.show', $registryRequest));
 
-        $this->assertFalse($registryRequest->fresh()->contract_concluded);
+        $this->assertTrue($registryRequest->fresh()->contract_concluded);
     }
 
     public function test_requests_index_shows_pagination_controls_after_first_page(): void
@@ -413,20 +410,20 @@ class AuthAndPolicyTest extends TestCase
         $this->assertDatabaseMissing('streets', ['name' => 'Ruxsatsiz']);
     }
 
-    public function test_operator_only_sees_and_manages_requests_they_created(): void
+    public function test_operator_sees_all_requests_but_only_manages_own_request(): void
     {
         $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona']);
-        $owner = User::create(['name' => 'Birinchi operator', 'email' => 'owner@example.com', 'password' => 'secret', 'role' => 'invest']);
-        $other = User::create(['name' => 'Ikkinchi operator', 'email' => 'other@example.com', 'password' => 'secret', 'role' => 'invest']);
+        $owner = User::create(['name' => 'Birinchi operator', 'email' => 'owner@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $district->id]);
+        $other = User::create(['name' => 'Ikkinchi operator', 'email' => 'other@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $district->id]);
         $ownRequest = $this->registryRequest($district, $owner);
         $otherRequest = $this->registryRequest($district, $other);
 
         $this->actingAs($owner)->get(route('requests.index'))
             ->assertOk()
             ->assertSee(route('requests.show', $ownRequest))
-            ->assertDontSee(route('requests.show', $otherRequest));
+            ->assertSee(route('requests.show', $otherRequest));
 
-        $this->actingAs($owner)->get(route('requests.show', $otherRequest))->assertForbidden();
+        $this->actingAs($owner)->get(route('requests.show', $otherRequest))->assertOk();
         $this->actingAs($owner)->get(route('requests.edit', $otherRequest))->assertForbidden();
         $this->actingAs($owner)->delete(route('requests.destroy', $otherRequest))->assertForbidden();
         $this->actingAs($owner)->patch(route('requests.process-statuses.update', $otherRequest), [
@@ -452,6 +449,19 @@ class AuthAndPolicyTest extends TestCase
             ->assertSee('Ali Valiyev')
             ->assertSee('Birinchi ariza')
             ->assertDontSee('Ikkinchi ariza');
+    }
+
+    public function test_invest_user_can_manage_another_users_request(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona']);
+        $invest = User::create(['name' => 'Invest operator', 'email' => 'invest-operator@example.com', 'password' => 'secret', 'role' => 'invest']);
+        $creator = User::create(['name' => 'Tuman operator', 'email' => 'creator@example.com', 'password' => 'secret', 'role' => 'tuman', 'district_id' => $district->id]);
+        $registryRequest = $this->registryRequest($district, $creator);
+
+        $this->actingAs($invest)->get(route('requests.edit', $registryRequest))->assertOk();
+        $this->actingAs($invest)->patch(route('requests.process-statuses.update', $registryRequest), [
+            'contract_concluded' => '1',
+        ])->assertRedirect(route('requests.show', $registryRequest));
     }
 
     private function registryRequest(District $district, User $user): RegistryRequest
