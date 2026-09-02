@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\District;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -10,6 +11,42 @@ use Tests\TestCase;
 class UserManagementTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_invest_can_create_a_district_user(): void
+    {
+        $invest = User::factory()->create(['role' => 'invest', 'email' => 'invest@tutash.local']);
+        $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona tumani']);
+
+        $this->actingAs($invest)->post(route('users.store'), [
+            'name' => 'Yangi operator',
+            'email' => 'yangi.operator@example.com',
+            'role' => 'tuman',
+            'district_id' => $district->id,
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $user = User::where('email', 'yangi.operator@example.com')->firstOrFail();
+        $this->assertSame('tuman', $user->role);
+        $this->assertSame($district->id, $user->district_id);
+        $this->assertTrue($user->is_active);
+        $this->assertTrue(Hash::check('StrongPassword123!', $user->password));
+    }
+
+    public function test_district_is_required_when_creating_a_tuman_user(): void
+    {
+        $invest = User::factory()->create(['role' => 'invest', 'email' => 'invest@tutash.local']);
+
+        $this->actingAs($invest)->from(route('users.index'))->post(route('users.store'), [
+            'name' => 'Tumansiz operator',
+            'email' => 'tumansiz@example.com',
+            'role' => 'tuman',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+        ])->assertRedirect(route('users.index'))->assertSessionHasErrors('district_id');
+
+        $this->assertDatabaseMissing('users', ['email' => 'tumansiz@example.com']);
+    }
 
     public function test_invest_can_change_another_users_password(): void
     {

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\District;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class UserManagementController extends Controller
@@ -16,7 +18,35 @@ class UserManagementController extends Controller
 
         $users = User::with('district')->orderBy('name')->get();
 
-        return view('users.index', compact('users'));
+        $districts = District::orderBy('name')->get();
+
+        return view('users.index', compact('users', 'districts'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $this->authorizeInvest($request);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'role' => ['required', Rule::in(['invest', 'tuman', 'viloyat_hokimi'])],
+            'district_id' => [
+                Rule::requiredIf(fn () => $request->input('role') === 'tuman'),
+                'nullable',
+                'integer',
+                'exists:districts,id',
+            ],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        if ($validated['role'] !== 'tuman') {
+            $validated['district_id'] = null;
+        }
+
+        $user = User::create($validated + ['is_active' => true]);
+
+        return back()->with('success', $user->name.' foydalanuvchisi qo‘shildi.');
     }
 
     public function updatePassword(Request $request, User $user): RedirectResponse

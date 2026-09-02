@@ -413,6 +413,47 @@ class AuthAndPolicyTest extends TestCase
         $this->assertDatabaseMissing('streets', ['name' => 'Ruxsatsiz']);
     }
 
+    public function test_operator_only_sees_and_manages_requests_they_created(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona']);
+        $owner = User::create(['name' => 'Birinchi operator', 'email' => 'owner@example.com', 'password' => 'secret', 'role' => 'invest']);
+        $other = User::create(['name' => 'Ikkinchi operator', 'email' => 'other@example.com', 'password' => 'secret', 'role' => 'invest']);
+        $ownRequest = $this->registryRequest($district, $owner);
+        $otherRequest = $this->registryRequest($district, $other);
+
+        $this->actingAs($owner)->get(route('requests.index'))
+            ->assertOk()
+            ->assertSee(route('requests.show', $ownRequest))
+            ->assertDontSee(route('requests.show', $otherRequest));
+
+        $this->actingAs($owner)->get(route('requests.show', $otherRequest))->assertForbidden();
+        $this->actingAs($owner)->get(route('requests.edit', $otherRequest))->assertForbidden();
+        $this->actingAs($owner)->delete(route('requests.destroy', $otherRequest))->assertForbidden();
+        $this->actingAs($owner)->patch(route('requests.process-statuses.update', $otherRequest), [
+            'contract_concluded' => '1',
+        ])->assertForbidden();
+    }
+
+    public function test_manager_can_see_creator_column_and_filter_requests_by_employee(): void
+    {
+        $district = District::create(['external_id' => 1, 'name' => 'Farg‘ona']);
+        $manager = User::create(['name' => 'Invest', 'email' => 'invest@tutash.local', 'password' => 'secret', 'role' => 'invest']);
+        $first = User::create(['name' => 'Ali Valiyev', 'email' => 'ali@example.com', 'password' => 'secret', 'role' => 'invest']);
+        $second = User::create(['name' => 'Vali Aliyev', 'email' => 'vali@example.com', 'password' => 'secret', 'role' => 'invest']);
+        $firstRequest = $this->registryRequest($district, $first);
+        $secondRequest = $this->registryRequest($district, $second);
+        $firstRequest->update(['owner_name' => 'Birinchi ariza']);
+        $secondRequest->update(['owner_name' => 'Ikkinchi ariza']);
+
+        $this->actingAs($manager)
+            ->get(route('requests.index', ['created_by' => $first->id]))
+            ->assertOk()
+            ->assertSee('Kiritgan xodim')
+            ->assertSee('Ali Valiyev')
+            ->assertSee('Birinchi ariza')
+            ->assertDontSee('Ikkinchi ariza');
+    }
+
     private function registryRequest(District $district, User $user): RegistryRequest
     {
         $mahalla = Mahalla::firstOrCreate(['district_id' => $district->id, 'name' => 'Markaz']);

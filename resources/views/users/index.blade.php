@@ -7,8 +7,50 @@
 <section class="page-title compact-title">
     <div>
         <h1>Foydalanuvchilar</h1>
-        <p>Parollarni yangilang yoki hisoblarni ma'lumotlarini o'chirmasdan vaqtincha o'chiring.</p>
+        <p>Yangi hisob qo'shing, parollarni yangilang yoki hisoblarni vaqtincha o'chiring.</p>
     </div>
+</section>
+
+<section class="registry-card user-create-card">
+    <div class="section-heading">
+        <div><h2>Yangi foydalanuvchi</h2><p>Foydalanuvchi o'zi kiritgan arizalar uchun javobgar bo'ladi.</p></div>
+    </div>
+    <form method="POST" action="{{ route('users.store') }}" class="form-grid user-create-form">
+        @csrf
+        <label>F.I.Sh.
+            <input name="name" value="{{ old('name') }}" maxlength="255" required>
+            @error('name')<small class="field-error">{{ $message }}</small>@enderror
+        </label>
+        <label>Login (email)
+            <input name="email" type="email" value="{{ old('email') }}" maxlength="255" required>
+            @error('email')<small class="field-error">{{ $message }}</small>@enderror
+        </label>
+        <label>Rol
+            <select name="role" id="new-user-role" required>
+                <option value="tuman" @selected(old('role', 'tuman') === 'tuman')>Tuman operatori</option>
+                <option value="invest" @selected(old('role') === 'invest')>Invest operatori</option>
+                <option value="viloyat_hokimi" @selected(old('role') === 'viloyat_hokimi')>Viloyat hokimi (faqat ko'rish)</option>
+            </select>
+            @error('role')<small class="field-error">{{ $message }}</small>@enderror
+        </label>
+        <label>Tuman
+            <select name="district_id" id="new-user-district">
+                <option value="">Tumanni tanlang</option>
+                @foreach($districts as $district)
+                    <option value="{{ $district->id }}" @selected((string) old('district_id') === (string) $district->id)>{{ $district->name }}</option>
+                @endforeach
+            </select>
+            @error('district_id')<small class="field-error">{{ $message }}</small>@enderror
+        </label>
+        <label>Parol
+            <input name="password" type="password" minlength="8" required>
+            @error('password')<small class="field-error">{{ $message }}</small>@enderror
+        </label>
+        <label>Parolni takrorlang
+            <input name="password_confirmation" type="password" minlength="8" required>
+        </label>
+        <div class="user-create-action"><button class="primary-button" type="submit">Foydalanuvchi qo'shish</button></div>
+    </form>
 </section>
 
 <section class="registry-card user-management-card">

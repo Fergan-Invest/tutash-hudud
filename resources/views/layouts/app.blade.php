@@ -43,7 +43,7 @@
                     <span>Manzillar</span>
                 </a>
                 @if(auth()->user()->canManageUsers())
-                    <a class="nav-link {{ request()->routeIs('users.index', 'users.password.*', 'users.status.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                    <a class="nav-link {{ request()->routeIs('users.index', 'users.store', 'users.password.*', 'users.status.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></svg>
                         <span>Foydalanuvchilar</span>
                     </a>

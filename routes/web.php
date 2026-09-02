@@ -51,6 +51,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::put('/streets/{street}', [StreetController::class, 'update'])->name('streets.update');
     Route::get('/users/online', [UserActivityController::class, 'online'])->name('users.online');
     Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
     Route::patch('/users/{user}/password', [UserManagementController::class, 'updatePassword'])->name('users.password.update');
     Route::patch('/users/{user}/status', [UserManagementController::class, 'updateStatus'])->name('users.status.update');
 });

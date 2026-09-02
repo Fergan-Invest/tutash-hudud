@@ -45,6 +45,12 @@
             <option value="{{ $mahalla->id }}" @selected((string) request('mahalla_id') === (string) $mahalla->id)>{{ $mahalla->name }}</option>
         @endforeach
     </select>
+    <select name="created_by" class="searchable-select" aria-label="Arizani kiritgan xodim">
+        <option value="">Barcha xodimlar</option>
+        @foreach($creators as $creator)
+            <option value="{{ $creator->id }}" @selected((string) request('created_by') === (string) $creator->id)>{{ $creator->name }}</option>
+        @endforeach
+    </select>
     <input name="date_from" type="date" value="{{ request('date_from') }}">
     <input name="date_to" type="date" value="{{ request('date_to') }}">
     <select name="per_page" aria-label="Sahifadagi qatorlar">
@@ -75,7 +81,7 @@
     <section class="panel table-panel registry-card">
         <div class="table-wrap">
             <table class="registry-table">
-                <thead><tr><th>T/r</th><th>Egasi</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Hokimiyatga biriktirilgan kadastr raqami</th><th>Fayllar</th><th>Sana</th><th></th></tr></thead>
+                <thead><tr><th>T/r</th><th>Egasi</th><th>Kiritgan xodim</th><th>Hudud</th><th>Ko‘cha turi</th><th>Kadastr</th><th>Hokimiyatga biriktirilgan kadastr raqami</th><th>Fayllar</th><th>Sana</th><th></th></tr></thead>
                 <tbody>
                 @foreach($requests as $item)
                     @php
@@ -84,6 +90,7 @@
                     <tr class="clickable-row" data-href="{{ route('requests.show', $item) }}" onclick="window.location=this.dataset.href">
                         <td><span class="row-number">{{ $requests->firstItem() + $loop->index }}</span></td>
                         <td>{{ $item->owner_name }}<small>{{ $item->owner_stir_pinfl }}</small></td>
+                        <td><strong>{{ $item->creator?->name ?? '-' }}</strong><small>{{ $item->creator?->email }}</small></td>
                         <td>{{ $item->district->name }}<small>{{ $item->mahalla->name }}, {{ $item->street->name }}</small></td>
                         <td>{{ $streetTypes[$item->street_type] ?? $item->street_type }}</td>
                         <td>{{ $item->building_cadastr_number }}</td>
