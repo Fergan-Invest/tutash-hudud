@@ -22,6 +22,7 @@ class RegistryRequestFormRequest extends FormRequest
     public function rules(): array
     {
         $requestId = $this->route('registryRequest')?->id;
+        $validationOnly = $this->routeIs('requests.validate') && $this->boolean('_validation_only');
         $districtId = (int) $this->input('district_id');
         $mahallaId = (int) $this->input('mahalla_id');
 
@@ -74,7 +75,7 @@ class RegistryRequestFormRequest extends FormRequest
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'polygon_coordinates' => ['required', 'json'],
-            'images' => [$requestId ? 'nullable' : 'required', 'array', $requestId ? 'min:0' : 'min:4'],
+            'images' => [($requestId || $validationOnly) ? 'nullable' : 'required', 'array', ($requestId || $validationOnly) ? 'min:0' : 'min:4'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'act_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'design_code_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],

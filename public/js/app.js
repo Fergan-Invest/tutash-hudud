@@ -204,7 +204,12 @@ function initSessionKeepAlive() {
 
 function saveCurrentFormDraft(form) {
   if (!form) return;
-  saveDraft(form, `request-form-draft:${location.pathname}`);
+  saveDraft(form, requestDraftKey());
+}
+
+function requestDraftKey() {
+  // Versioned so stale drafts created by the old form cannot populate a new request.
+  return `request-form-draft:v2:${location.pathname}`;
 }
 
 function clearStepStorageForCurrentPage() {
@@ -229,6 +234,12 @@ async function validateFormBeforeSubmit(form) {
   try {
     const payload = new FormData(form);
     payload.delete("_method");
+    payload.set("_validation_only", "1");
+    // Files are validated by the final store/update request. Sending them during
+    // preflight doubled uploads and could exceed the web server request limit.
+    for (const key of [...payload.keys()]) {
+      if (payload.get(key) instanceof File) payload.delete(key);
+    }
 
     const response = await fetch(url, {
       method: "POST",
@@ -258,11 +269,42 @@ async function validateFormBeforeSubmit(form) {
       return false;
     }
 
-    showToast("Ma'lumotlarni tekshirishda xatolik yuz berdi. Qayta urinib ko'ring.", "error");
-    return false;
-  } catch {
-    showToast("Internet yoki server bilan aloqa uzildi. Ma'lumotlar yuborilmadi.", "error");
-    return false;
+    let serverMessage = "";
+    try {
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        serverMessage = typeof data.message === "string" ? data.message.trim() : "";
+      }
+    } catch {
+      // The status code below is still useful when a proxy returns invalid JSON.
+    }
+
+    const safeClientMessage = response.status < 500 && serverMessage
+      ? serverMessage
+      : "Server qo'shimcha tekshiruvni bajara olmadi";
+    showToast(`${safeClientMessage} (HTTP ${response.status}). Ariza asosiy tekshiruvga yuboriladi.`, "error");
+    console.error("Request validation preflight failed", {
+      status: response.status,
+      statusText: response.statusText,
+      message: serverMessage,
+      url,
+    });
+
+    // The preflight endpoint is only a convenience for showing validation
+    // errors without leaving the page.  A missing/stale route cache or a
+    // temporary server error here must not block the real form submission;
+    // the store/update action still performs the same server-side validation.
+    clearAjaxValidationSummary();
+    return true;
+  } catch (error) {
+    // Let the browser perform the normal form POST. If connectivity is really
+    // unavailable, the native request will show that failure; if only fetch
+    // was blocked by a proxy/browser, the application can still be saved.
+    showToast("Qo'shimcha tekshiruv serveriga ulanib bo'lmadi. Ariza asosiy tekshiruvga yuboriladi.", "error");
+    console.error("Request validation preflight connection failed", error);
+    clearAjaxValidationSummary();
+    return true;
   }
 }
 
@@ -881,7 +923,7 @@ function initDraftPersistence() {
   const form = document.querySelector(".stepped-form");
   if (!form) return;
 
-  const draftKey = `request-form-draft:${location.pathname}`;
+  const draftKey = requestDraftKey();
   const imageKey = `${draftKey}:images`;
   const draft = readJson(draftKey, {});
 
