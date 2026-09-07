@@ -1,115 +1,113 @@
-Tutash hudud tizimi loginlari
+"Tutash hudud" axborot tizimiga kirish ma'lumotlari
+URL: http://localhost
 
-Umumiy parol: Password123!
-Eslatma: parol .env faylidagi SEED_PASSWORD orqali o'zgartirilishi mumkin.
+Eslatma: quyidagi ma'lumotlar faqat mas'ul xodimlarga yopiq kanal orqali beriladi.
 
-Viloyat hokimiyati:
-1. Login: viloyat.hokimi@tutash.local
+1. Viloyat hokimi
+   Login: viloyat.hokimi@tutash.local
+   Parol: @3224ew1411ADBiQ#@!a
    Rol: viloyat_hokimi
-   Ko'rish huquqi: barcha tuman/shahar mulklari
+   Huquq: barcha hududlarni ko'rish
 
-Invest:
-1. Login: invest@tutash.local
+2. Invest operatori
+   Login: invest@tutash.local
+   Parol: @ew1411ADBiQ#@!a
    Rol: invest
-   Ko'rish huquqi: barcha tuman/shahar mulklari
+   Huquq: barcha hududlar bilan ishlash va foydalanuvchilarni boshqarish
 
-Tuman/shahar loginlari:
-1. Farg'ona shahar
+3. Farg'ona shahar operatori
    Login: district-1@tutash.local
+   Parol: @3456@#gfh#@!a
    Rol: tuman
-   Ko'rish huquqi: faqat Farg'ona shahar mulklari
 
-2. Qo'qon shahar
+4. Qo'qon shahar operatori
    Login: district-2@tutash.local
+   Parol: Tutash-Qoqon#02!26
    Rol: tuman
-   Ko'rish huquqi: faqat Qo'qon shahar mulklari
 
-3. Quvasoy shahar
+5. Quvasoy shahar operatori
    Login: district-3@tutash.local
+   Parol: Tutash-Quvasoy#03!26
    Rol: tuman
-   Ko'rish huquqi: faqat Quvasoy shahar mulklari
 
-4. Marg'ilon shahar
+6. Marg'ilon shahar operatori
    Login: district-4@tutash.local
+   Parol: Tutash-Margilon#04!26
    Rol: tuman
-   Ko'rish huquqi: faqat Marg'ilon shahar mulklari
 
-5. Oltiariq tumani
+7. Oltiariq tumani operatori
    Login: district-5@tutash.local
+   Parol: Tutash-Oltiariq#05!26
    Rol: tuman
-   Ko'rish huquqi: faqat Oltiariq tumani mulklari
 
-6. Bog'dod tumani
+8. Bog'dod tumani operatori
    Login: district-6@tutash.local
+   Parol: Tutash-Bogdod#06!26
    Rol: tuman
-   Ko'rish huquqi: faqat Bog'dod tumani mulklari
 
-7. Buvayda tumani
+9. Buvayda tumani operatori
    Login: district-7@tutash.local
+   Parol: Tutash-Buvayda#07!26
    Rol: tuman
-   Ko'rish huquqi: faqat Buvayda tumani mulklari
 
-8. Beshariq tumani
-   Login: district-8@tutash.local
-   Rol: tuman
-   Ko'rish huquqi: faqat Beshariq tumani mulklari
+10. Beshariq tumani operatori
+    Login: district-8@tutash.local
+    Parol: Tutash-Beshariq#08!26
+    Rol: tuman
 
-9. Quva tumani
-   Login: district-9@tutash.local
-   Rol: tuman
-   Ko'rish huquqi: faqat Quva tumani mulklari
+11. Quva tumani operatori
+    Login: district-9@tutash.local
+    Parol: Tutash-Quva#09!26
+    Rol: tuman
 
-10. Uchko'prik tumani
+12. Uchko'prik tumani operatori
     Login: district-10@tutash.local
+    Parol: Tutash-Uchkoprik#10!26
     Rol: tuman
-    Ko'rish huquqi: faqat Uchko'prik tumani mulklari
 
-11. Rishton tumani
+13. Rishton tumani operatori
     Login: district-11@tutash.local
+    Parol: Tutash-Rishton#11!26
     Rol: tuman
-    Ko'rish huquqi: faqat Rishton tumani mulklari
 
-12. So'x tumani
+14. So'x tumani operatori
     Login: district-12@tutash.local
+    Parol: Tutash-Sox#12!26
     Rol: tuman
-    Ko'rish huquqi: faqat So'x tumani mulklari
 
-13. Toshloq tumani
+15. Toshloq tumani operatori
     Login: district-13@tutash.local
+    Parol: Tutash-Toshloq#13!26
     Rol: tuman
-    Ko'rish huquqi: faqat Toshloq tumani mulklari
 
-14. O'zbekiston tumani
+16. O'zbekiston tumani operatori
     Login: district-14@tutash.local
+    Parol: Tutash-Uzbekiston#14!26
     Rol: tuman
-    Ko'rish huquqi: faqat O'zbekiston tumani mulklari
 
-15. Farg'ona tumani
+17. Farg'ona tumani operatori
     Login: district-15@tutash.local
+    Parol: Tutash-Fargona#15!26
     Rol: tuman
-    Ko'rish huquqi: faqat Farg'ona tumani mulklari
 
-16. Dang'ara tumani
+18. Dang'ara tumani operatori
     Login: district-16@tutash.local
+    Parol: Tutash-Dangara#16!26
     Rol: tuman
-    Ko'rish huquqi: faqat Dang'ara tumani mulklari
 
-17. Furqat tumani
+19. Furqat tumani operatori
     Login: district-17@tutash.local
+    Parol: Tutash-Furqat#17!26
     Rol: tuman
-    Ko'rish huquqi: faqat Furqat tumani mulklari
 
-18. Yozyovon tumani
+20. Yozyovon tumani operatori
     Login: district-18@tutash.local
+    Parol: Tutash-Yozyovon#18!26
     Rol: tuman
-    Ko'rish huquqi: faqat Yozyovon tumani mulklari
 
-19. Qo'shtepa tumani
+21. Qo'shtepa tumani operatori
     Login: district-19@tutash.local
+    Parol: Tutash-Qoshtepa#19!26
     Rol: tuman
-    Ko'rish huquqi: faqat Qo'shtepa tumani mulklari
 
-Jami: 21 ta login
-- 19 ta tuman/shahar logini
-- 1 ta invest logini
-- 1 ta viloyat hokimiyati logini
+Jami: 21 ta login (1 ta viloyat hokimi, 1 ta invest, 19 ta tuman/shahar operatori).
