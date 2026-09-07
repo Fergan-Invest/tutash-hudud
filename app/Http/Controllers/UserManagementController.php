@@ -52,7 +52,6 @@ class UserManagementController extends Controller
     public function updatePassword(Request $request, User $user): RedirectResponse
     {
         $this->authorizeInvest($request);
-        $this->preventSelfManagement($request, $user);
 
         $validated = $request->validate([
             'password' => ['required', 'string', 'min:8', 'confirmed'],

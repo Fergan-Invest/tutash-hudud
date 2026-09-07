@@ -83,9 +83,6 @@
                         <td><strong>{{ $user->name }}</strong><small>{{ $user->email }}</small></td>
                         <td>{{ str_replace('_', ' ', $user->role) }}<small>{{ $user->district?->name ?? 'Barcha hududlar' }}</small></td>
                         <td><span class="status {{ $user->is_active ? 'approved' : 'rejected' }}">{{ $user->is_active ? 'Faol' : 'O‘chirilgan' }}</span></td>
-                        @if(auth()->user()->is($user))
-                            <td colspan="2"><small>Joriy Invest hisobi bu sahifadan o'zgartirilmaydi.</small></td>
-                        @else
                             <td>
                                 <form class="user-password-form" method="POST" action="{{ route('users.password.update', $user) }}">
                                     @csrf @method('PATCH')
@@ -94,6 +91,9 @@
                                     <button class="secondary-button" type="submit">Yangilash</button>
                                 </form>
                             </td>
+                        @if(auth()->user()->is($user))
+                            <td><small>Joriy hisob</small></td>
+                        @else
                             <td>
                                 <form method="POST" action="{{ route('users.status.update', $user) }}">
                                     @csrf @method('PATCH')

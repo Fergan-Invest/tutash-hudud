@@ -71,6 +71,57 @@ class UserManagementTest extends TestCase
         $this->assertTrue(Hash::check('NewPassword123!', $user->fresh()->password));
     }
 
+    public function test_invest_can_change_own_password_and_login_with_it(): void
+    {
+        $invest = User::factory()->create(['role' => 'invest', 'email' => 'invest@tutash.local']);
+
+        $this->actingAs($invest)->get(route('users.index'))
+            ->assertOk()
+            ->assertSee('action="'.route('users.password.update', $invest).'"', false);
+
+        $this->from(route('users.index'))->patch(route('users.password.update', $invest), [
+            'password' => 'NewPassword123!',
+            'password_confirmation' => 'NewPassword123!',
+        ])->assertRedirect(route('users.index'))->assertSessionHas('success');
+
+        $this->assertTrue(Hash::check('NewPassword123!', $invest->fresh()->password));
+        $this->post(route('logout'));
+        $this->post(route('login.store'), [
+            'email' => $invest->email,
+            'password' => 'NewPassword123!',
+        ])->assertSessionHasNoErrors();
+        $this->assertAuthenticatedAs($invest);
+    }
+
+    public function test_own_password_change_requires_a_valid_confirmed_password(): void
+    {
+        $invest = User::factory()->create(['role' => 'invest', 'email' => 'invest@tutash.local']);
+        $originalPassword = $invest->password;
+
+        foreach ([['short', 'short'], ['NewPassword123!', 'DifferentPassword123!']] as [$password, $confirmation]) {
+            $this->actingAs($invest)->from(route('users.index'))->patch(route('users.password.update', $invest), [
+                'password' => $password,
+                'password_confirmation' => $confirmation,
+            ])->assertRedirect(route('users.index'))->assertSessionHasErrors('password');
+
+            $this->assertSame($originalPassword, $invest->fresh()->password);
+        }
+    }
+
+    public function test_other_invest_accounts_cannot_change_the_manager_password(): void
+    {
+        $invest = User::factory()->create(['role' => 'invest', 'email' => 'invest@tutash.local']);
+        $operator = User::factory()->create(['role' => 'invest']);
+        $originalPassword = $invest->password;
+
+        $this->actingAs($operator)->patch(route('users.password.update', $invest), [
+            'password' => 'NewPassword123!',
+            'password_confirmation' => 'NewPassword123!',
+        ])->assertForbidden();
+
+        $this->assertSame($originalPassword, $invest->fresh()->password);
+    }
+
     public function test_invest_can_disable_and_reenable_another_user(): void
     {
         $invest = User::factory()->create(['role' => 'invest', 'email' => 'invest@tutash.local']);
